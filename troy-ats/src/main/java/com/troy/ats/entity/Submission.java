@@ -1,37 +1,21 @@
-﻿package com.troy.ats.entity;
+package com.troy.ats.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.troy.ats.enums.PipelineStage;
 import jakarta.persistence.*;
 import lombok.*;
-
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
 
-/**
- * Submission entity for Troy ATS
- */
 @Entity
-@Table(name = "submissions", uniqueConstraints = {
-    @UniqueConstraint(name = "uk_submissions_candidate_job", columnNames = {"candidate_id", "job_id"})
-}, indexes = {
-    @Index(name = "idx_submissions_candidate_id", columnList = "candidate_id"),
-    @Index(name = "idx_submissions_job_id", columnList = "job_id"),
-    @Index(name = "idx_submissions_stage", columnList = "pipeline_stage")
-})
+@Table(name = "submissions")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class Submission {
-
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", updatable = false, nullable = false)
-    private UUID id;
+    private Long id;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "candidate_id", nullable = false)
@@ -72,14 +56,6 @@ public class Submission {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
-    @OneToOne(mappedBy = "submission", fetch = FetchType.LAZY)
-    @JsonBackReference
-    private Offer offer;
-
-    @OneToMany(mappedBy = "submission", fetch = FetchType.LAZY)
-    @JsonBackReference
-    private Set<Interview> interviews = new HashSet<>();
-
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
@@ -91,3 +67,4 @@ public class Submission {
         this.updatedAt = LocalDateTime.now();
     }
 }
+

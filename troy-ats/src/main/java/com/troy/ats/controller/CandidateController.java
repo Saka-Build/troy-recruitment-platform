@@ -1,25 +1,25 @@
-﻿package com.troy.ats.controller;
-
+package com.troy.ats.controller;
 import com.troy.ats.entity.Candidate;
 import com.troy.ats.service.CandidateService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/candidates")
-@RequiredArgsConstructor
 public class CandidateController {
 
     private final CandidateService candidateService;
 
+    public CandidateController(CandidateService candidateService) {
+        this.candidateService = candidateService;
+    }
+
     @GetMapping
-    public ResponseEntity<Page<Candidate>> getAllCandidates(Pageable pageable) {
-        return ResponseEntity.ok(candidateService.getAllCandidates(pageable));
+    public List<Candidate> getAllCandidates() {
+        return candidateService.getAllCandidates();
     }
 
     @GetMapping("/{id}")
@@ -29,11 +29,21 @@ public class CandidateController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @GetMapping("/cv/{cvId}")
-    public ResponseEntity<Candidate> getCandidateByCvId(@PathVariable String cvId) {
-        return candidateService.getCandidateByCvId(cvId)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    @PostMapping
+    public Candidate createCandidate(@RequestBody Candidate candidate) {
+        return candidateService.createCandidate(candidate);
+    }
+
+    @PutMapping("/{id}")
+    public Candidate updateCandidate(
+            @PathVariable UUID id,
+            @RequestBody Candidate candidate
+    ) {
+        return candidateService.updateCandidate(id, candidate);
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteCandidate(@PathVariable UUID id) {
+        candidateService.deleteCandidate(id);
     }
 }
-

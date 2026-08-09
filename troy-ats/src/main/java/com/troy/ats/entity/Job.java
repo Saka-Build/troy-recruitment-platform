@@ -1,40 +1,25 @@
-﻿package com.troy.ats.entity;
+package com.troy.ats.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.troy.ats.enums.JobStatus;
 import com.troy.ats.enums.JobType;
 import com.troy.ats.enums.JobWorkMode;
 import jakarta.persistence.*;
 import lombok.*;
-
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.UUID;
 
-/**
- * Job/Role entity for Troy ATS
- */
 @Entity
-@Table(name = "jobs", indexes = {
-    @Index(name = "idx_jobs_client_id", columnList = "client_id"),
-    @Index(name = "idx_jobs_status", columnList = "status"),
-    @Index(name = "idx_jobs_priority", columnList = "priority"),
-    @Index(name = "idx_jobs_skills_gin", columnList = "skills_required", columnDefinition = "text[]"),
-    @Index(name = "idx_jobs_created_at", columnList = "created_at DESC"),
-    @Index(name = "idx_jobs_is_template", columnList = "is_template")
-})
+@Table(name = "jobs")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class Job {
-
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", updatable = false, nullable = false)
-    private UUID id;
+    private Long id;
 
     @Column(name = "title", nullable = false, length = 255)
     private String title;
@@ -118,30 +103,6 @@ public class Job {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "created_by")
-    private Employee createdBy;
-
-    @OneToMany(mappedBy = "job", fetch = FetchType.LAZY)
-    @JsonBackReference
-    private Set<Submission> submissions = new HashSet<>();
-
-    @OneToMany(mappedBy = "job", fetch = FetchType.LAZY)
-    @JsonBackReference
-    private Set<Interview> interviews = new HashSet<>();
-
-    @OneToMany(mappedBy = "job", fetch = FetchType.LAZY)
-    @JsonBackReference
-    private Set<Offer> offers = new HashSet<>();
-
-    @OneToMany(mappedBy = "job", fetch = FetchType.LAZY)
-    @JsonBackReference
-    private Set<Onboarding> onboardingRecords = new HashSet<>();
-
-    @OneToMany(mappedBy = "job", fetch = FetchType.LAZY)
-    @JsonBackReference
-    private Set<AiReview> aiReviews = new HashSet<>();
-
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
@@ -153,3 +114,4 @@ public class Job {
         this.updatedAt = LocalDateTime.now();
     }
 }
+

@@ -1,26 +1,26 @@
-﻿package com.troy.ats.entity;
+package com.troy.ats.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.troy.ats.enums.OfferStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
-/**
- * Offer entity for Troy ATS
- */
 @Entity
-@Table(name = "offers", indexes = {
-    @Index(name = "idx_offers_candidate_id", columnList = "candidate_id"),
-    @Index(name = "idx_offers_job_id", columnList = "job_id"),
-    @Index(name = "idx_offers_status", columnList = "offer_status")
-})
-@Data
+@Table(
+        name = "offers",
+        indexes = {
+                @Index(name = "idx_offer_candidate", columnList = "candidate_id"),
+                @Index(name = "idx_offer_job", columnList = "job_id"),
+                @Index(name = "idx_offer_status", columnList = "offer_status"),
+                @Index(name = "idx_offer_created_by", columnList = "created_by")
+        }
+)
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -28,23 +28,50 @@ public class Offer {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "id", updatable = false, nullable = false)
+    @Column(name = "id", nullable = false, updatable = false)
     private UUID id;
 
-    @OneToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "submission_id", nullable = false, unique = true)
+    /*
+     * One submission can have only one offer
+     * because submission_id is UNIQUE in database.
+     */
+    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(
+            name = "submission_id",
+            nullable = false,
+            unique = true,
+            foreignKey = @ForeignKey(name = "fk_offer_submission")
+    )
     private Submission submission;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "candidate_id", nullable = false)
+    /*
+     * Candidate receiving the offer
+     */
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(
+            name = "candidate_id",
+            nullable = false,
+            foreignKey = @ForeignKey(name = "fk_offer_candidate")
+    )
     private Candidate candidate;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "job_id", nullable = false)
+    /*
+     * Job for which offer is being made
+     */
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(
+            name = "job_id",
+            nullable = false,
+            foreignKey = @ForeignKey(name = "fk_offer_job")
+    )
     private Job job;
 
-    @Column(name = "offered_salary", precision = 14, scale = 2)
-    private Double offeredSalary;
+    @Column(
+            name = "offered_salary",
+            precision = 14,
+            scale = 2
+    )
+    private BigDecimal offeredSalary;
 
     @Column(name = "salary_currency", length = 3)
     private String salaryCurrency;
@@ -53,49 +80,72 @@ public class Offer {
     private LocalDate joiningDate;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "offer_status", nullable = false)
+    @Column(
+            name = "offer_status",
+            nullable = false
+    )
     private OfferStatus offerStatus;
 
-    @Column(name = "offer_letter_url")
+    @Column(name = "offer_letter_url", columnDefinition = "text")
     private String offerLetterUrl;
 
     @Column(name = "released_at")
-    private LocalDateTime releasedAt;
+    private OffsetDateTime releasedAt;
 
     @Column(name = "accepted_at")
-    private LocalDateTime acceptedAt;
+    private OffsetDateTime acceptedAt;
 
     @Column(name = "declined_at")
-    private LocalDateTime declinedAt;
+    private OffsetDateTime declinedAt;
 
-    @Column(name = "decline_reason", columnDefinition = "TEXT")
+    @Column(name = "decline_reason", columnDefinition = "text")
     private String declineReason;
 
-    @Column(name = "notes", columnDefinition = "TEXT")
+    @Column(name = "notes", columnDefinition = "text")
     private String notes;
 
+    /*
+     * Employee who created the offer
+     */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "created_by")
+    @JoinColumn(
+            name = "created_by",
+            foreignKey = @ForeignKey(name = "fk_offer_created_by")
+    )
     private Employee createdBy;
 
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
+    @Column(
+            name = "created_at",
+            nullable = false,
+            updatable = false
+    )
+    private OffsetDateTime createdAt;
 
-    @Column(name = "updated_at", nullable = false)
-    private LocalDateTime updatedAt;
-
-    @OneToOne(mappedBy = "offer", fetch = FetchType.LAZY)
-    @JsonBackReference
-    private Onboarding onboarding;
+    @Column(
+            name = "updated_at",
+            nullable = false
+    )
+    private OffsetDateTime updatedAt;
 
     @PrePersist
     protected void onCreate() {
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
+
+        OffsetDateTime now = OffsetDateTime.now();
+
+        createdAt = now;
+        updatedAt = now;
+
+        if (salaryCurrency == null) {
+            salaryCurrency = "USD";
+        }
+
+        if (offerStatus == null) {
+            offerStatus = OfferStatus.PENDING;
+        }
     }
 
     @PreUpdate
     protected void onUpdate() {
-        this.updatedAt = LocalDateTime.now();
+        updatedAt = OffsetDateTime.now();
     }
 }

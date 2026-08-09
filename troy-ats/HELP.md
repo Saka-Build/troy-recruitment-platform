@@ -1,4 +1,36 @@
 # Getting Started
+This project is a Spring Boot application that uses Maven as its build tool. It includes various dependencies for web development, data access, security, and more.
+
+## Prerequisites
+Before you begin, ensure you have the following installed:
+
+- Java Development Kit (JDK) 17 or higher
+- Apache Maven 3.6.0 or higher
+- A suitable IDE (e.g., IntelliJ IDEA, Eclipse)
+
+## Building the Project
+To build the project, run the following command in the root directory of the project:
+
+```bash
+mvn clean install
+```
+
+This command will compile the code, run tests, and package the application into a JAR file.
+
+## Running the Application
+You can run the application using the following Maven command:
+
+```bash
+mvn spring-boot:run
+```
+
+Alternatively, you can run the packaged JAR file:
+
+```bash
+java -jar target/troy-ats-0.0.1-SNAPSHOT.jar
+```
+
+The application will start on the default port 8080. You can access it at `http://localhost:8080`.
 
 ### Reference Documentation
 For further reference, please consider the following sections:

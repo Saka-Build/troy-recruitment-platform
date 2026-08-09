@@ -1,23 +1,23 @@
-﻿package com.troy.ats.entity;
+package com.troy.ats.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
-/**
- * Sub-Status entity for Troy ATS
- */
 @Entity
-@Table(name = "sub_statuses", uniqueConstraints = {
-    @UniqueConstraint(name = "uk_sub_statuses_status_name", columnNames = {"status_id", "name"})
-}, indexes = {
-    @Index(name = "idx_sub_statuses_status_id", columnList = "status_id")
-})
-@Data
+@Table(
+        name = "sub_statuses",
+        uniqueConstraints = {
+                @UniqueConstraint(
+                        name = "uk_sub_status_status_name",
+                        columnNames = {"status_id", "name"}
+                )
+        }
+)
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -25,11 +25,15 @@ public class SubStatus {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "id", updatable = false, nullable = false)
+    @Column(name = "id", nullable = false, updatable = false)
     private UUID id;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "status_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(
+            name = "status_id",
+            nullable = false,
+            foreignKey = @ForeignKey(name = "fk_sub_status_status")
+    )
     private Status status;
 
     @Column(name = "name", nullable = false, length = 100)
@@ -39,22 +43,24 @@ public class SubStatus {
     private String colourHex;
 
     @Column(name = "sort_order", nullable = false)
-    private Short sortOrder;
+    private Short sortOrder = 0;
 
     @Column(name = "is_active", nullable = false)
-    private Boolean isActive = true;
+    private Boolean active = true;
 
-    @Column(name = "created_at", nullable = false)
-    private LocalDateTime createdAt;
-
-    @OneToMany(mappedBy = "subStatus", fetch = FetchType.LAZY)
-    private Set<Candidate> candidatesWithSubStatus = new HashSet<>();
-
-    @OneToMany(mappedBy = "subStatus", fetch = FetchType.LAZY)
-    private Set<Submission> submissionsWithSubStatus = new HashSet<>();
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private OffsetDateTime createdAt;
 
     @PrePersist
     protected void onCreate() {
-        this.createdAt = LocalDateTime.now();
+        createdAt = OffsetDateTime.now();
+
+        if (sortOrder == null) {
+            sortOrder = 0;
+        }
+
+        if (active == null) {
+            active = true;
+        }
     }
 }

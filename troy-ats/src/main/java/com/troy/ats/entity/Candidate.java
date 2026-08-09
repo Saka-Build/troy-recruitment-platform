@@ -1,30 +1,25 @@
-﻿package com.troy.ats.entity;
+package com.troy.ats.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.troy.ats.enums.CvFormat;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
+import java.math.BigDecimal;
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
-/**
- * Candidate entity for Troy ATS
- */
 @Entity
-@Table(name = "candidates", indexes = {
-    @Index(name = "idx_candidates_skills_gin", columnList = "skills", columnDefinition = "text[]"),
-    @Index(name = "idx_candidates_full_name", columnList = "full_name"),
-    @Index(name = "idx_candidates_status_id", columnList = "status_id"),
-    @Index(name = "idx_candidates_cv_owner_id", columnList = "cv_owner_id"),
-    @Index(name = "idx_candidates_location", columnList = "location"),
-    @Index(name = "idx_candidates_created_at", columnList = "created_at DESC"),
-    @Index(name = "idx_candidates_is_active", columnList = "is_active")
-})
-@Data
+@Table(
+        name = "candidates",
+        indexes = {
+                @Index(name = "idx_candidates_email", columnList = "email"),
+                @Index(name = "idx_candidates_cv_owner", columnList = "cv_owner_id"),
+                @Index(name = "idx_candidates_status", columnList = "status_id"),
+                @Index(name = "idx_candidates_sub_status", columnList = "sub_status_id")
+        }
+)
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -32,7 +27,7 @@ public class Candidate {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "id", updatable = false, nullable = false)
+    @Column(name = "id", nullable = false, updatable = false)
     private UUID id;
 
     @Column(name = "cv_id", nullable = false, unique = true, length = 50)
@@ -62,77 +57,78 @@ public class Candidate {
     @Column(name = "current_employer", length = 255)
     private String currentEmployer;
 
-    @Column(name = "experience_years", precision = 4)
-    private Double experienceYears;
+    @Column(name = "experience_years", precision = 4, scale = 1)
+    private BigDecimal experienceYears;
 
     @Column(name = "notice_period_days")
-    private Integer noticePeriodDays;
+    private Short noticePeriodDays;
 
     @Column(name = "current_salary", precision = 14, scale = 2)
-    private Double currentSalary;
+    private BigDecimal currentSalary;
 
     @Column(name = "expected_salary", precision = 14, scale = 2)
-    private Double expectedSalary;
+    private BigDecimal expectedSalary;
 
     @Column(name = "salary_currency", length = 3)
     private String salaryCurrency;
 
-    @ElementCollection
-    @CollectionTable(name = "candidate_skills", joinColumns = @JoinColumn(name = "candidate_id"))
-    @Column(name = "skill", length = 100)
-    private Set<String> skills = new HashSet<>();
+    @Column(name = "skills", columnDefinition = "text[]")
+    private String[] skills;
 
-    @Column(name = "education", columnDefinition = "TEXT")
+    @Column(name = "education", columnDefinition = "text")
     private String education;
 
     @Column(name = "visa_status", length = 100)
     private String visaStatus;
 
-    @Column(name = "linkedin_url")
+    @Column(name = "linkedin_url", columnDefinition = "text")
     private String linkedinUrl;
 
     @Column(name = "source", length = 100)
     private String source;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    // Status
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "status_id")
     private Status status;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sub_status_id")
     private SubStatus subStatus;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    // Ownership
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "cv_owner_id", nullable = false)
     private Employee cvOwner;
 
     @Column(name = "referred_by", length = 255)
     private String referredBy;
 
-    @Column(name = "reference_note", columnDefinition = "TEXT")
+    @Column(name = "reference_note", columnDefinition = "text")
     private String referenceNote;
 
-    @Column(name = "original_cv_url")
+    // CV files
+    @Column(name = "original_cv_url", columnDefinition = "text")
     private String originalCvUrl;
 
-    @Enumerated(EnumType.STRING)
     @Column(name = "original_cv_format")
+    @Enumerated(EnumType.STRING)
     private CvFormat originalCvFormat;
 
-    @Column(name = "troy_cv_url")
+    @Column(name = "troy_cv_url", columnDefinition = "text")
     private String troyCvUrl;
 
-    @Column(name = "troy_cv_pdf_url")
+    @Column(name = "troy_cv_pdf_url", columnDefinition = "text")
     private String troyCvPdfUrl;
 
     @Column(name = "is_active", nullable = false)
-    private Boolean isActive = true;
+    private Boolean active = true;
 
     @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
+    private OffsetDateTime createdAt;
 
     @Column(name = "updated_at", nullable = false)
-    private LocalDateTime updatedAt;
+    private OffsetDateTime updatedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by")
@@ -142,29 +138,23 @@ public class Candidate {
     @JoinColumn(name = "updated_by")
     private Employee updatedBy;
 
-    @OneToMany(mappedBy = "candidate", fetch = FetchType.LAZY)
-    private Set<Submission> submissions = new HashSet<>();
-
-    @OneToMany(mappedBy = "candidate", fetch = FetchType.LAZY)
-    private Set<Interview> interviews = new HashSet<>();
-
-    @OneToMany(mappedBy = "candidate", fetch = FetchType.LAZY)
-    private Set<Offer> offers = new HashSet<>();
-
-    @OneToMany(mappedBy = "candidate", fetch = FetchType.LAZY)
-    private Set<Onboarding> onboardingRecords = new HashSet<>();
-
-    @OneToMany(mappedBy = "candidate", fetch = FetchType.LAZY)
-    private Set<AiReview> aiReviews = new HashSet<>();
-
     @PrePersist
     protected void onCreate() {
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
+        OffsetDateTime now = OffsetDateTime.now();
+        createdAt = now;
+        updatedAt = now;
+
+        if (active == null) {
+            active = true;
+        }
+
+        if (salaryCurrency == null) {
+            salaryCurrency = "USD";
+        }
     }
 
     @PreUpdate
     protected void onUpdate() {
-        this.updatedAt = LocalDateTime.now();
+        updatedAt = OffsetDateTime.now();
     }
 }

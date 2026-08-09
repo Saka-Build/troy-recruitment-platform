@@ -1,25 +1,25 @@
-﻿package com.troy.ats.controller;
+package com.troy.ats.controller;
 
 import com.troy.ats.entity.Client;
 import com.troy.ats.service.ClientService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/clients")
-@RequiredArgsConstructor
 public class ClientController {
 
     private final ClientService clientService;
 
+    public ClientController(ClientService clientService) {
+        this.clientService = clientService;
+    }
+
     @GetMapping
-    public ResponseEntity<List<Client>> getAllClients() {
-        return ResponseEntity.ok(clientService.getAllClients());
+    public List<Client> getAllClients() {
+        return clientService.getAllClients();
     }
 
     @GetMapping("/{id}")
@@ -30,21 +30,18 @@ public class ClientController {
     }
 
     @PostMapping
-    public ResponseEntity<Client> createClient(@RequestBody Client client) {
-        Client savedClient = clientService.createClient(client);
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedClient);
+    public Client createClient(@RequestBody Client client) {
+        return clientService.createClient(client);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Client> updateClient(@PathVariable UUID id, @RequestBody Client client) {
-        Client updatedClient = clientService.updateClient(id, client);
-        return ResponseEntity.ok(updatedClient);
+    public Client updateClient(@PathVariable UUID id, @RequestBody Client client) {
+       // client.setId(id);
+        return clientService.updateClient(id, client);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteClient(@PathVariable UUID id) {
+    public void deleteClient(@PathVariable UUID id) {
         clientService.deleteClient(id);
-        return ResponseEntity.noContent().build();
     }
 }
-

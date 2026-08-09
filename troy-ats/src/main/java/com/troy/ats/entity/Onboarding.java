@@ -1,23 +1,15 @@
-﻿package com.troy.ats.entity;
+package com.troy.ats.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
-/**
- * Onboarding entity for Troy ATS
- */
 @Entity
-@Table(name = "onboarding", indexes = {
-    @Index(name = "idx_onboarding_candidate_id", columnList = "candidate_id"),
-    @Index(name = "idx_onboarding_onboarded_at", columnList = "onboarded_at")
-})
-@Data
+@Table(name = "onboarding")
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -25,54 +17,75 @@ public class Onboarding {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "id", updatable = false, nullable = false)
+    @Column(name = "id", nullable = false, updatable = false)
     private UUID id;
 
-    @OneToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "offer_id", nullable = false, unique = true)
+    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(
+            name = "offer_id",
+            nullable = false,
+            unique = true,
+            foreignKey = @ForeignKey(name = "fk_onboarding_offer")
+    )
     private Offer offer;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "candidate_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(
+            name = "candidate_id",
+            nullable = false,
+            foreignKey = @ForeignKey(name = "fk_onboarding_candidate")
+    )
     private Candidate candidate;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "job_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(
+            name = "job_id",
+            nullable = false,
+            foreignKey = @ForeignKey(name = "fk_onboarding_job")
+    )
     private Job job;
 
     @Column(name = "joining_confirmed_at")
-    private LocalDateTime joiningConfirmedAt;
+    private OffsetDateTime joiningConfirmedAt;
 
     @Column(name = "security_clearance_at")
-    private LocalDateTime securityClearanceAt;
+    private OffsetDateTime securityClearanceAt;
 
     @Column(name = "onboarding_started_at")
-    private LocalDateTime onboardingStartedAt;
+    private OffsetDateTime onboardingStartedAt;
 
+    /**
+     * When this is set, the candidate is considered placed/onboarded.
+     */
     @Column(name = "onboarded_at")
-    private LocalDateTime onboardedAt;
+    private OffsetDateTime onboardedAt;
 
-    @Column(name = "notes", columnDefinition = "TEXT")
+    @Column(name = "notes")
     private String notes;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "managed_by")
+    @JoinColumn(
+            name = "managed_by",
+            foreignKey = @ForeignKey(name = "fk_onboarding_managed_by")
+    )
     private Employee managedBy;
 
     @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
+    private OffsetDateTime createdAt;
 
     @Column(name = "updated_at", nullable = false)
-    private LocalDateTime updatedAt;
+    private OffsetDateTime updatedAt;
 
     @PrePersist
     protected void onCreate() {
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
+        OffsetDateTime now = OffsetDateTime.now();
+
+        createdAt = now;
+        updatedAt = now;
     }
 
     @PreUpdate
     protected void onUpdate() {
-        this.updatedAt = LocalDateTime.now();
+        updatedAt = OffsetDateTime.now();
     }
 }

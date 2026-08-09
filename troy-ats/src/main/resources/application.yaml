@@ -4,8 +4,8 @@ spring:
 
   datasource:
     url: jdbc:postgresql://localhost:5432/troy_ats
-    username: postgres
-    password: postgres
+    username: ats_admin
+    password: TroyAts_&1947
     driver-class-name: org.postgresql.Driver
 
   jpa:

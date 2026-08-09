@@ -1,29 +1,17 @@
-﻿package com.troy.ats.entity;
+package com.troy.ats.entity;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
-
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.UUID;
 
-/**
- * Client entity for Troy ATS
- */
 @Entity
-@Table(name = "clients", indexes = {
-    @Index(name = "idx_clients_name", columnList = "name"),
-    @Index(name = "idx_clients_status", columnList = "status"),
-    @Index(name = "idx_clients_country", columnList = "country")
-})
+@Table(name = "clients")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class Client {
-
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id", updatable = false, nullable = false)
@@ -65,11 +53,6 @@ public class Client {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "created_by")
-    @JsonManagedReference
-    private Employee createdBy;
-
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
@@ -81,3 +64,4 @@ public class Client {
         this.updatedAt = LocalDateTime.now();
     }
 }
+
