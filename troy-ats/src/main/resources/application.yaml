@@ -22,7 +22,7 @@
 
   security:
     user:
-      name: admin
+      name: sakaadmin
       password: admin123
 
 server:
