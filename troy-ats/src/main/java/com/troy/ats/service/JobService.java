@@ -49,5 +49,10 @@ public class JobService {
     public void deleteJob(UUID id) {
         jobRepository.deleteById(id);
     }
+
+    @Transactional(readOnly = true)
+    public List<Job> getJobsByClientId(UUID clientId) {
+        return jobRepository.findByClientId(clientId);
+    }
 }
 
