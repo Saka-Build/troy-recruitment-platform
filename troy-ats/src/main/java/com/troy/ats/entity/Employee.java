@@ -3,6 +3,9 @@ package com.troy.ats.entity;
 import com.troy.ats.enums.UserRole;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -43,6 +46,7 @@ public class Employee {
     private String photoUrl;
 
     @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Column(name = "role", nullable = false)
     private UserRole role;
 
@@ -71,5 +75,7 @@ public class Employee {
     protected void onUpdate() {
         this.updatedAt = LocalDateTime.now();
     }
+
+
 }
 
