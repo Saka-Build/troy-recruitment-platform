@@ -16,6 +16,7 @@ TO ats_admin;
 Run the below command to create tables in DB.
 /db/troy_ats.sql
 
+#Update application.yml file with details of DB, username and password.
 #Swagger API Documentation
 http://localhost:8080/swagger-ui/index.htm
 
