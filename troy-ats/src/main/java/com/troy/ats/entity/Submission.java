@@ -4,6 +4,7 @@ import com.troy.ats.enums.PipelineStage;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
 @Table(name = "submissions")
@@ -13,9 +14,9 @@ import java.time.LocalDateTime;
 @Builder
 public class Submission {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id", updatable = false, nullable = false)
-    private Long id;
+    private UUID id;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "candidate_id", nullable = false)

@@ -4,6 +4,7 @@ import com.troy.ats.enums.UserRole;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
 @Table(name = "employees")
@@ -13,9 +14,9 @@ import java.time.LocalDateTime;
 @Builder
 public class Employee {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id", updatable = false, nullable = false)
-    private Long id;
+    private UUID id;
 
     @Column(name = "employee_code", nullable = false, unique = true, length = 50)
     private String employeeCode;

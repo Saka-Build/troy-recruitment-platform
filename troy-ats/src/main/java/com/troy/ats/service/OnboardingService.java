@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class OnboardingService {
@@ -20,7 +21,7 @@ public class OnboardingService {
         return onboardingRepository.findAll();
     }
 
-    public Optional<Onboarding> getOnboardingById(Long id) {
+    public Optional<Onboarding> getOnboardingById(UUID id) {
         return onboardingRepository.findById(id);
     }
 
@@ -28,7 +29,7 @@ public class OnboardingService {
         return onboardingRepository.save(onboarding);
     }
 
-    public void deleteOnboarding(Long id) {
+    public void deleteOnboarding(UUID id) {
         onboardingRepository.deleteById(id);
     }
 }

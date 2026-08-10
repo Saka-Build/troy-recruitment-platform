@@ -5,9 +5,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 
 public interface InterviewRepository extends JpaRepository<Interview, Long> {
-    List<Interview> findByCandidateId(Long candidateId);
-    List<Interview> findByJobId(Long jobId);
+    List<Interview> findByCandidateId(UUID candidateId);
+    List<Interview> findByJobId(UUID jobId);
     List<Interview> findByInterviewDate(LocalDate date);
 }

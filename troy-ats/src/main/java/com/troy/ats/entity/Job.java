@@ -3,11 +3,15 @@ package com.troy.ats.entity;
 import com.troy.ats.enums.JobStatus;
 import com.troy.ats.enums.JobType;
 import com.troy.ats.enums.JobWorkMode;
+import com.troy.ats.enums.Skill;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 @Entity
 @Table(name = "jobs")
@@ -17,9 +21,9 @@ import java.util.Set;
 @Builder
 public class Job {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id", updatable = false, nullable = false)
-    private Long id;
+    private UUID id;
 
     @Column(name = "title", nullable = false, length = 255)
     private String title;
@@ -46,24 +50,22 @@ public class Job {
     private String industry;
 
     @Column(name = "experience_min", precision = 4)
-    private Double experienceMin;
+    private BigDecimal experienceMin;
 
     @Column(name = "experience_max", precision = 4)
-    private Double experienceMax;
+    private BigDecimal  experienceMax;
 
     @Column(name = "salary_min", precision = 14, scale = 2)
-    private Double salaryMin;
+    private BigDecimal salaryMin;
 
     @Column(name = "salary_max", precision = 14, scale = 2)
-    private Double salaryMax;
+    private BigDecimal salaryMax;
 
     @Column(name = "salary_currency", length = 3)
     private String salaryCurrency;
 
-    @ElementCollection
-    @CollectionTable(name = "job_skills_required", joinColumns = @JoinColumn(name = "job_id"))
-    @Column(name = "skill", length = 100)
-    private Set<String> skillsRequired = new HashSet<>();
+    @Column(name = "skills_required", columnDefinition = "text[]")
+    private String[] skillsRequired;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
@@ -84,8 +86,8 @@ public class Job {
     @Column(name = "template_name", length = 255)
     private String templateName;
 
-    @Column(name = "ats_keywords", columnDefinition = "TEXT")
-    private String atsKeywords;
+    @Column(name = "ats_keywords", columnDefinition = "text[]")
+    private  String[] atsKeywords = new String[0];
 
     @Column(name = "openings_count", nullable = false)
     private Short openingsCount = 1;

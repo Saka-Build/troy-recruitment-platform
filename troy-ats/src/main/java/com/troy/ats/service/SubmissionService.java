@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class SubmissionService {
@@ -20,7 +21,7 @@ public class SubmissionService {
         return submissionRepository.findAll();
     }
 
-    public Optional<Submission> getSubmissionById(Long id) {
+    public Optional<Submission> getSubmissionById(UUID id) {
         return submissionRepository.findById(id);
     }
 
@@ -28,7 +29,7 @@ public class SubmissionService {
         return submissionRepository.save(submission);
     }
 
-    public void deleteSubmission(Long id) {
+    public void deleteSubmission(UUID id) {
         submissionRepository.deleteById(id);
     }
 }

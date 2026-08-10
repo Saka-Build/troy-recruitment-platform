@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/submissions")
@@ -23,7 +24,7 @@ public class SubmissionController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Submission> getSubmissionById(@PathVariable Long id) {
+    public ResponseEntity<Submission> getSubmissionById(@PathVariable UUID id) {
         return submissionService.getSubmissionById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());

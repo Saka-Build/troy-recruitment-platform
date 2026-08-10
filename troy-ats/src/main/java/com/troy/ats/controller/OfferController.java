@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/offers")
@@ -23,7 +24,7 @@ public class OfferController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Offer> getOfferById(@PathVariable Long id) {
+    public ResponseEntity<Offer> getOfferById(@PathVariable UUID id) {
         return offerService.getOfferById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());

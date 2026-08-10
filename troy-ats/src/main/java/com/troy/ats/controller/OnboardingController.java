@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/onboarding")
@@ -23,7 +24,7 @@ public class OnboardingController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Onboarding> getOnboardingById(@PathVariable Long id) {
+    public ResponseEntity<Onboarding> getOnboardingById(@PathVariable UUID id) {
         return onboardingService.getOnboardingById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());

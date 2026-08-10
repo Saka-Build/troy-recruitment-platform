@@ -129,7 +129,7 @@ ALTER TABLE clients
 CREATE TABLE statuses (
     id          UUID            PRIMARY KEY DEFAULT gen_random_uuid(),
     name        VARCHAR(100)    NOT NULL UNIQUE,
-    colour_hex  CHAR(7)         NOT NULL DEFAULT '#6B7280'
+    colour_hex  VARCHAR(7)         NOT NULL DEFAULT '#6B7280'
                                 CHECK (colour_hex ~* '^#[0-9A-Fa-f]{6}$'),
     sort_order  SMALLINT        NOT NULL DEFAULT 0,
     is_active   BOOLEAN         NOT NULL DEFAULT TRUE,
@@ -161,7 +161,7 @@ CREATE TABLE sub_statuses (
     id          UUID            PRIMARY KEY DEFAULT gen_random_uuid(),
     status_id   UUID            NOT NULL REFERENCES statuses (id) ON DELETE CASCADE,
     name        VARCHAR(100)    NOT NULL,
-    colour_hex  CHAR(7)         CHECK (
+    colour_hex  VARCHAR(7)         CHECK (
                                     colour_hex IS NULL OR
                                     colour_hex ~* '^#[0-9A-Fa-f]{6}$'
                                 ),
@@ -195,7 +195,7 @@ CREATE TABLE candidates (
     notice_period_days  SMALLINT        CHECK (notice_period_days IS NULL OR notice_period_days >= 0),
     current_salary      NUMERIC(14,2)   CHECK (current_salary IS NULL OR current_salary >= 0),
     expected_salary     NUMERIC(14,2)   CHECK (expected_salary IS NULL OR expected_salary >= 0),
-    salary_currency     CHAR(3)         DEFAULT 'USD',
+    salary_currency     VARCHAR(10)         DEFAULT 'USD',
     skills              TEXT[],
     education           TEXT,
     visa_status         VARCHAR(100),
@@ -254,7 +254,7 @@ CREATE TABLE jobs (
     experience_max      NUMERIC(4,1)    CHECK (experience_max IS NULL OR experience_max >= 0),
     salary_min          NUMERIC(14,2)   CHECK (salary_min IS NULL OR salary_min >= 0),
     salary_max          NUMERIC(14,2)   CHECK (salary_max IS NULL OR salary_max >= 0),
-    salary_currency     CHAR(3)         DEFAULT 'USD',
+    salary_currency     VARCHAR(10)     DEFAULT 'USD',
     skills_required     TEXT[],
     status              job_status      NOT NULL DEFAULT 'open',
     priority            VARCHAR(20)     NOT NULL DEFAULT 'medium'
@@ -362,7 +362,7 @@ CREATE TABLE offers (
     candidate_id    UUID            NOT NULL REFERENCES candidates (id) ON DELETE CASCADE,
     job_id          UUID            NOT NULL REFERENCES jobs (id) ON DELETE CASCADE,
     offered_salary  NUMERIC(14,2)   CHECK (offered_salary IS NULL OR offered_salary >= 0),
-    salary_currency CHAR(3)         DEFAULT 'USD',
+    salary_currency  VARCHAR(10)         DEFAULT 'USD',
     joining_date    DATE,
     offer_status    offer_status    NOT NULL DEFAULT 'pending',
     offer_letter_url TEXT,
