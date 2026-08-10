@@ -14,6 +14,6 @@ public class SwaggerApiConfig {
                 .info(new Info()
                         .title("ATS API")
                         .version("1.0")
-                        .description("API documentation for the ATS application"));
+                        .description("API documentation for the ATS"));
     }
 }
