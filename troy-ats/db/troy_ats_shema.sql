@@ -111,6 +111,8 @@ CREATE TABLE employees (
     last_login_at   TIMESTAMPTZ,
     created_at      TIMESTAMPTZ     NOT NULL DEFAULT NOW(),
     updated_at      TIMESTAMPTZ     NOT NULL DEFAULT NOW()
+    failed_login_attempts  INT      NOT NULL DEFAULT 0,
+    locked_until    TIMESTAMP       WITH TIME ZONE
 );
 
 CREATE INDEX idx_employees_official_email ON employees (official_email);
@@ -516,6 +518,21 @@ CREATE TABLE message_templates (
     created_at  TIMESTAMPTZ       NOT NULL DEFAULT NOW(),
     updated_at  TIMESTAMPTZ       NOT NULL DEFAULT NOW()
 );
+
+--=================================================================
+-- 16. REFRESH TOKEN
+--=======================================================================
+CREATE TABLE refresh_tokens (
+                                id              BIGSERIAL       PRIMARY KEY,
+                                token_id_hash   VARCHAR(100)    NOT NULL UNIQUE,
+                                user_id         VARCHAR(100)    NOT NULL,
+                                expires_at      TIMESTAMP       WITH TIME ZONE NOT NULL,
+                                revoked         BOOLEAN         NOT NULL DEFAULT FALSE,
+                                created_at      TIMESTAMP       WITH TIME ZONE NOT NULL
+);
+
+CREATE INDEX idx_refresh_token_id ON refresh_tokens(token_id_hash);
+CREATE INDEX idx_refresh_user_id ON refresh_tokens(user_id);
 
 -- Seed default templates
 INSERT INTO message_templates (name, subject, body, channels) VALUES
