@@ -2,6 +2,7 @@ package com.troy.ats.controller;
 import com.troy.ats.entity.Candidate;
 import com.troy.ats.service.CandidateService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,6 +19,7 @@ public class CandidateController {
     }
 
     @GetMapping
+    @PreAuthorize("isAuthenticated()")
     public List<Candidate> getAllCandidates() {
         return candidateService.getAllCandidates();
     }

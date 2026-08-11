@@ -2,7 +2,12 @@ package com.troy.ats.entity;
 
 import com.troy.ats.enums.UserRole;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -52,6 +57,9 @@ public class Employee {
     @Column(name = "is_active", nullable = false)
     private Boolean isActive = true;
 
+    @Column(name = "failed_login_attempts", nullable = false)
+    private int failedLoginAttempts = 0;
+
     @Column(name = "last_login_at")
     private LocalDateTime lastLoginAt;
 
@@ -60,6 +68,12 @@ public class Employee {
 
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
+
+    @Column(name = "locked_until")
+    private Instant lockedUntil;
+
+    public Instant getLockedUntil() { return lockedUntil; }
+    public void setLockedUntil(Instant lockedUntil) { this.lockedUntil = lockedUntil; }
 
     @PrePersist
     protected void onCreate() {
@@ -71,5 +85,7 @@ public class Employee {
     protected void onUpdate() {
         this.updatedAt = LocalDateTime.now();
     }
+
+
 }
 

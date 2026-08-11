@@ -2,6 +2,14 @@ spring:
   application:
     name: troy-ats
 
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+  profiles:
+    active: database
+
   datasource:
     url: jdbc:postgresql://localhost:5432/troy_ats
     username: ats_admin
@@ -27,3 +35,8 @@ spring:
 server:
   port: 8080
 
+app:
+  jwt:
+    secret: "super-longest-secret-key-troyats"
+    access-ttl-minutes: 30
+    refresh-ttl-days: 2
