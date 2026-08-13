@@ -55,7 +55,7 @@ public class DashBoardSummaryPopulator {
         dashboardSummaryDto.setActiveClients(clientService.getTotalClientsByActive(Boolean.TRUE));
         dashboardSummaryDto.setTotalPlacements(candidateService.getTotalCandidatesByStatusName(CommonConstants.CANDIDATE_STATUS_ONBOARDED));
         dashboardSummaryDto.setTotalCvSubmissionPending(submissionService.getTotalCVSubmissionsByPipelineStage(PipelineStage.READY_TO_SUBMIT));
-        dashboardSummaryDto.setTotalJoiningToday(offerService.getTotalJoiningTodayForZoneId(getZoneIdForCurrentUser()));
+        dashboardSummaryDto.setTotalJoiningToday(offerService.getTotalJoiningTodayForZoneId(CommonUtil.getZoneIdForCurrentUser(sessionService)));
         dashboardSummaryDto.setTotalUrgentRoles(jobService.getTotalJobsByPriority(CommonConstants.JOB_PRIORITY_URGENT));
         dashboardSummaryDto.setTotalClientFeedbackPending(interviewService.getTotalClientFeedBackPending());
         dashboardSummaryDto.setTotalOffersPending(offerService.getTotalOffersByStaus(OfferStatus.PENDING));
@@ -74,7 +74,7 @@ public class DashBoardSummaryPopulator {
 
     private void populateTodayInterviews(DashboardSummaryDto dashboardSummaryDto){
 
-        ZoneId zoneId = getZoneIdForCurrentUser();
+        ZoneId zoneId = CommonUtil.getZoneIdForCurrentUser(sessionService);
         List<Interview> todayInterviews = interviewService.getTodayInterviewsForZoneIdWithDescOrder(zoneId);
 
         /*todayInterviews.sort(Comparator.comparing(
@@ -97,7 +97,7 @@ public class DashBoardSummaryPopulator {
     private void populateInterview(Interview source, InterviewDataForDashboardDto target){
 
         Instant instant = source.getInterviewDateTimeWithZone();
-        ZoneId zoneId = getZoneIdForCurrentUser();
+        ZoneId zoneId = CommonUtil.getZoneIdForCurrentUser(sessionService);
         ZonedDateTime DateTime = instant.atZone(zoneId);
         LocalDate date = DateTime.toLocalDate();
         LocalTime time = DateTime.toLocalTime();
@@ -108,13 +108,5 @@ public class DashBoardSummaryPopulator {
         target.setCandidateName(source.getCandidate().getFullName());
         target.setJobName(source.getJob().getClient().getName());
         target.setInterviewLink(source.getMeetingLink());
-    }
-
-    private ZoneId getZoneIdForCurrentUser(){
-
-        Employee user = sessionService.getCurrentUser();
-        String countryCode = CountryEnum.fromValue(user.getCountryCode()).getValue();
-        ZoneId zoneId = CommonUtil.getTimeZone(countryCode);
-        return  zoneId;
     }
 }

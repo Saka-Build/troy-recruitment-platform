@@ -1,5 +1,7 @@
 package com.troy.ats.service.impl;
+import com.troy.ats.dto.EmployeeDto;
 import com.troy.ats.entity.Employee;
+import com.troy.ats.populator.EmployeePopulator;
 import com.troy.ats.repository.EmployeeRepository;
 import com.troy.ats.service.EmployeeService;
 import org.springframework.stereotype.Service;
@@ -13,6 +15,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
 
     private  EmployeeRepository employeeRepository;
+    private EmployeePopulator employeePopulator;
     public EmployeeServiceImpl(EmployeeRepository employeeRepository) {
         this.employeeRepository = employeeRepository;
     }
@@ -40,5 +43,18 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     public Optional<Employee> getEmployeeByEmail(String email) {
         return employeeRepository.findByOfficialEmail(email);
+    }
+
+    /**
+     *
+     * @param employee
+     * @return
+     */
+    @Override
+    public EmployeeDto getEmployeeDtoFromEntity(Employee employee) {
+
+        EmployeeDto employeeDto = new EmployeeDto();
+        employeePopulator.populate(employee, employeeDto);
+        return employeeDto;
     }
 }

@@ -1,15 +1,20 @@
 package com.troy.ats.controller;
 
+import com.troy.ats.dto.EmployeeDto;
 import com.troy.ats.entity.Employee;
 import com.troy.ats.entity.LoginRequest;
 import com.troy.ats.entity.RefreshTokenRequest;
 import com.troy.ats.entity.TokenResponse;
 import com.troy.ats.service.EmployeeService;
+import com.troy.ats.service.SessionService;
 import com.troy.ats.service.jwt.JwtService;
 import com.troy.ats.service.jwt.RefreshTokenService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -32,16 +37,18 @@ public class AuthController {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final RefreshTokenService refreshTokenService;
+    private final SessionService sessionService;
 
     public AuthController(EmployeeService employeeService, PasswordEncoder passwordEncoder,
-                          JwtService jwtService, RefreshTokenService refreshTokenService) {
+                          JwtService jwtService, RefreshTokenService refreshTokenService, SessionService sessionService) {
         this.employeeService = employeeService;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
         this.refreshTokenService = refreshTokenService;
+        this.sessionService = sessionService;
     }
 
-    @PostMapping("/login")
+    @PostMapping("/token")
     public ResponseEntity<?> login(@Valid @RequestBody LoginRequest req) {
         Optional<Employee> employee = employeeService.getEmployeeByEmail(req.getEmailId());
         Employee user = employee.isPresent() ? employee.get() : null;
@@ -101,6 +108,18 @@ public class AuthController {
         String newRefreshToken = refreshTokenService.issue(user.getId().toString()); // rotation
         //return null;
         return ResponseEntity.ok(new TokenResponse(accessToken, newRefreshToken, ACCESS_TOKEN_TTL_SECONDS));
+    }
+
+    @PostMapping("/login")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> login(final HttpServletRequest req, HttpServletResponse res) {
+
+        Employee user = sessionService.getCurrentUser();
+        if (user != null) {
+            EmployeeDto userDto = employeeService.getEmployeeDtoFromEntity(user);
+            return ResponseEntity.ok(userDto);
+        }
+        return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/logout")
