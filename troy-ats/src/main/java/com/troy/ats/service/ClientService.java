@@ -37,4 +37,8 @@ public class ClientService {
     public void deleteClient(UUID id) {
         clientRepository.deleteById(id);
     }
+
+    public long getTotalClientsByActive(boolean active) {
+        return clientRepository.countByIsActive(active);
+    }
 }

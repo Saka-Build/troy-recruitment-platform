@@ -6,6 +6,7 @@ import com.troy.ats.enums.InterviewType;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.OffsetDateTime;
@@ -65,6 +66,9 @@ public class Interview {
 
     @Column(name = "interview_time")
     private LocalTime interviewTime;
+
+    @Column(name = "interview_date_time_with_zone", nullable = false)
+    private Instant interviewDateTimeWithZone;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "interview_type")

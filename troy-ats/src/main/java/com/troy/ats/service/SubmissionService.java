@@ -1,6 +1,7 @@
 package com.troy.ats.service;
 
 import com.troy.ats.entity.Submission;
+import com.troy.ats.enums.PipelineStage;
 import com.troy.ats.repository.SubmissionRepository;
 import org.springframework.stereotype.Service;
 
@@ -31,5 +32,9 @@ public class SubmissionService {
 
     public void deleteSubmission(UUID id) {
         submissionRepository.deleteById(id);
+    }
+
+    public long getTotalCVSubmissionsByPipelineStage(PipelineStage pipelineStage) {
+        return submissionRepository.countByPipelineStage(pipelineStage);
     }
 }

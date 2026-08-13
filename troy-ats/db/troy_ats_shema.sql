@@ -18,7 +18,7 @@ CREATE TYPE user_role AS ENUM (
 );
 
 CREATE TYPE job_status AS ENUM (
-    'open', 'on_hold', 'filled', 'closed', 'cancelled'
+    'OPEN', 'ON_HOLD', 'FILLED', 'CLOSED', 'CANCELLED'
 );
 
 CREATE TYPE job_work_mode AS ENUM (
@@ -50,7 +50,7 @@ CREATE TYPE cv_format AS ENUM (
 );
 
 CREATE TYPE pipeline_stage AS ENUM (
-    'applied', 'screening', 'submitted', 'interview', 'offer', 'joined'
+    'APPLIED', 'SCREENING', 'READY_TO_SUBMIT', 'SUBMITTED', 'INTERVIEW', 'OFFER', 'JOINED'
 );
 
 CREATE TYPE offer_status AS ENUM (
@@ -77,6 +77,7 @@ CREATE TABLE clients (
                                     CHECK (status IN ('active', 'inactive', 'prospect')),
     address         TEXT,
     notes           TEXT,
+    is_active BOOLEAN  NOT NULL DEFAULT TRUE,
     created_at      TIMESTAMPTZ     NOT NULL DEFAULT NOW(),
     updated_at      TIMESTAMPTZ     NOT NULL DEFAULT NOW(),
     created_by      UUID            -- FK to employees added after employees table
@@ -104,13 +105,14 @@ CREATE TABLE employees (
                                     ),
     phone           VARCHAR(30)     NOT NULL,
     whatsapp        VARCHAR(30)     NOT NULL,
+    country_code    VARCHAR(2)      NOT NULL,
     photo_url       TEXT,
     role            user_role       NOT NULL DEFAULT 'recruiter',
     password_hash   TEXT,           -- store bcrypt / argon2 hash ONLY, never plain-text
     is_active       BOOLEAN         NOT NULL DEFAULT TRUE,
     last_login_at   TIMESTAMPTZ,
     created_at      TIMESTAMPTZ     NOT NULL DEFAULT NOW(),
-    updated_at      TIMESTAMPTZ     NOT NULL DEFAULT NOW()
+    updated_at      TIMESTAMPTZ     NOT NULL DEFAULT NOW(),
     failed_login_attempts  INT      NOT NULL DEFAULT 0,
     locked_until    TIMESTAMP       WITH TIME ZONE
 );
@@ -153,7 +155,7 @@ INSERT INTO statuses (name, colour_hex, sort_order) VALUES
     ('Onboarded',         '#16A34A', 9),
     ('Hold',              '#D97706', 10),
     ('Rejected',          '#DC2626', 11),
-    ('Closed',            '#374151', 12);
+    ('Offboarded',            '#374151', 12);
 
 
 -- ============================================================
@@ -258,7 +260,7 @@ CREATE TABLE jobs (
     salary_max          NUMERIC(14,2)   CHECK (salary_max IS NULL OR salary_max >= 0),
     salary_currency     VARCHAR(10)     DEFAULT 'USD',
     skills_required     TEXT[],
-    status              job_status      NOT NULL DEFAULT 'open',
+    status              job_status      NOT NULL DEFAULT 'OPEN',
     priority            VARCHAR(20)     NOT NULL DEFAULT 'medium'
                                         CHECK (priority IN ('low', 'medium', 'high', 'urgent')),
     description         TEXT,
@@ -301,7 +303,7 @@ CREATE TABLE submissions (
     id              UUID            PRIMARY KEY DEFAULT gen_random_uuid(),
     candidate_id    UUID            NOT NULL REFERENCES candidates (id) ON DELETE CASCADE,
     job_id          UUID            NOT NULL REFERENCES jobs (id) ON DELETE CASCADE,
-    pipeline_stage  pipeline_stage  NOT NULL DEFAULT 'applied',
+    pipeline_stage  pipeline_stage  NOT NULL DEFAULT 'APPLIED',
     status_id       UUID            REFERENCES statuses (id) ON DELETE RESTRICT,
     sub_status_id   UUID            REFERENCES sub_statuses (id) ON DELETE RESTRICT,
     submitted_by    UUID            REFERENCES employees (id) ON DELETE SET NULL,
@@ -329,6 +331,7 @@ CREATE TABLE interviews (
     job_id              UUID            NOT NULL REFERENCES jobs (id) ON DELETE CASCADE,
     interview_date      DATE            NOT NULL,
     interview_time      TIME,
+    interview_date_time_with_zone TIMESTAMP WITH TIME ZONE  NOT NULL,
     interview_type      interview_type,
     round               interview_round,
     interviewer_name    VARCHAR(255),
@@ -365,7 +368,7 @@ CREATE TABLE offers (
     job_id          UUID            NOT NULL REFERENCES jobs (id) ON DELETE CASCADE,
     offered_salary  NUMERIC(14,2)   CHECK (offered_salary IS NULL OR offered_salary >= 0),
     salary_currency  VARCHAR(10)         DEFAULT 'USD',
-    joining_date    DATE,
+    joining_date    TIMESTAMPTZ,
     offer_status    offer_status    NOT NULL DEFAULT 'pending',
     offer_letter_url TEXT,
     released_at     TIMESTAMPTZ,

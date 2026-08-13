@@ -1,6 +1,7 @@
 package com.troy.ats.service;
 
 import com.troy.ats.entity.Candidate;
+import com.troy.ats.entity.Status;
 import com.troy.ats.repository.CandidateRepository;
 import org.springframework.stereotype.Service;
 
@@ -36,6 +37,16 @@ public class CandidateService {
 
     public void deleteCandidate(UUID id) {
         candidateRepository.deleteById(id);
+    }
+
+    public long getTotalCandidatesByStatus(boolean active) {
+        return candidateRepository.countByStatus_Active(active);
+    }
+    public long getTotalCandidatesByStatusName(String statusName) {
+        return candidateRepository.countByStatus_Name(statusName);
+    }
+    public List<Candidate> getCandidatesByStatusNameANDSubStatusName(String statusName, String subStatusName) {
+        return candidateRepository.findByStatus_NameAndSubStatus_Name(statusName, subStatusName);
     }
 }
 

@@ -3,14 +3,16 @@ package com.troy.ats.entity;
 import com.troy.ats.enums.JobStatus;
 import com.troy.ats.enums.JobType;
 import com.troy.ats.enums.JobWorkMode;
-import com.troy.ats.enums.Skill;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -68,7 +70,8 @@ public class Job {
     private String[] skillsRequired;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
+    @Column(name = "status", nullable = false, columnDefinition = "job_status")
     private JobStatus status;
 
     @Column(name = "priority", nullable = false, length = 20)

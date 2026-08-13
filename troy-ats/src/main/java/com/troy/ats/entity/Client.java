@@ -53,6 +53,9 @@ public class Client {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
+    @Column(name = "is_active", nullable = false)
+    private Boolean isActive = true;
+
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
