@@ -1,7 +1,7 @@
 package com.troy.ats.service.jwt;
 
 import com.troy.ats.entity.Employee;
-import com.troy.ats.service.impl.EmployeeService;
+import com.troy.ats.service.EmployeeService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;

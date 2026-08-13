@@ -1,8 +1,7 @@
-package com.troy.ats.service;
+package com.troy.ats.service.impl;
 import com.troy.ats.entity.Employee;
-import com.troy.ats.repository.CandidateRepository;
 import com.troy.ats.repository.EmployeeRepository;
-import com.troy.ats.service.impl.EmployeeService;
+import com.troy.ats.service.EmployeeService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

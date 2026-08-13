@@ -1,6 +1,6 @@
 package com.troy.ats.controller;
 import com.troy.ats.entity.Employee;
-import com.troy.ats.service.impl.EmployeeService;
+import com.troy.ats.service.EmployeeService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;

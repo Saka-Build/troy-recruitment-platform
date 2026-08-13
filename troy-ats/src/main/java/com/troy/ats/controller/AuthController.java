@@ -4,7 +4,7 @@ import com.troy.ats.entity.Employee;
 import com.troy.ats.entity.LoginRequest;
 import com.troy.ats.entity.RefreshTokenRequest;
 import com.troy.ats.entity.TokenResponse;
-import com.troy.ats.service.impl.EmployeeService;
+import com.troy.ats.service.EmployeeService;
 import com.troy.ats.service.jwt.JwtService;
 import com.troy.ats.service.jwt.RefreshTokenService;
 import jakarta.validation.Valid;
