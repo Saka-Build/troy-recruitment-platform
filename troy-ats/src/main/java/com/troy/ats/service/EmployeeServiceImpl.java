@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-@Service
+@Service("employeeService")
 public class EmployeeServiceImpl implements EmployeeService {
 
 

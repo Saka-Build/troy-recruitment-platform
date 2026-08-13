@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
@@ -77,7 +77,7 @@ public class Offer {
     private String salaryCurrency;
 
     @Column(name = "joining_date")
-    private LocalDate joiningDate;
+    private Instant joiningDate;
 
     @Enumerated(EnumType.STRING)
     @Column(

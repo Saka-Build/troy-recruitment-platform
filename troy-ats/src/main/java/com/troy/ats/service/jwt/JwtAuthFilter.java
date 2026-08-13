@@ -1,5 +1,7 @@
 package com.troy.ats.service.jwt;
 
+import com.troy.ats.entity.Employee;
+import com.troy.ats.service.impl.EmployeeService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
@@ -9,21 +11,27 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Stateless: every instance validates the JWT signature/expiry itself,
  * no DB or Redis lookup on the hot path.
  */
+@Component
 public class JwtAuthFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
+    private final EmployeeService employeeService;
 
-    public JwtAuthFilter(JwtService jwtService) {
+    public JwtAuthFilter(JwtService jwtService, EmployeeService employeeService) {
         this.jwtService = jwtService;
+        this.employeeService = employeeService;
     }
 
     @Override
@@ -44,11 +52,26 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             Claims claims = jwtService.parseAndValidate(token);
             String role = claims.get("role", String.class);
 
-            var auth = new UsernamePasswordAuthenticationToken(
+            /*var auth = new UsernamePasswordAuthenticationToken(
                     claims.getSubject(),
                     null,
                     List.of(new SimpleGrantedAuthority("ROLE_" + role))
+            );*/
+
+            UUID userId = UUID.fromString(claims.getSubject());
+
+            Employee user = employeeService.getEmployeeById(userId)
+                    .orElseThrow(() ->
+                            new UsernameNotFoundException(
+                                    "User not found: " + userId
+                            )
+                    );
+            var auth = new UsernamePasswordAuthenticationToken(
+                    user,
+                    null,
+                    List.of(new SimpleGrantedAuthority("ROLE_" + role))
             );
+
             SecurityContextHolder.getContext().setAuthentication(auth);
 
         } catch (JwtException e) {

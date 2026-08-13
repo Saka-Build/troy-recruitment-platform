@@ -1,10 +1,13 @@
 package com.troy.ats.service;
 
 import com.troy.ats.entity.Interview;
+import com.troy.ats.enums.InterviewOutcome;
 import com.troy.ats.repository.InterviewRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,5 +38,18 @@ public class InterviewService {
 
     public void deleteInterview(Long id) {
         interviewRepository.deleteById(id);
+    }
+
+    public List<Interview> getTodayInterviewsForZoneIdWithDescOrder(ZoneId zoneId) {
+
+        LocalDate today = LocalDate.now(zoneId);
+        Instant start = today.atStartOfDay(zoneId).toInstant();
+        Instant end = today.plusDays(1).atStartOfDay(zoneId).toInstant();
+
+        return interviewRepository.findByInterviewDateTimeWithZoneGreaterThanEqualAndInterviewDateTimeWithZoneLessThanOrderByInterviewDateTimeWithZoneDesc(start, end);
+    }
+
+    public long getTotalClientFeedBackPending(){
+        return interviewRepository.countByOutcomeAndFeedbackEmpty(InterviewOutcome.completed);
     }
 }

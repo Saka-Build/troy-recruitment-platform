@@ -2,7 +2,13 @@ package com.troy.ats.entity;
 
 import com.troy.ats.enums.PipelineStage;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -27,6 +33,7 @@ public class Submission {
     private Job job;
 
     @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Column(name = "pipeline_stage", nullable = false)
     private PipelineStage pipelineStage;
 

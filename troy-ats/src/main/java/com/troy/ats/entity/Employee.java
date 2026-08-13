@@ -75,6 +75,10 @@ public class Employee {
     @Column(name = "locked_until")
     private Instant lockedUntil;
 
+    @Column(name = "country_code", nullable = false, length = 2)
+    private String countryCode;
+
+
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();

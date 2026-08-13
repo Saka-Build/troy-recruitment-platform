@@ -1,6 +1,7 @@
 package com.troy.ats.service;
 
 import com.troy.ats.entity.Job;
+import com.troy.ats.enums.JobStatus;
 import com.troy.ats.repository.JobRepository;
 import org.springframework.stereotype.Service;
 
@@ -36,5 +37,13 @@ public class JobService {
 
     public void deleteJob(UUID id) {
         jobRepository.deleteById(id);
+    }
+
+    public long getTotalJobsByStatus(JobStatus status) {
+        return jobRepository.countByStatus(status);
+    }
+
+    public long getTotalJobsByPriority(String priority) {
+        return jobRepository.countByPriority(priority);
     }
 }
