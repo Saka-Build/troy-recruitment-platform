@@ -9,10 +9,10 @@ public interface FileStorageService {
     /**
      *
      * @param file
-     * @param candidateId
+     * @param id
      * @return
      */
-    String store(MultipartFile file, UUID candidateId, boolean isOriginalCV);
+    String store(MultipartFile file, UUID id, boolean isOriginalCV, boolean isPhoto);
 
 }
 

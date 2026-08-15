@@ -155,23 +155,19 @@ public class CandidateService {
         if (originalCVFile != null && !originalCVFile.isEmpty()) {
 
             CvFormat originalCVformat = CommonUtil.determineCvFormat(originalCVFile);
-
-            String originalCVFileUrl = fileStorageService.store(originalCVFile, candidate.getId(), Boolean.TRUE);
+            String originalCVFileUrl = fileStorageService.store(originalCVFile, candidate.getId(), Boolean.TRUE, Boolean.FALSE);
 
             candidate.setOriginalCvUrl(originalCVFileUrl);
             candidate.setOriginalCvFormat(originalCVformat);
-
             candidateRepository.save(candidate);
         }
 
         if (troyCVFile != null && !troyCVFile.isEmpty()) {
 
             CvFormat troyCVformat = CommonUtil.determineCvFormat(troyCVFile);
-
-            String troyCVFileUrl = fileStorageService.store(troyCVFile, candidate.getId(), Boolean.FALSE);
+            String troyCVFileUrl = fileStorageService.store(troyCVFile, candidate.getId(), Boolean.FALSE, Boolean.FALSE);
 
             candidate.setOriginalCvUrl(troyCVFileUrl);
-
             candidateRepository.save(candidate);
         }
 

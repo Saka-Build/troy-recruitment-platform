@@ -21,6 +21,7 @@ import org.springframework.stereotype.Component;
 import java.time.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Component
 public class EmployeePopulator {
@@ -45,10 +46,17 @@ public class EmployeePopulator {
 
     private LocalDateTime convertInstantToLocalDate(Instant lastLoginAt){
 
-        ZoneId zoneId = CommonUtil.getZoneIdForCurrentUser(sessionService);
-        ZonedDateTime DateTime = lastLoginAt.atZone(zoneId);
-        LocalDateTime date = DateTime.toLocalDateTime();
-        return  date;
+        try{
+            ZoneId zoneId = CommonUtil.getZoneIdForCurrentUser(sessionService);
+            ZonedDateTime DateTime = lastLoginAt.atZone(zoneId);
+            LocalDateTime date = DateTime.toLocalDateTime();
+            return  date;
+
+        } catch (RuntimeException e) {
+            Instant instant = Objects.nonNull(lastLoginAt) ? lastLoginAt : Instant.now();
+            return LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
+        }
+
 
     }
 }

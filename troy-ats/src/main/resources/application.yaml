@@ -55,11 +55,11 @@ server:
 file:
   upload-original-cv-dir: C:/work/Docs-Troy-ats/upload/originalcv
   upload-troy-cv-dir: C:/work/Docs-Troy-ats/upload/troycv
+  upload-photo-dir: C:/work/Docs-Troy-ats/upload/employee/photo
 
 app:
   jwt:
     secret: "super-longest-secret-key-troyats"
     access-ttl-minutes: 30
     refresh-ttl-days: 2
-
 

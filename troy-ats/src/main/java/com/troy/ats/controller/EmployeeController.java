@@ -1,8 +1,14 @@
 package com.troy.ats.controller;
+import com.troy.ats.dto.EmployeeCreateRequest;
+import com.troy.ats.dto.EmployeeDto;
 import com.troy.ats.entity.Employee;
 import com.troy.ats.service.EmployeeService;
+import jakarta.validation.Valid;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
 import java.util.List;
 import java.util.UUID;
 
@@ -35,11 +41,14 @@ public class EmployeeController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @PostMapping
-    public Employee createEmployee(@RequestBody Employee employee) {
-        System.out.println("employeeCode  = " + employee.getEmployeeCode());
+    @PostMapping(value = "/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<EmployeeDto> createEmployee(
+            @RequestPart("employee") @Valid EmployeeCreateRequest request,
+            @RequestPart(value = "photo", required = false) MultipartFile photo) {
 
-        return employeeService.createEmployee(employee);
+        EmployeeDto employeeDto = employeeService.createEmployee(request, photo);
+
+        return ResponseEntity.ok(employeeDto);
     }
 
     @PutMapping("/{id}")

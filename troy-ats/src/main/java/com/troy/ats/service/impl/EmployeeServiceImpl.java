@@ -1,24 +1,33 @@
 package com.troy.ats.service.impl;
+import com.troy.ats.dto.EmployeeCreateRequest;
 import com.troy.ats.dto.EmployeeDto;
 import com.troy.ats.entity.Employee;
 import com.troy.ats.populator.EmployeePopulator;
+import com.troy.ats.populator.ReverseEmployeePopulator;
 import com.troy.ats.repository.EmployeeRepository;
 import com.troy.ats.service.EmployeeService;
+import com.troy.ats.service.FileStorageService;
+import com.troy.ats.util.CommonUtil;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 @Service("employeeService")
+@RequiredArgsConstructor
 public class EmployeeServiceImpl implements EmployeeService {
 
 
-    private  EmployeeRepository employeeRepository;
-    private EmployeePopulator employeePopulator;
-    public EmployeeServiceImpl(EmployeeRepository employeeRepository) {
-        this.employeeRepository = employeeRepository;
-    }
+    private final EmployeeRepository employeeRepository;
+    private final EmployeePopulator employeePopulator;
+    private final ReverseEmployeePopulator reverseEmployeePopulator;
+    private final FileStorageService fileStorageService;
+
 
     public List<Employee> getAllEmployees() {
         return employeeRepository.findAll();
@@ -57,4 +66,55 @@ public class EmployeeServiceImpl implements EmployeeService {
         employeePopulator.populate(employee, employeeDto);
         return employeeDto;
     }
+
+    /**
+     *
+     * @param request
+     * @param photo
+     * @return
+     */
+    @Override
+    @Transactional
+    public EmployeeDto createEmployee(EmployeeCreateRequest request, MultipartFile photo) {
+        // Employee code
+        if (employeeRepository.existsByEmployeeCode(request.getEmployeeCode())) {
+
+            throw new IllegalArgumentException("Employee code already exists");
+        }
+
+        // Official email
+        if (employeeRepository.existsByOfficialEmailIgnoreCase(request.getOfficialEmail())) {
+
+            throw new IllegalArgumentException("Official email already exists");
+        }
+
+        // Personal email
+        if (request.getPersonalEmail() != null && !request.getPersonalEmail().isBlank()
+                && employeeRepository.existsByPersonalEmailIgnoreCase(request.getPersonalEmail())) {
+
+            throw new IllegalArgumentException("Personal email already exists");
+        }
+
+        // Create employee
+        Employee employee = new Employee();
+        reverseEmployeePopulator.populate(request, employee);
+
+        // Save employee first
+        employee = employeeRepository.save(employee);
+
+        // Upload photo
+        if (photo != null && !photo.isEmpty()) {
+
+            CommonUtil.validatePhoto(photo);
+            String photoUrl = fileStorageService.store(photo, employee.getId(),Boolean.FALSE, Boolean.TRUE);
+            employee.setPhotoUrl(photoUrl);
+
+            employee = employeeRepository.save(employee);
+        }
+        EmployeeDto employeeDto = new EmployeeDto();
+        employeePopulator.populate(employee, employeeDto);
+
+        return employeeDto;
+    }
+
 }
