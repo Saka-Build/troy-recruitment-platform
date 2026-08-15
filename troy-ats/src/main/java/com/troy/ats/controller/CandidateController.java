@@ -1,5 +1,6 @@
 package com.troy.ats.controller;
 
+import com.troy.ats.dto.CandidateCreateRequest;
 import com.troy.ats.dto.CandidateDto;
 import com.troy.ats.dto.CandidatesDto;
 import com.troy.ats.dto.CandidatesFiltersDto;
@@ -18,15 +19,15 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.OffsetDateTime;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
+
+import static com.troy.ats.constants.CommonConstants.CANDIDATE_CV_TYPE_TROY;
 
 @RestController
 @RequestMapping("/api/v1/candidates")
@@ -81,6 +82,14 @@ public class CandidateController {
         return candidateService.createCandidate(candidate);
     }
 
+    @PostMapping(value = "/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public CandidateDto createCandidateWithCV(
+            @RequestPart("candidate") CandidateCreateRequest candidate,
+            @RequestPart(value = "file", required = false) MultipartFile file) {
+
+        return candidateService.createCandidate(candidate, file);
+    }
+
     @PutMapping("/{id}")
     public Candidate updateCandidate(
             @PathVariable UUID id,
@@ -94,17 +103,18 @@ public class CandidateController {
         candidateService.deleteCandidate(id);
     }
 
-    @GetMapping("/{candidateId}/download/originalcv")
+    @GetMapping("/{candidateId}/download/cv/{cvType}")
     public ResponseEntity<Resource> downloadCv(
-            @PathVariable UUID candidateId) {
+            @PathVariable UUID candidateId, @PathVariable String cvType) {
 
         Optional<Candidate> candidateOptional = candidateService.getCandidateById(candidateId);
         Candidate candidate = candidateOptional.isPresent() ? candidateOptional.get() : null;
         if(Objects.isNull(candidate)){
             return ResponseEntity.notFound().build();
         }
+        String cvUrl = cvType.toLowerCase(Locale.ROOT).contains(CANDIDATE_CV_TYPE_TROY) ? candidate.getTroyCvUrl() : candidate.getOriginalCvUrl();
 
-        Path path = Paths.get(candidate.getOriginalCvUrl());
+        Path path = Paths.get(cvUrl);
         if (!Files.exists(path) || !Files.isReadable(path)) {
             return ResponseEntity.notFound().build();
         }

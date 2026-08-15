@@ -2,6 +2,11 @@ spring:
   application:
     name: troy-ats
 
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 12MB
+
   data:
     redis:
       host: localhost
@@ -35,9 +40,13 @@ spring:
 server:
   port: 8080
 
+file:
+  upload-dir: C:/work/Docs-Troy-ats/upload/cv
+
 app:
   jwt:
     secret: "super-longest-secret-key-troyats"
     access-ttl-minutes: 30
     refresh-ttl-days: 2
+
 

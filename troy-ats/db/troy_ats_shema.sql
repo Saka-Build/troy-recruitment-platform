@@ -46,7 +46,7 @@ CREATE TYPE message_channel AS ENUM (
 );
 
 CREATE TYPE cv_format AS ENUM (
-    'pdf', 'doc', 'docx'
+    'PDF', 'DOC', 'DOCX'
 );
 
 CREATE TYPE pipeline_stage AS ENUM (

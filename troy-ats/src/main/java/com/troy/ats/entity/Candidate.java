@@ -3,6 +3,8 @@ package com.troy.ats.entity;
 import com.troy.ats.enums.CvFormat;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
@@ -111,8 +113,9 @@ public class Candidate {
     @Column(name = "original_cv_url", columnDefinition = "text")
     private String originalCvUrl;
 
-    @Column(name = "original_cv_format")
     @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
+    @Column(name = "original_cv_format")
     private CvFormat originalCvFormat;
 
     @Column(name = "troy_cv_url", columnDefinition = "text")

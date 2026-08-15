@@ -1,23 +1,31 @@
 package com.troy.ats.service;
 
 import com.troy.ats.constants.CommonConstants;
+import com.troy.ats.dto.CandidateCreateRequest;
 import com.troy.ats.dto.CandidateDto;
 import com.troy.ats.dto.CandidatesDto;
 import com.troy.ats.dto.CandidatesFiltersDto;
 import com.troy.ats.entity.Candidate;
+import com.troy.ats.entity.Employee;
 import com.troy.ats.entity.Status;
+import com.troy.ats.entity.SubStatus;
+import com.troy.ats.enums.CvFormat;
 import com.troy.ats.populator.CandidatePopulator;
 import com.troy.ats.populator.CandidatesPopulator;
+import com.troy.ats.populator.ReverseCandidatePopulator;
 import com.troy.ats.repository.CandidateRepository;
 import com.troy.ats.repository.JobRepository;
 import com.troy.ats.repository.StatusRepository;
 import com.troy.ats.repository.SubStatusRepository;
 import com.troy.ats.searchfilter.dto.CandidateFilter;
 import com.troy.ats.searchfilter.filter.CandidateSpecification;
+import com.troy.ats.util.CommonUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -33,6 +41,8 @@ public class CandidateService {
     private final JobRepository jobRepository;
     private final CandidatesPopulator candidatesPopulator;
     private final CandidatePopulator candidatePopulator;
+    private final ReverseCandidatePopulator reverseCandidatePopulator;
+    private final FileStorageService fileStorageService;
 
 
     public List<Candidate> getAllCandidates() {
@@ -129,6 +139,33 @@ public class CandidateService {
         candidatesFiltersDto.setFilterDropDowns(filterDropDowns);
 
         return candidatesFiltersDto;
+    }
+
+    @Transactional
+    public CandidateDto createCandidate(CandidateCreateRequest request, MultipartFile file) {
+
+        Candidate candidate = new Candidate();
+        reverseCandidatePopulator.populate(request, candidate);
+
+        // Save candidate first
+        candidate = candidateRepository.save(candidate);
+
+        // Upload CV
+        if (file != null && !file.isEmpty()) {
+
+            CvFormat format = CommonUtil.determineCvFormat(file);
+
+            String fileUrl = fileStorageService.store(file, candidate.getId());
+
+            candidate.setOriginalCvUrl(fileUrl);
+            candidate.setOriginalCvFormat(format);
+
+            candidateRepository.save(candidate);
+        }
+        CandidateDto candidateDto = new CandidateDto();
+        //candidatePopulator.populate(candidate, candidateDto);
+
+        return candidateDto;
     }
 }
 
