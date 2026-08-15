@@ -1,5 +1,6 @@
 package com.troy.ats.util;
 
+import com.troy.ats.constants.CommonConstants;
 import com.troy.ats.entity.Employee;
 import com.troy.ats.enums.CountryEnum;
 import com.troy.ats.enums.CvFormat;
@@ -39,6 +40,20 @@ public final class CommonUtil {
             case PDF -> MediaType.APPLICATION_PDF;
             case DOC -> MediaType.parseMediaType("application/msword");
             case DOCX -> MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.wordprocessingml.document");
+        };
+    }
+
+    public static String getEmailSubject(String emailType){
+
+        return switch (emailType) {
+
+            case CommonConstants.EMAIL_TYPE_CV_REQUEST -> CommonConstants.EMAIL_TYPE_CV_REQUEST_SUBJECT;
+            case CommonConstants.EMAIL_TYPE_INTERVIEW_INVITATION -> CommonConstants.EMAIL_TYPE_INTERVIEW_INVITATION_SUBJECT;
+            case CommonConstants.EMAIL_TYPE_FOLLOW_UP -> CommonConstants.EMAIL_TYPE_FOLLOW_UP_SUBJECT;
+            case CommonConstants.EMAIL_TYPE_OFFER -> CommonConstants.EMAIL_TYPE_OFFER_SUBJECT;
+            case CommonConstants.EMAIL_TYPE_JOINING_REMINDER -> CommonConstants.EMAIL_TYPE_JOINING_REMINDER_SUBJECT;
+            default ->
+                    throw new IllegalArgumentException("Unknown email type: " + emailType);
         };
     }
 

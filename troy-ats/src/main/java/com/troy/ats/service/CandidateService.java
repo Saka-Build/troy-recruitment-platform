@@ -43,6 +43,7 @@ public class CandidateService {
     private final CandidatePopulator candidatePopulator;
     private final ReverseCandidatePopulator reverseCandidatePopulator;
     private final FileStorageService fileStorageService;
+    private final EmailService emailService;
 
 
     public List<Candidate> getAllCandidates() {
@@ -142,7 +143,7 @@ public class CandidateService {
     }
 
     @Transactional
-    public CandidateDto createCandidate(CandidateCreateRequest request, MultipartFile file) {
+    public CandidateDto createCandidate(CandidateCreateRequest request, MultipartFile originalCVFile, MultipartFile troyCVFile) {
 
         Candidate candidate = new Candidate();
         reverseCandidatePopulator.populate(request, candidate);
@@ -151,21 +152,41 @@ public class CandidateService {
         candidate = candidateRepository.save(candidate);
 
         // Upload CV
-        if (file != null && !file.isEmpty()) {
+        if (originalCVFile != null && !originalCVFile.isEmpty()) {
 
-            CvFormat format = CommonUtil.determineCvFormat(file);
+            CvFormat originalCVformat = CommonUtil.determineCvFormat(originalCVFile);
 
-            String fileUrl = fileStorageService.store(file, candidate.getId());
+            String originalCVFileUrl = fileStorageService.store(originalCVFile, candidate.getId(), Boolean.TRUE);
 
-            candidate.setOriginalCvUrl(fileUrl);
-            candidate.setOriginalCvFormat(format);
+            candidate.setOriginalCvUrl(originalCVFileUrl);
+            candidate.setOriginalCvFormat(originalCVformat);
 
             candidateRepository.save(candidate);
         }
+
+        if (troyCVFile != null && !troyCVFile.isEmpty()) {
+
+            CvFormat troyCVformat = CommonUtil.determineCvFormat(troyCVFile);
+
+            String troyCVFileUrl = fileStorageService.store(troyCVFile, candidate.getId(), Boolean.FALSE);
+
+            candidate.setOriginalCvUrl(troyCVFileUrl);
+
+            candidateRepository.save(candidate);
+        }
+
         CandidateDto candidateDto = new CandidateDto();
         //candidatePopulator.populate(candidate, candidateDto);
 
         return candidateDto;
+    }
+
+    public void sendCandidateEmail(UUID candidateId, String emailType, MultipartFile file) {
+
+        Candidate candidate = candidateRepository.findById(candidateId)
+                .orElseThrow(() -> new RuntimeException("Candidate not found"));
+
+        emailService.sendCandidateEmail(candidate, emailType, file);
     }
 }
 

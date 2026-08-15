@@ -12,7 +12,7 @@ public interface FileStorageService {
      * @param candidateId
      * @return
      */
-    String store(MultipartFile file, UUID candidateId);
+    String store(MultipartFile file, UUID candidateId, boolean isOriginalCV);
 
 }
 
