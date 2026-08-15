@@ -1,5 +1,6 @@
 package com.troy.ats.controller;
 
+import com.troy.ats.dto.CandidateDto;
 import com.troy.ats.dto.CandidatesDto;
 import com.troy.ats.dto.CandidatesFiltersDto;
 import com.troy.ats.entity.Candidate;
@@ -68,8 +69,9 @@ public class CandidateController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Candidate> getCandidateById(@PathVariable UUID id) {
-        return candidateService.getCandidateById(id)
+    public ResponseEntity<CandidateDto> getCandidateById(@PathVariable UUID id) {
+
+        return candidateService.getCandidateDtoById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
@@ -92,7 +94,7 @@ public class CandidateController {
         candidateService.deleteCandidate(id);
     }
 
-    @GetMapping("/{candidateId}/originalcv")
+    @GetMapping("/{candidateId}/download/originalcv")
     public ResponseEntity<Resource> downloadCv(
             @PathVariable UUID candidateId) {
 

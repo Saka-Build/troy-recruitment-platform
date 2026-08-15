@@ -1,10 +1,12 @@
 package com.troy.ats.service;
 
 import com.troy.ats.constants.CommonConstants;
+import com.troy.ats.dto.CandidateDto;
 import com.troy.ats.dto.CandidatesDto;
 import com.troy.ats.dto.CandidatesFiltersDto;
 import com.troy.ats.entity.Candidate;
 import com.troy.ats.entity.Status;
+import com.troy.ats.populator.CandidatePopulator;
 import com.troy.ats.populator.CandidatesPopulator;
 import com.troy.ats.repository.CandidateRepository;
 import com.troy.ats.repository.JobRepository;
@@ -30,6 +32,7 @@ public class CandidateService {
     private final SubStatusRepository subStatusRepository;
     private final JobRepository jobRepository;
     private final CandidatesPopulator candidatesPopulator;
+    private final CandidatePopulator candidatePopulator;
 
 
     public List<Candidate> getAllCandidates() {
@@ -38,6 +41,17 @@ public class CandidateService {
 
     public Optional<Candidate> getCandidateById(UUID id) {
         return candidateRepository.findById(id);
+    }
+
+    public Optional<CandidateDto> getCandidateDtoById(UUID id) {
+
+        Optional<CandidateDto> candidateDto = candidateRepository.findById(id)
+                .map(candidate -> {
+                    CandidateDto dto = new CandidateDto();
+                    candidatePopulator.populate(candidate, dto);
+                    return dto;
+                });
+        return candidateDto;
     }
 
     public Candidate createCandidate(Candidate candidate) {
@@ -74,19 +88,39 @@ public class CandidateService {
     }
 
     public CandidatesFiltersDto getCandidateFilters() {
-        List<Candidate> candidates =  candidateRepository.findAll();
+
+        Map<UUID, Long> counts = candidateRepository.countCandidatesByStatus().stream()
+                .collect(Collectors.toMap(
+                        row -> (UUID) row[0],
+                        row -> (Long) row[1]
+                ));
+
+        List<Status> statusList = statusRepository.findAll();
+        long totalActiveCandidates = candidateRepository.countByStatus_Active(Boolean.TRUE);
+        long countTotalCandidates = candidateRepository.count();
+
+        Map<String, Long> countByCandidateStatus = new HashMap<>();
+        countByCandidateStatus.put("Total",countTotalCandidates);
+        countByCandidateStatus.put("ActiveCandidates",totalActiveCandidates);
+        statusList.forEach(status -> {
+            countByCandidateStatus.put(status.getName(), counts.getOrDefault(status.getId(),0L));
+        });
+
+        /*List<Candidate> candidates =  candidateRepository.findAll();
+        long totalActiveCandidates = candidateRepository.countByStatus_Active(Boolean.TRUE);
         List<Candidate> filteredCandidates = candidates.stream().filter(candidate -> Objects.nonNull(candidate.getStatus())).toList();
         List<Status> statusList = statusRepository.findAll();
 
         Map<String, Long> countByCandidateStatus = new HashMap<>();
         countByCandidateStatus.put("Total",(long)candidates.size());
+        countByCandidateStatus.put("ActiveCandidates",totalActiveCandidates);
 
         statusList.forEach(status -> {
             long count = filteredCandidates.stream().filter(candidate ->
                             candidate.getStatus() != null && candidate.getStatus().getId().equals(status.getId())
                     ).count();
             countByCandidateStatus.put(status.getName(), count);
-        });
+        });*/
         /*Map<String, Long> countByStatus = filteredCandidates.stream()
                 .collect(Collectors.groupingBy(
                         candidate -> candidate.getStatus().getName(),
