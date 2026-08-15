@@ -4,11 +4,14 @@ import com.troy.ats.constants.CommonConstants;
 import com.troy.ats.entity.Employee;
 import com.troy.ats.enums.CountryEnum;
 import com.troy.ats.enums.CvFormat;
+import com.troy.ats.enums.PipelineStage;
 import com.troy.ats.service.SessionService;
 import org.springframework.http.MediaType;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.ZoneId;
+import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 public final class CommonUtil {
@@ -94,7 +97,11 @@ public final class CommonUtil {
 
     public static void validateExtension(String extension) {
 
-        if (!extension.equals(".pdf") && !extension.equals(".doc") && !extension.equals(".docx")) {
+        List<String> extensions = List.of(
+                ".pdf",".doc", ".docx", ".jpeg", ".png", ".webp", ".jpg"
+        );
+
+        if (!extensions.contains(extension)) {
 
             throw new IllegalArgumentException("Only PDF, DOC and DOCX files are supported");
         }
@@ -106,5 +113,20 @@ public final class CommonUtil {
                         .toString()
                         .substring(0, 8)
                         .toUpperCase();
+    }
+
+    private static final Set<String> ALLOWED_IMAGE_TYPES =
+            Set.of(
+                    "image/jpeg",
+                    "image/png",
+                    "image/webp"
+            );
+
+    public static void validatePhoto(MultipartFile photo) {
+
+        String contentType = photo.getContentType();
+        if (!ALLOWED_IMAGE_TYPES.contains(contentType)) {
+            throw new IllegalArgumentException("Only JPG, PNG and WebP images are allowed");
+        }
     }
 }

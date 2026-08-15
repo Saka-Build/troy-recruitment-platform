@@ -1,7 +1,9 @@
 package com.troy.ats.service;
 
+import com.troy.ats.dto.EmployeeCreateRequest;
 import com.troy.ats.dto.EmployeeDto;
 import com.troy.ats.entity.Employee;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Optional;
@@ -25,5 +27,13 @@ public interface EmployeeService {
      * @return
      */
     public EmployeeDto getEmployeeDtoFromEntity(Employee employee);
+
+    /**
+     *
+     * @param request
+     * @param photo
+     * @return
+     */
+    EmployeeDto createEmployee(EmployeeCreateRequest request, MultipartFile photo);
 }
 

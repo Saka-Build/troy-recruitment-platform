@@ -26,12 +26,6 @@ public class SecurityConfig {
     }
 
     @Bean
-    public PasswordEncoder passwordEncoder() {
-        // work factor 12 is a reasonable default (~250ms/hash) - tune based on your login latency budget
-        return new BCryptPasswordEncoder(12);
-    }
-
-    @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }

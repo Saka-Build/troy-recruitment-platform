@@ -24,12 +24,15 @@ public class FileStorageServiceImpl implements FileStorageService {
     @Value("${file.upload-troy-cv-dir:uploads/troycv}")
     private String uploadTroyCVDir;
 
+    @Value("${file.upload-photo-dir:uploads/photo}")
+    private String uploadPhotoDir;
+
     private Path uploadDirectory;
 
 
-    public void setUploadDirectory(boolean isOriginalCV) {
+    public void setUploadDirectory(boolean isOriginalCV, boolean isPhoto) {
 
-        String uploadDir = isOriginalCV ? uploadOriginalCVDir : uploadTroyCVDir;
+        String uploadDir = isPhoto ? uploadPhotoDir : isOriginalCV ? uploadOriginalCVDir : uploadTroyCVDir;
         this.uploadDirectory = Paths.get(uploadDir).toAbsolutePath().normalize();
 
         try {
@@ -42,13 +45,13 @@ public class FileStorageServiceImpl implements FileStorageService {
     /**
      *
      * @param file
-     * @param candidateId
+     * @param id
      * @return
      */
     @Override
-    public String store(MultipartFile file, UUID candidateId, boolean isOriginalCV) {
+    public String store(MultipartFile file, UUID id, boolean isOriginalCV, boolean isPhoto) {
 
-        setUploadDirectory(isOriginalCV);
+        setUploadDirectory(isOriginalCV, isPhoto);
 
         if (file == null || file.isEmpty()) {
             throw new IllegalArgumentException("CV file cannot be empty");
@@ -57,7 +60,7 @@ public class FileStorageServiceImpl implements FileStorageService {
         String extension = CommonUtil.getExtension(file.getOriginalFilename());
         CommonUtil.validateExtension(extension);
 
-        String fileName = candidateId + extension;
+        String fileName = id + extension;
 
         try {
 
