@@ -7,6 +7,18 @@ spring:
       max-file-size: 10MB
       max-request-size: 12MB
 
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
   data:
     redis:
       host: localhost
@@ -41,7 +53,8 @@ server:
   port: 8080
 
 file:
-  upload-dir: C:/work/Docs-Troy-ats/upload/cv
+  upload-original-cv-dir: C:/work/Docs-Troy-ats/upload/originalcv
+  upload-troy-cv-dir: C:/work/Docs-Troy-ats/upload/troycv
 
 app:
   jwt:

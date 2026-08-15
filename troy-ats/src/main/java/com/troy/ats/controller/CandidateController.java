@@ -85,9 +85,10 @@ public class CandidateController {
     @PostMapping(value = "/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public CandidateDto createCandidateWithCV(
             @RequestPart("candidate") CandidateCreateRequest candidate,
-            @RequestPart(value = "file", required = false) MultipartFile file) {
+            @RequestPart(value = "original_cv_file", required = false) MultipartFile originalCVFile,
+            @RequestPart(value = "troy_cv_file", required = false) MultipartFile troyCVFile) {
 
-        return candidateService.createCandidate(candidate, file);
+        return candidateService.createCandidate(candidate, originalCVFile,troyCVFile);
     }
 
     @PutMapping("/{id}")
@@ -130,6 +131,17 @@ public class CandidateController {
                         "attachment; filename=\"" + fileName + "\""
                 )
                 .body(resource);
+    }
+
+    @PostMapping("/{id}/send/email/{emailType}")
+    public ResponseEntity<Void> sendCandidateEmail(
+            @PathVariable UUID id,
+            @PathVariable String emailType,
+            @RequestPart("file") MultipartFile file ) {
+
+        candidateService.sendCandidateEmail(id, emailType, file);
+
+        return ResponseEntity.ok().build();
     }
 
 }

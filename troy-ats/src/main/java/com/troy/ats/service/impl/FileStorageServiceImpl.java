@@ -18,10 +18,18 @@ import java.util.UUID;
 @Service("fileStorageService")
 public class FileStorageServiceImpl implements FileStorageService {
 
-    private final Path uploadDirectory;
+    @Value("${file.upload-original-cv-dir:uploads/originalcv}")
+    private String uploadOriginalCVDir;
 
-    public FileStorageServiceImpl(@Value("${file.upload-dir:uploads/cv}") String uploadDir) {
+    @Value("${file.upload-troy-cv-dir:uploads/troycv}")
+    private String uploadTroyCVDir;
 
+    private Path uploadDirectory;
+
+
+    public void setUploadDirectory(boolean isOriginalCV) {
+
+        String uploadDir = isOriginalCV ? uploadOriginalCVDir : uploadTroyCVDir;
         this.uploadDirectory = Paths.get(uploadDir).toAbsolutePath().normalize();
 
         try {
@@ -38,7 +46,9 @@ public class FileStorageServiceImpl implements FileStorageService {
      * @return
      */
     @Override
-    public String store(MultipartFile file, UUID candidateId) {
+    public String store(MultipartFile file, UUID candidateId, boolean isOriginalCV) {
+
+        setUploadDirectory(isOriginalCV);
 
         if (file == null || file.isEmpty()) {
             throw new IllegalArgumentException("CV file cannot be empty");
