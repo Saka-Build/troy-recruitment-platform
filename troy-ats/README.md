@@ -18,5 +18,5 @@ Run the below command to create tables in DB.
 
 #Update application.yml file with details of DB, username and password.
 #Swagger API Documentation
-http://localhost:8080/swagger-ui/index.htm
+http://localhost:8080/swagger-ui/index.html
 

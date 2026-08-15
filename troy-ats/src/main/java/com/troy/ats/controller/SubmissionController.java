@@ -1,5 +1,6 @@
 package com.troy.ats.controller;
 
+import com.troy.ats.dto.PipelineDto;
 import com.troy.ats.entity.Submission;
 import com.troy.ats.service.SubmissionService;
 import org.springframework.http.ResponseEntity;
@@ -33,5 +34,11 @@ public class SubmissionController {
     @PostMapping
     public Submission createSubmission(@RequestBody Submission submission) {
         return submissionService.createSubmission(submission);
+    }
+
+    @GetMapping("/pipeline")
+    public ResponseEntity<List<PipelineDto>> getCandidatePipelines() {
+        List<PipelineDto> pipelines = submissionService.getCandidatePipelines();
+        return ResponseEntity.ok(pipelines);
     }
 }
