@@ -106,27 +106,6 @@ public class CandidateService {
             countByCandidateStatus.put(status.getName(), counts.getOrDefault(status.getId(),0L));
         });
 
-        /*List<Candidate> candidates =  candidateRepository.findAll();
-        long totalActiveCandidates = candidateRepository.countByStatus_Active(Boolean.TRUE);
-        List<Candidate> filteredCandidates = candidates.stream().filter(candidate -> Objects.nonNull(candidate.getStatus())).toList();
-        List<Status> statusList = statusRepository.findAll();
-
-        Map<String, Long> countByCandidateStatus = new HashMap<>();
-        countByCandidateStatus.put("Total",(long)candidates.size());
-        countByCandidateStatus.put("ActiveCandidates",totalActiveCandidates);
-
-        statusList.forEach(status -> {
-            long count = filteredCandidates.stream().filter(candidate ->
-                            candidate.getStatus() != null && candidate.getStatus().getId().equals(status.getId())
-                    ).count();
-            countByCandidateStatus.put(status.getName(), count);
-        });*/
-        /*Map<String, Long> countByStatus = filteredCandidates.stream()
-                .collect(Collectors.groupingBy(
-                        candidate -> candidate.getStatus().getName(),
-                        Collectors.counting()
-                ));*/
-
         List<Map<UUID, String>> statuses = statusList.stream().map(status -> Map.of(
                         status.getId(),
                         status.getName()
