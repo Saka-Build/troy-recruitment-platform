@@ -7,19 +7,26 @@ import com.troy.ats.entity.Employee;
 import com.troy.ats.populator.EmployeePopulator;
 import com.troy.ats.populator.ReverseEmployeePopulator;
 import com.troy.ats.repository.EmployeeRepository;
+import com.troy.ats.searchfilter.dto.EmployeeExportFilter;
 import com.troy.ats.searchfilter.dto.EmployeeFilter;
 import com.troy.ats.searchfilter.filter.EmployeeSpecification;
 import com.troy.ats.service.EmployeeService;
 import com.troy.ats.service.FileStorageService;
 import com.troy.ats.util.CommonUtil;
 import lombok.RequiredArgsConstructor;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -156,6 +163,97 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         return employeesFiltersDto;
 
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public byte[] exportEmployees(EmployeeExportFilter filter) throws IOException {
+
+        Specification<Employee> specification = EmployeeSpecification.exportFilter(filter);
+
+        List<Employee> employees = employeeRepository.findAll(specification, Sort.by(Sort.Direction.DESC, "createdAt"));
+
+        return createExcel(employees);
+    }
+
+    private byte[] createExcel(List<Employee> employees) throws IOException {
+
+        try (Workbook workbook = new HSSFWorkbook();
+             ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+
+            Sheet sheet = workbook.createSheet("Employees");
+
+            // Header style
+            CellStyle headerStyle = workbook.createCellStyle();
+
+            Font headerFont = workbook.createFont();
+            headerFont.setBold(true);
+
+            headerStyle.setFont(headerFont);
+
+            // Header
+            Row header = sheet.createRow(0);
+
+            String[] columns = {
+                    "Employee Code",
+                    "Full Name",
+                    "Designation",
+                    "Official Email",
+                    "Personal Email",
+                    "Phone",
+                    "WhatsApp",
+                    "Role",
+                    "Active",
+                    "Country Code",
+                    "Created At",
+                    "Updated At",
+                    "Last Login At"
+            };
+
+            for (int i = 0; i < columns.length; i++) {
+
+                Cell cell = header.createCell(i);
+                cell.setCellValue(columns[i]);
+                cell.setCellStyle(headerStyle);
+            }
+
+            // Data
+            int rowNum = 1;
+
+            for (Employee employee : employees) {
+
+                Row row = sheet.createRow(rowNum++);
+
+                int col = 0;
+
+                row.createCell(col++).setCellValue(value(employee.getEmployeeCode()));
+                row.createCell(col++).setCellValue(value(employee.getFullName()));
+                row.createCell(col++).setCellValue(value(employee.getDesignation()));
+                row.createCell(col++).setCellValue(value(employee.getOfficialEmail()));
+                row.createCell(col++).setCellValue(value(employee.getPersonalEmail()));
+                row.createCell(col++).setCellValue(value(employee.getPhone()));
+                row.createCell(col++).setCellValue(value(employee.getWhatsapp()));
+                row.createCell(col++).setCellValue(employee.getRole() != null ? employee.getRole().name() : "");
+                row.createCell(col++).setCellValue(employee.getIsActive() != null ? employee.getIsActive() : false);
+                row.createCell(col++).setCellValue(value(employee.getCountryCode()));
+                row.createCell(col++).setCellValue(employee.getCreatedAt() != null ? employee.getCreatedAt().toString() : "");
+                row.createCell(col++).setCellValue(employee.getUpdatedAt() != null ? employee.getUpdatedAt().toString() : "");
+                row.createCell(col++).setCellValue(employee.getLastLoginAt() != null ? employee.getLastLoginAt().toString() : "");
+            }
+
+            // Auto-size columns
+            for (int i = 0; i < columns.length; i++) {
+                sheet.autoSizeColumn(i);
+            }
+
+            workbook.write(outputStream);
+
+            return outputStream.toByteArray();
+        }
+    }
+
+    private String value(String value) {
+        return value != null ? value : "";
     }
 
 }

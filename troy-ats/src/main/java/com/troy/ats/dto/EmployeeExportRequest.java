@@ -4,19 +4,17 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.OffsetDateTime;
-import java.util.UUID;
+import java.time.LocalDate;
 
 @Getter
 @Setter
 @Data
-public class CandidateExportRequest {
+public class EmployeeExportRequest {
 
-    private OffsetDateTime fromDate;
-    private OffsetDateTime toDate;
-    private String skill;
-    private String location;
+    private LocalDate fromDate;
+    private LocalDate toDate;
+    private String role;
+    private String designation;
     private Boolean active;
-    private UUID statusId;
 
 }

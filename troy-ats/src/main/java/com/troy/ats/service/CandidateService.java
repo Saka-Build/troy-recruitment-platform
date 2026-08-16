@@ -1,14 +1,9 @@
 package com.troy.ats.service;
 
 import com.troy.ats.constants.CommonConstants;
-import com.troy.ats.dto.CandidateCreateRequest;
-import com.troy.ats.dto.CandidateDto;
-import com.troy.ats.dto.CandidatesDto;
-import com.troy.ats.dto.CandidatesFiltersDto;
+import com.troy.ats.dto.*;
 import com.troy.ats.entity.Candidate;
-import com.troy.ats.entity.Employee;
 import com.troy.ats.entity.Status;
-import com.troy.ats.entity.SubStatus;
 import com.troy.ats.enums.CvFormat;
 import com.troy.ats.populator.CandidatePopulator;
 import com.troy.ats.populator.CandidatesPopulator;
@@ -21,12 +16,16 @@ import com.troy.ats.searchfilter.dto.CandidateFilter;
 import com.troy.ats.searchfilter.filter.CandidateSpecification;
 import com.troy.ats.util.CommonUtil;
 import lombok.RequiredArgsConstructor;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -184,6 +183,144 @@ public class CandidateService {
                 .orElseThrow(() -> new RuntimeException("Candidate not found"));
 
         emailService.sendCandidateEmail(candidate, emailType, file);
+    }
+
+    @Transactional(readOnly = true)
+    public byte[] exportCandidates(CandidateExportRequest request)
+            throws IOException {
+
+        List<Candidate> candidates =
+                candidateRepository.findCandidatesForExport(
+                        request.getFromDate(),
+                        request.getToDate(),
+                        request.getLocation(),
+                        request.getActive(),
+                        request.getStatusId(),
+                        request.getSkill()
+                );
+
+        try (
+                HSSFWorkbook workbook = new HSSFWorkbook();
+                ByteArrayOutputStream outputStream = new ByteArrayOutputStream()
+        ) {
+
+            Sheet sheet = workbook.createSheet("Candidates");
+            createHeader(sheet);
+            int rowIndex = 1;
+
+            for (Candidate candidate : candidates) {
+                Row row = sheet.createRow(rowIndex++);
+                int column = 0;
+
+                setCell(row, column++, candidate.getCvId());
+                setCell(row, column++, candidate.getFullName());
+                setCell(row, column++, candidate.getEmail());
+                setCell(row, column++, candidate.getPhone());
+                setCell(row, column++, candidate.getWhatsapp());
+                setCell(row, column++, candidate.getLocation());
+                setCell(row, column++, candidate.getNationality());
+                setCell(row, column++, candidate.getCurrentDesignation());
+                setCell(row, column++, candidate.getCurrentEmployer());
+
+                setCell(row, column++, candidate.getExperienceYears() != null ? candidate.getExperienceYears().toString() : "");
+                setCell(row, column++, candidate.getNoticePeriodDays() != null ? candidate.getNoticePeriodDays().toString() : "");
+                setCell(row, column++, candidate.getCurrentSalary() != null ? candidate.getCurrentSalary().toString() : "");
+                setCell(row, column++, candidate.getExpectedSalary() != null ? candidate.getExpectedSalary().toString() : "");
+                setCell(row, column++, candidate.getSalaryCurrency());
+                setCell(row, column++, candidate.getSkills() != null ? String.join(", ", candidate.getSkills()) : "");
+
+                setCell(row, column++, candidate.getEducation());
+                setCell(row, column++, candidate.getVisaStatus());
+                setCell(row, column++, candidate.getLinkedinUrl());
+                setCell(row, column++, candidate.getSource());
+
+                // Status
+                setCell(row, column++, candidate.getStatus() != null ? candidate.getStatus().getName() : "");
+
+                // Sub status
+                setCell(row, column++, candidate.getSubStatus() != null ? candidate.getSubStatus().getName() : "");
+
+                // CV Owner
+                setCell(row, column++, candidate.getCvOwner() != null ? candidate.getCvOwner().getFullName() : "");
+
+                setCell(row, column++, candidate.getReferredBy());
+                setCell(row, column++, candidate.getReferenceNote());
+                setCell(row, column++, candidate.getOriginalCvUrl());
+                setCell(row, column++, candidate.getOriginalCvFormat() != null ? candidate.getOriginalCvFormat().name() : "");
+                setCell(row, column++, candidate.getTroyCvUrl());
+                setCell(row, column++, candidate.getTroyCvPdfUrl());
+                setCell(row, column++, candidate.getActive() != null ? candidate.getActive().toString() : "");
+                setCell(row, column++, candidate.getCreatedAt() != null ? candidate.getCreatedAt().toString() : "");
+                setCell(row, column++, candidate.getUpdatedAt() != null ? candidate.getUpdatedAt().toString() : "");
+            }
+
+            // Auto-size columns
+            for (int i = 0; i < 30; i++) {
+                sheet.autoSizeColumn(i);
+            }
+
+            workbook.write(outputStream);
+
+            return outputStream.toByteArray();
+        }
+    }
+
+    private void createHeader(Sheet sheet) {
+
+        Row header = sheet.createRow(0);
+
+        String[] columns = {
+                "CV ID",
+                "Full Name",
+                "Email",
+                "Phone",
+                "WhatsApp",
+                "Location",
+                "Nationality",
+                "Current Designation",
+                "Current Employer",
+                "Experience Years",
+                "Notice Period Days",
+                "Current Salary",
+                "Expected Salary",
+                "Salary Currency",
+                "Skills",
+                "Education",
+                "Visa Status",
+                "LinkedIn",
+                "Source",
+                "Status",
+                "Sub Status",
+                "CV Owner",
+                "Referred By",
+                "Reference Note",
+                "Original CV URL",
+                "Original CV Format",
+                "Troy CV URL",
+                "Troy CV PDF URL",
+                "Active",
+                "Created At",
+                "Updated At"
+        };
+
+        CellStyle style = sheet.getWorkbook().createCellStyle();
+
+        Font font = sheet.getWorkbook().createFont();
+        font.setBold(true);
+
+        style.setFont(font);
+
+        for (int i = 0; i < columns.length; i++) {
+            Cell cell = header.createCell(i);
+            cell.setCellValue(columns[i]);
+            cell.setCellStyle(style);
+        }
+    }
+
+    private void setCell(Row row, int column, String value) {
+
+        Cell cell = row.createCell(column);
+        cell.setCellValue(value != null ? value : "");
     }
 }
 

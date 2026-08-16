@@ -1,9 +1,6 @@
 package com.troy.ats.controller;
 
-import com.troy.ats.dto.CandidateCreateRequest;
-import com.troy.ats.dto.CandidateDto;
-import com.troy.ats.dto.CandidatesDto;
-import com.troy.ats.dto.CandidatesFiltersDto;
+import com.troy.ats.dto.*;
 import com.troy.ats.entity.Candidate;
 import com.troy.ats.searchfilter.dto.CandidateFilter;
 import com.troy.ats.service.CandidateService;
@@ -21,6 +18,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -144,6 +142,18 @@ public class CandidateController {
         candidateService.sendCandidateEmail(id, emailType, file);
 
         return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/export")
+    public ResponseEntity<byte[]> exportCandidates(
+            @RequestBody CandidateExportRequest request)
+            throws IOException {
+
+        byte[] file = candidateService.exportCandidates(request);
+
+        return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=candidates.xls")
+                .contentType(MediaType.parseMediaType("application/vnd.ms-excel"))
+                .body(file);
     }
 
 }

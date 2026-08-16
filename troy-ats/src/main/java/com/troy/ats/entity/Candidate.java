@@ -75,6 +75,7 @@ public class Candidate {
     private String salaryCurrency;
 
     @Column(name = "skills", columnDefinition = "text[]")
+    @JdbcTypeCode(SqlTypes.ARRAY)
     private String[] skills;
 
     @Column(name = "education", columnDefinition = "text")

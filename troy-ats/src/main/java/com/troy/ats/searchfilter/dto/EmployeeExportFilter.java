@@ -1,12 +1,16 @@
 package com.troy.ats.searchfilter.dto;
 
-import java.time.OffsetDateTime;
+import com.troy.ats.enums.UserRole;
+import lombok.Data;
 
-public record EmployeeFilter(
-        String search,
-        Boolean active,
-        String location,
-        OffsetDateTime createdFrom,
-        OffsetDateTime createdTo
-) {
+import java.time.LocalDateTime;
+
+@Data
+public class EmployeeExportFilter {
+
+    private LocalDateTime fromDate;
+    private LocalDateTime toDate;
+    private UserRole role;
+    private String designation;
+    private Boolean active;
 }
