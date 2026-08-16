@@ -1,10 +1,9 @@
 package com.troy.ats.searchfilter.filter;
 
 
-import com.troy.ats.entity.Candidate;
 import com.troy.ats.entity.Employee;
+import com.troy.ats.searchfilter.dto.EmployeeExportFilter;
 import com.troy.ats.searchfilter.dto.EmployeeFilter;
-import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;
 
@@ -57,4 +56,38 @@ public class EmployeeSpecification {
             return cb.and(predicates.toArray(new Predicate[0]));
         };
     }
+
+    public static Specification<Employee> exportFilter(EmployeeExportFilter filter) {
+
+        return (root, query, cb) -> {
+
+            List<Predicate> predicates = new ArrayList<>();
+            // From date
+            if (filter.getFromDate() != null) {
+                predicates.add(cb.greaterThanOrEqualTo(root.get("createdAt"), filter.getFromDate()));
+            }
+            // To date
+            if (filter.getToDate() != null) {
+                predicates.add(cb.lessThanOrEqualTo(root.get("createdAt"), filter.getToDate()));
+            }
+            // Role
+            if (filter.getRole() != null) {
+                predicates.add(cb.equal(root.get("role"), filter.getRole()));
+            }
+            // Designation
+            if (filter.getDesignation() != null) {
+                predicates.add(cb.equal(root.get("designation"), filter.getDesignation()));
+            }
+            // Active
+            // IMPORTANT: use != null, NOT if (filter.getActive())
+            if (filter.getActive() != null) {
+                predicates.add(cb.equal(root.get("isActive"), filter.getActive()));
+            }
+
+            query.orderBy(cb.desc(root.get("createdAt")));
+
+            return cb.and(predicates.toArray(new Predicate[0]));
+        };
+    }
+
 }

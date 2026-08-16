@@ -2,13 +2,18 @@ package com.troy.ats.service;
 
 import com.troy.ats.dto.EmployeeCreateRequest;
 import com.troy.ats.dto.EmployeeDto;
+import com.troy.ats.dto.EmployeeExportRequest;
 import com.troy.ats.dto.EmployeesFiltersDto;
 import com.troy.ats.entity.Employee;
+import com.troy.ats.enums.UserRole;
+import com.troy.ats.searchfilter.dto.EmployeeExportFilter;
 import com.troy.ats.searchfilter.dto.EmployeeFilter;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -53,6 +58,14 @@ public interface EmployeeService {
      * @return
      */
     public EmployeesFiltersDto getEmployeeFilters();
+
+    /**
+     *
+     * @param filter
+     * @return
+     * @throws IOException
+     */
+    byte[] exportEmployees(EmployeeExportFilter filter) throws IOException;
 
 }
 
