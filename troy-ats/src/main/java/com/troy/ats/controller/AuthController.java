@@ -68,7 +68,7 @@ public class AuthController {
             user.setFailedLoginAttempts(0);
         }
 
-        if (!passwordEncoder.matches(passwordEncoder.encode(req.getPassword()), user.getPasswordHash())) {
+        if (!passwordEncoder.matches(req.getPassword(), user.getPasswordHash())) {
             user.setFailedLoginAttempts(user.getFailedLoginAttempts() + 1);
             if (user.getFailedLoginAttempts() >= MAX_FAILED_ATTEMPTS) {
                 user.setIsActive(true);

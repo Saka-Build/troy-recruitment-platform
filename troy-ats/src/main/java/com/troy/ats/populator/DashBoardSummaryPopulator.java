@@ -91,7 +91,9 @@ public class DashBoardSummaryPopulator {
         }
         dashboardSummaryDto.setTotalInterviewsToday(todayInterviewList.size());
         dashboardSummaryDto.setTodayInterviews(todayInterviewList);
-        dashboardSummaryDto.setEarliestInterview(todayInterviewList.get(0));
+        if(todayInterviewList.size() > 0){
+            dashboardSummaryDto.setEarliestInterview(todayInterviewList.get(0));
+        }
     }
 
     private void populateInterview(Interview source, InterviewDataForDashboardDto target){
