@@ -25,7 +25,7 @@ public class ReverseEmployeePopulator {
         target.setWhatsapp(source.getWhatsapp());
         target.setRole(UserRole.fromValue(source.getRole()));
         target.setPasswordHash(passwordEncoder.encode(source.getPassword()));
-        target.setIsActive(source.getIsActive() != null ? source.getIsActive() : true);
+        //target.setIsActive(source.getIsActive() != null ? source.getIsActive() : true);
         target.setCountryCode(source.getCountryCode());
         target.setFailedLoginAttempts(0);
 

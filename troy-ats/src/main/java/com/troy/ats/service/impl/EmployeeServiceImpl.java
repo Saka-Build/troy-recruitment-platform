@@ -104,6 +104,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         // Create employee
         Employee employee = new Employee();
         reverseEmployeePopulator.populate(request, employee);
+        employee.setIsActive(Boolean.TRUE);
 
         // Save employee first
         employee = employeeRepository.save(employee);

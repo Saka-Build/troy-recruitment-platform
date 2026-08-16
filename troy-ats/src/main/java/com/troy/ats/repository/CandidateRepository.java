@@ -18,7 +18,7 @@ public interface CandidateRepository extends JpaRepository<Candidate, UUID>, Jpa
     """)
 
     List<Object[]> countCandidatesByStatus();
-    long countByStatus_Active(boolean active);
+    long countByActive(boolean active);
     long countByStatus_Name(String statusName);
     List<Candidate> findByStatus_NameAndSubStatus_Name(String statusName, String subStatusName);
 }

@@ -79,7 +79,7 @@ public class CandidateService {
     }
 
     public long getTotalCandidatesByStatus(boolean active) {
-        return candidateRepository.countByStatus_Active(active);
+        return candidateRepository.countByActive(active);
     }
     public long getTotalCandidatesByStatusName(String statusName) {
         return candidateRepository.countByStatus_Name(statusName);
@@ -107,7 +107,7 @@ public class CandidateService {
                 ));
 
         List<Status> statusList = statusRepository.findAll();
-        long totalActiveCandidates = candidateRepository.countByStatus_Active(Boolean.TRUE);
+        long totalActiveCandidates = candidateRepository.countByActive(Boolean.TRUE);
         long countTotalCandidates = candidateRepository.count();
 
         Map<String, Long> countByCandidateStatus = new HashMap<>();
@@ -147,6 +147,7 @@ public class CandidateService {
 
         Candidate candidate = new Candidate();
         reverseCandidatePopulator.populate(request, candidate);
+        candidate.setActive(Boolean.TRUE);
 
         // Save candidate first
         candidate = candidateRepository.save(candidate);
