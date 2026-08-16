@@ -2,7 +2,11 @@ package com.troy.ats.service;
 
 import com.troy.ats.dto.EmployeeCreateRequest;
 import com.troy.ats.dto.EmployeeDto;
+import com.troy.ats.dto.EmployeesFiltersDto;
 import com.troy.ats.entity.Employee;
+import com.troy.ats.searchfilter.dto.EmployeeFilter;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -35,5 +39,20 @@ public interface EmployeeService {
      * @return
      */
     EmployeeDto createEmployee(EmployeeCreateRequest request, MultipartFile photo);
+
+    /**
+     *
+     * @param filter
+     * @param pageable
+     * @return
+     */
+    Page<EmployeeDto> getEmployees(EmployeeFilter filter, Pageable pageable);
+
+    /**
+     *
+     * @return
+     */
+    public EmployeesFiltersDto getEmployeeFilters();
+
 }
 
