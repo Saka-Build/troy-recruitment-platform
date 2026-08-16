@@ -1,15 +1,21 @@
 package com.troy.ats.service.impl;
+
 import com.troy.ats.dto.EmployeeCreateRequest;
 import com.troy.ats.dto.EmployeeDto;
+import com.troy.ats.dto.EmployeesFiltersDto;
 import com.troy.ats.entity.Employee;
 import com.troy.ats.populator.EmployeePopulator;
 import com.troy.ats.populator.ReverseEmployeePopulator;
 import com.troy.ats.repository.EmployeeRepository;
+import com.troy.ats.searchfilter.dto.EmployeeFilter;
+import com.troy.ats.searchfilter.filter.EmployeeSpecification;
 import com.troy.ats.service.EmployeeService;
 import com.troy.ats.service.FileStorageService;
 import com.troy.ats.util.CommonUtil;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -115,6 +121,40 @@ public class EmployeeServiceImpl implements EmployeeService {
         employeePopulator.populate(employee, employeeDto);
 
         return employeeDto;
+    }
+
+    /**
+     *
+     * @param filter
+     * @param pageable
+     * @return
+     */
+    @Override
+    public Page<EmployeeDto> getEmployees(EmployeeFilter filter, Pageable pageable) {
+        return employeeRepository.findAll(EmployeeSpecification.filter(filter), pageable)
+                .map(employee -> {
+                    EmployeeDto dto = new EmployeeDto();
+                    employeePopulator.populate(employee, dto);
+                    return dto;
+                });
+    }
+
+    /**
+     *
+     * @return
+     */
+    @Override
+    public EmployeesFiltersDto getEmployeeFilters() {
+
+        long totalEmployees = employeeRepository.count();
+        long totalActiveEmployees = employeeRepository.countByIsActive(Boolean.TRUE);
+
+        EmployeesFiltersDto employeesFiltersDto = new EmployeesFiltersDto();
+        employeesFiltersDto.setTotalEmployees(totalEmployees);
+        employeesFiltersDto.setTotalActiveEmployees(totalActiveEmployees);
+
+        return employeesFiltersDto;
+
     }
 
 }

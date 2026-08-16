@@ -1,14 +1,22 @@
 package com.troy.ats.controller;
+
 import com.troy.ats.dto.EmployeeCreateRequest;
 import com.troy.ats.dto.EmployeeDto;
+import com.troy.ats.dto.EmployeesFiltersDto;
 import com.troy.ats.entity.Employee;
+import com.troy.ats.searchfilter.dto.EmployeeFilter;
 import com.troy.ats.service.EmployeeService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -25,6 +33,25 @@ public class EmployeeController {
     @GetMapping(("/allEmployees"))
     public List<Employee> getAllEmployees() {
         return employeeService.getAllEmployees();
+    }
+
+    @GetMapping
+    public ResponseEntity<Page<EmployeeDto>> getEmployees(@RequestParam(required = false) String search,
+                                                           @RequestParam(required = false) Boolean active,
+                                                           @RequestParam(required = false) String location,
+                                                           @RequestParam(required = false) OffsetDateTime createdFrom,
+                                                           @RequestParam(required = false) OffsetDateTime createdTo,
+                                                           @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+
+        EmployeeFilter filter = new EmployeeFilter(search, active, location, createdFrom, createdTo);
+
+        return ResponseEntity.ok(employeeService.getEmployees(filter, pageable));
+    }
+
+    @GetMapping("/employeefilters")
+    public ResponseEntity<EmployeesFiltersDto> getCandidateFilters() {
+
+        return ResponseEntity.ok(employeeService.getEmployeeFilters());
     }
 
     @GetMapping("/{id}")
