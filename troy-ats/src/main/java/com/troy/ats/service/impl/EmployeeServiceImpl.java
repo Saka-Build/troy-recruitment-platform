@@ -4,6 +4,7 @@ import com.troy.ats.dto.EmployeeCreateRequest;
 import com.troy.ats.dto.EmployeeDto;
 import com.troy.ats.dto.EmployeesFiltersDto;
 import com.troy.ats.entity.Employee;
+import com.troy.ats.exception.DuplicateResourceException;
 import com.troy.ats.populator.EmployeePopulator;
 import com.troy.ats.populator.ReverseEmployeePopulator;
 import com.troy.ats.repository.EmployeeRepository;
@@ -92,20 +93,20 @@ public class EmployeeServiceImpl implements EmployeeService {
         // Employee code
         if (employeeRepository.existsByEmployeeCode(request.getEmployeeCode())) {
 
-            throw new IllegalArgumentException("Employee code already exists");
+            throw new DuplicateResourceException("Employee code already exists");
         }
 
         // Official email
         if (employeeRepository.existsByOfficialEmailIgnoreCase(request.getOfficialEmail())) {
 
-            throw new IllegalArgumentException("Official email already exists");
+            throw new DuplicateResourceException("Official email already exists");
         }
 
         // Personal email
         if (request.getPersonalEmail() != null && !request.getPersonalEmail().isBlank()
                 && employeeRepository.existsByPersonalEmailIgnoreCase(request.getPersonalEmail())) {
 
-            throw new IllegalArgumentException("Personal email already exists");
+            throw new DuplicateResourceException("Personal email already exists");
         }
 
         // Create employee

@@ -1,0 +1,10 @@
+services:
+  troy-ats:
+    image: troyats/troy-ats:1.2
+    container_name: troy-ats
+
+    ports:
+      - "8080:8080"
+
+    env_file:
+      - D:/troy-worspace/config/troy-ats.env

@@ -1,6 +1,7 @@
 package com.troy.ats.service.impl;
 
 
+import com.troy.ats.exception.FileStorageException;
 import com.troy.ats.service.FileStorageService;
 import com.troy.ats.util.CommonUtil;
 import lombok.RequiredArgsConstructor;
@@ -38,7 +39,7 @@ public class FileStorageServiceImpl implements FileStorageService {
         try {
             Files.createDirectories(this.uploadDirectory);
         } catch (IOException e) {
-            throw new RuntimeException("Could not create upload directory", e);
+            throw new FileStorageException("Could not create upload directory", e);
         }
     }
 
@@ -72,7 +73,7 @@ public class FileStorageServiceImpl implements FileStorageService {
 
         } catch (IOException e) {
 
-            throw new RuntimeException("Failed to store CV file", e);
+            throw new FileStorageException("Failed to store CV file", e);
         }
 
 
