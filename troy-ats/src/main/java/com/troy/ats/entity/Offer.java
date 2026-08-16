@@ -3,6 +3,8 @@ package com.troy.ats.entity;
 import com.troy.ats.enums.OfferStatus;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -80,10 +82,8 @@ public class Offer {
     private Instant joiningDate;
 
     @Enumerated(EnumType.STRING)
-    @Column(
-            name = "offer_status",
-            nullable = false
-    )
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
+    @Column(name = "offer_status", nullable = false)
     private OfferStatus offerStatus;
 
     @Column(name = "offer_letter_url", columnDefinition = "text")

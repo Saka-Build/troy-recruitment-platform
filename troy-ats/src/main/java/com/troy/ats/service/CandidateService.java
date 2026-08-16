@@ -172,7 +172,7 @@ public class CandidateService {
         }
 
         CandidateDto candidateDto = new CandidateDto();
-        //candidatePopulator.populate(candidate, candidateDto);
+        candidatePopulator.populate(candidate, candidateDto);
 
         return candidateDto;
     }

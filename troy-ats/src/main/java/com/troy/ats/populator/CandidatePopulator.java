@@ -19,8 +19,13 @@ public class CandidatePopulator {
 
     public void populate(Candidate source, CandidateDto target) {
 
-        populateCandidateHeader(source, new CandidateHeaderDto());
-        populateCandidateProfile(source, new CandidateProfileDto());
+        CandidateHeaderDto candidateHeaderDto = new CandidateHeaderDto();
+        CandidateProfileDto candidateProfileDto = new CandidateProfileDto();
+        populateCandidateHeader(source, candidateHeaderDto);
+        populateCandidateProfile(source, candidateProfileDto);
+
+        target.setCandidateHeader(candidateHeaderDto);
+        target.setCandidateProfile(candidateProfileDto);
     }
 
     private void populateCandidateHeader(Candidate source, CandidateHeaderDto target){
