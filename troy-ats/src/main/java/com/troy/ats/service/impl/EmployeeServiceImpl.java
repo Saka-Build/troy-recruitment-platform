@@ -1,8 +1,10 @@
 package com.troy.ats.service.impl;
 
+import com.troy.ats.dto.CandidateDto;
 import com.troy.ats.dto.EmployeeCreateRequest;
 import com.troy.ats.dto.EmployeeDto;
 import com.troy.ats.dto.EmployeesFiltersDto;
+import com.troy.ats.entity.Candidate;
 import com.troy.ats.entity.Employee;
 import com.troy.ats.exception.DuplicateResourceException;
 import com.troy.ats.populator.EmployeePopulator;
@@ -14,6 +16,7 @@ import com.troy.ats.searchfilter.filter.EmployeeSpecification;
 import com.troy.ats.service.EmployeeService;
 import com.troy.ats.service.FileStorageService;
 import com.troy.ats.util.CommonUtil;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
@@ -43,22 +46,30 @@ public class EmployeeServiceImpl implements EmployeeService {
     private final FileStorageService fileStorageService;
 
 
+    @Override
     public List<Employee> getAllEmployees() {
         return employeeRepository.findAll();
     }
 
+    @Override
     public Optional<Employee> getEmployeeById(UUID id) {
         return employeeRepository.findById(id);
     }
 
+
+
+    @Override
     public Employee createEmployee(Employee employee) {
         return employeeRepository.save(employee);
     }
 
+    @Override
     public Employee updateEmployee(UUID id, Employee employee) {
         // candidate.setId(id);
         return employeeRepository.save(employee);
     }
+
+    @Override
     public void deleteEmployee(UUID id) {
         employeeRepository.deleteById(id);
     }
@@ -90,6 +101,84 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     @Transactional
     public EmployeeDto createEmployee(EmployeeCreateRequest request, MultipartFile photo) {
+
+        validateEmployee(request);
+
+        // Create employee
+        Employee employee = new Employee();
+        reverseEmployeePopulator.populate(request, employee);
+        employee.setIsActive(Boolean.TRUE);
+        employee.setFailedLoginAttempts(0);
+
+        // Save employee first
+        employee = employeeRepository.save(employee);
+
+        // Upload photo
+        if (photo != null && !photo.isEmpty()) {
+
+            CommonUtil.validatePhoto(photo);
+            String photoUrl = fileStorageService.store(photo, employee.getId(),Boolean.FALSE, Boolean.TRUE);
+            employee.setPhotoUrl(photoUrl);
+
+            employee = employeeRepository.save(employee);
+        }
+        EmployeeDto employeeDto = new EmployeeDto();
+        employeePopulator.populate(employee, employeeDto);
+
+        return employeeDto;
+    }
+
+    @Override
+    public EmployeeDto updateEmployee(UUID employeeId, EmployeeCreateRequest request, MultipartFile photo) {
+
+        Employee employee = employeeRepository.findById(employeeId)
+                .orElseThrow(() -> new EntityNotFoundException("Employee not found: " + employeeId));
+
+        reverseEmployeePopulator.populate(request, employee);
+        // Save employee first
+        employee = employeeRepository.save(employee);
+
+        // Upload photo
+        if (photo != null && !photo.isEmpty()) {
+
+            CommonUtil.validatePhoto(photo);
+            // Keep old URL before replacing
+            String oldPhotoUrl = employee.getPhotoUrl();
+            // Delete old CV
+            if (oldPhotoUrl != null && !oldPhotoUrl.isBlank()) {
+
+                fileStorageService.delete(oldPhotoUrl, Boolean.FALSE, Boolean.TRUE);
+            }
+            String photoUrl = fileStorageService.store(photo, employee.getId(), Boolean.FALSE, Boolean.TRUE);
+            employee.setPhotoUrl(photoUrl);
+
+            employee = employeeRepository.save(employee);
+        }
+        EmployeeDto employeeDto = new EmployeeDto();
+        employeePopulator.populate(employee, employeeDto);
+
+        return employeeDto;
+    }
+
+    /**
+     *
+     * @param id
+     * @return
+     */
+    @Override
+    public Optional<EmployeeDto> getEmployeeDtoById(UUID id) {
+
+        Optional<EmployeeDto> employeeDto = employeeRepository.findById(id)
+                .map(employee -> {
+                    EmployeeDto dto = new EmployeeDto();
+                    employeePopulator.populate(employee, dto);
+                    return dto;
+                });
+        return employeeDto;
+    }
+
+    private void validateEmployee(EmployeeCreateRequest request){
+
         // Employee code
         if (employeeRepository.existsByEmployeeCode(request.getEmployeeCode())) {
 
@@ -108,28 +197,6 @@ public class EmployeeServiceImpl implements EmployeeService {
 
             throw new DuplicateResourceException("Personal email already exists");
         }
-
-        // Create employee
-        Employee employee = new Employee();
-        reverseEmployeePopulator.populate(request, employee);
-        employee.setIsActive(Boolean.TRUE);
-
-        // Save employee first
-        employee = employeeRepository.save(employee);
-
-        // Upload photo
-        if (photo != null && !photo.isEmpty()) {
-
-            CommonUtil.validatePhoto(photo);
-            String photoUrl = fileStorageService.store(photo, employee.getId(),Boolean.FALSE, Boolean.TRUE);
-            employee.setPhotoUrl(photoUrl);
-
-            employee = employeeRepository.save(employee);
-        }
-        EmployeeDto employeeDto = new EmployeeDto();
-        employeePopulator.populate(employee, employeeDto);
-
-        return employeeDto;
     }
 
     /**

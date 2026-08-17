@@ -17,8 +17,10 @@ public interface FileStorageService {
     /**
      *
      * @param fileUrl
+     * @param isOriginalCV
+     * @param isPhoto
      */
-    void delete(String fileUrl);
+    void delete(String fileUrl, boolean isOriginalCV, boolean isPhoto);
 
 }
 

@@ -1,9 +1,6 @@
 package com.troy.ats.service;
 
-import com.troy.ats.dto.EmployeeCreateRequest;
-import com.troy.ats.dto.EmployeeDto;
-import com.troy.ats.dto.EmployeeExportRequest;
-import com.troy.ats.dto.EmployeesFiltersDto;
+import com.troy.ats.dto.*;
 import com.troy.ats.entity.Employee;
 import com.troy.ats.enums.UserRole;
 import com.troy.ats.searchfilter.dto.EmployeeExportFilter;
@@ -44,6 +41,22 @@ public interface EmployeeService {
      * @return
      */
     EmployeeDto createEmployee(EmployeeCreateRequest request, MultipartFile photo);
+
+    /**
+     *
+     * @param employeeId
+     * @param request
+     * @param photo
+     * @return
+     */
+    EmployeeDto updateEmployee(UUID employeeId, EmployeeCreateRequest request, MultipartFile photo);
+
+    /**
+     *
+     * @param id
+     * @return
+     */
+    Optional<EmployeeDto> getEmployeeDtoById(UUID id);
 
     /**
      *

@@ -40,6 +40,7 @@ public class EmployeePopulator {
         target.setPhone(source.getPhone());
         target.setWhatsapp(source.getWhatsapp());
         target.setRole(source.getRole());
+        target.setPhotoUrl(source.getPhotoUrl());
         target.setLastLoginAt(convertInstantToLocalDate(source.getLastLoginAt()));
 
     }

@@ -197,7 +197,7 @@ public class CandidateService {
             // Delete old CV
             if (oldCvUrl != null && !oldCvUrl.isBlank()) {
 
-                fileStorageService.delete(oldCvUrl);
+                fileStorageService.delete(oldCvUrl, Boolean.TRUE, Boolean.FALSE);
             }
             // Store new file
             String originalCVFileUrl = fileStorageService.store(originalCVFile, candidate.getId(), Boolean.TRUE, Boolean.FALSE);
@@ -215,7 +215,7 @@ public class CandidateService {
             // Delete old CV
             if (oldCvUrl != null && !oldCvUrl.isBlank()) {
 
-                fileStorageService.delete(oldCvUrl);
+                fileStorageService.delete(oldCvUrl, Boolean.FALSE, Boolean.FALSE);
             }
             // Store new file
             String troyCVFileUrl = fileStorageService.store(troyCVFile, candidate.getId(), Boolean.FALSE, Boolean.FALSE);

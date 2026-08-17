@@ -58,8 +58,8 @@ public class EmployeeController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Employee> getEmployeeById(@PathVariable UUID id) {
-        return employeeService.getEmployeeById(id)
+    public ResponseEntity<EmployeeDto> getEmployeeById(@PathVariable UUID id) {
+        return employeeService.getEmployeeDtoById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
@@ -77,6 +77,17 @@ public class EmployeeController {
             @RequestPart(value = "photo", required = false) MultipartFile photo) {
 
         EmployeeDto employeeDto = employeeService.createEmployee(request, photo);
+
+        return ResponseEntity.ok(employeeDto);
+    }
+
+    @PutMapping(value = "/update/{employeeId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<EmployeeDto> updateEmployee(
+            @PathVariable UUID employeeId,
+            @RequestPart("employee") @Valid EmployeeCreateRequest request,
+            @RequestPart(value = "photo", required = false) MultipartFile photo) {
+
+        EmployeeDto employeeDto = employeeService.updateEmployee(employeeId,request, photo);
 
         return ResponseEntity.ok(employeeDto);
     }
