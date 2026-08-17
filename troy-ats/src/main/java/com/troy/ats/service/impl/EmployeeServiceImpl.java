@@ -129,6 +129,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
+    @Transactional
     public EmployeeDto updateEmployee(UUID employeeId, EmployeeCreateRequest request, MultipartFile photo) {
 
         Employee employee = employeeRepository.findById(employeeId)
@@ -303,7 +304,7 @@ public class EmployeeServiceImpl implements EmployeeService {
                 row.createCell(col++).setCellValue(value(employee.getWhatsapp()));
                 row.createCell(col++).setCellValue(employee.getRole() != null ? employee.getRole().name() : "");
                 row.createCell(col++).setCellValue(employee.getIsActive() != null ? employee.getIsActive() : false);
-                row.createCell(col++).setCellValue(value(employee.getCountryCode()));
+                row.createCell(col++).setCellValue(value(employee.getCountry().getCode()));
                 row.createCell(col++).setCellValue(employee.getCreatedAt() != null ? employee.getCreatedAt().toString() : "");
                 row.createCell(col++).setCellValue(employee.getUpdatedAt() != null ? employee.getUpdatedAt().toString() : "");
                 row.createCell(col++).setCellValue(employee.getLastLoginAt() != null ? employee.getLastLoginAt().toString() : "");

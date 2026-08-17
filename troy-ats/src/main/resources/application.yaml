@@ -27,18 +27,15 @@ spring:
   profiles:
     active: database
 
-
   datasource:
-    #url: jdbc:postgresql://localhost:5432/troy_ats
-    #url: jdbc:postgresql://troyats.c3cqkw6sy5vo.ap-south-1.rds.amazonaws.com:5432/troyats
-    url: ${DB_URL}
-    username: ${DB_USER}
-    password: ${DB_PASSWORD}
+    url: jdbc:postgresql://localhost:5432/troy_ats
+    username: ats_admin
+    password: TroyAts_&1947
     driver-class-name: org.postgresql.Driver
 
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
     show-sql: true
     properties:
       hibernate:
@@ -60,18 +57,9 @@ file:
   upload-troy-cv-dir: C:/work/Docs-Troy-ats/upload/troycv
   upload-photo-dir: C:/work/Docs-Troy-ats/upload/employee/photo
 
-logging:
-  level:
-    root: INFO
-    com.troy.ats: DEBUG
-    org.hibernate.SQL: DEBUG
-    org.springframework.web: INFO
-
 app:
-  logging:
-    dir: ${LOG_DIR}
   jwt:
-    secret: ${JWT_SECRET}
+    secret: "super-longest-secret-key-troyats"
     access-ttl-minutes: 30
     refresh-ttl-days: 2
 

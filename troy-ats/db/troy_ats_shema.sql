@@ -71,7 +71,7 @@ CREATE TABLE clients (
                                     ),
     phone           VARCHAR(30),
     whatsapp        VARCHAR(30),
-    country         VARCHAR(100),
+    country_id         UUID    NOT NULL REFERENCES countries(id) ON DELETE RESTRICT,
     industry        VARCHAR(100),
     status          VARCHAR(50)     NOT NULL DEFAULT 'active'
                                     CHECK (status IN ('active', 'inactive', 'prospect')),
@@ -105,7 +105,7 @@ CREATE TABLE employees (
                                     ),
     phone           VARCHAR(30)     NOT NULL,
     whatsapp        VARCHAR(30)     NOT NULL,
-    country_code    VARCHAR(2)      NOT NULL,
+    country_id    UUID            NOT NULL REFERENCES countries(id) ON DELETE RESTRICT,
     photo_url       TEXT,
     role            user_role       NOT NULL DEFAULT 'recruiter',
     password_hash   TEXT,           -- store bcrypt / argon2 hash ONLY, never plain-text
@@ -117,6 +117,8 @@ CREATE TABLE employees (
     locked_until    TIMESTAMP       WITH TIME ZONE
 );
 
+CREATE INDEX idx_employees_full_name ON employees (full_name);
+CREATE INDEX idx_employees_designation ON employees (designation);
 CREATE INDEX idx_employees_official_email ON employees (official_email);
 CREATE INDEX idx_employees_role           ON employees (role);
 CREATE INDEX idx_employees_is_active      ON employees (is_active);
@@ -235,6 +237,7 @@ CREATE TABLE candidates (
 
 CREATE INDEX idx_candidates_skills_gin   ON candidates USING GIN (skills);
 CREATE INDEX idx_candidates_full_name    ON candidates (full_name);
+CREATE INDEX idx_candidates_phone       ON candidates (phone);
 CREATE INDEX idx_candidates_status_id   ON candidates (status_id);
 CREATE INDEX idx_candidates_cv_owner_id ON candidates (cv_owner_id);
 CREATE INDEX idx_candidates_location    ON candidates (location);
@@ -250,7 +253,7 @@ CREATE TABLE jobs (
     title               VARCHAR(255)    NOT NULL,
     client_id           UUID            NOT NULL REFERENCES clients (id) ON DELETE RESTRICT,
     location            VARCHAR(255),
-    country             VARCHAR(100),
+    country_id             UUID    NOT NULL REFERENCES countries(id) ON DELETE RESTRICT,
     work_mode           job_work_mode,
     job_type            job_type,
     industry            VARCHAR(100),
@@ -522,21 +525,6 @@ CREATE TABLE message_templates (
     updated_at  TIMESTAMPTZ       NOT NULL DEFAULT NOW()
 );
 
---=================================================================
--- 16. REFRESH TOKEN
---=======================================================================
-CREATE TABLE refresh_tokens (
-                                id              BIGSERIAL       PRIMARY KEY,
-                                token_id_hash   VARCHAR(100)    NOT NULL UNIQUE,
-                                user_id         VARCHAR(100)    NOT NULL,
-                                expires_at      TIMESTAMP       WITH TIME ZONE NOT NULL,
-                                revoked         BOOLEAN         NOT NULL DEFAULT FALSE,
-                                created_at      TIMESTAMP       WITH TIME ZONE NOT NULL
-);
-
-CREATE INDEX idx_refresh_token_id ON refresh_tokens(token_id_hash);
-CREATE INDEX idx_refresh_user_id ON refresh_tokens(user_id);
-
 -- Seed default templates
 INSERT INTO message_templates (name, subject, body, channels) VALUES
     ('Interview Invite',   'Interview Invitation',          'Dear {{candidate_name}}, we would like to invite you for an interview...', ARRAY['outlook','gmail','whatsapp']::message_channel[]),
@@ -545,9 +533,49 @@ INSERT INTO message_templates (name, subject, body, channels) VALUES
     ('Offer Letter',       'Offer of Employment',           'Dear {{candidate_name}}, we are pleased to offer you the position of...', ARRAY['outlook','gmail']::message_channel[]),
     ('Joining Reminder',   'Joining Date Reminder',         'Dear {{candidate_name}}, this is a reminder that your joining date is...', ARRAY['outlook','gmail','whatsapp']::message_channel[]);
 
+--=================================================================
+-- 16. REFRESH TOKEN
+--=======================================================================
+CREATE TABLE refresh_tokens (
+        id              BIGSERIAL       PRIMARY KEY,
+        token_id_hash   VARCHAR(100)    NOT NULL UNIQUE,
+        user_id         VARCHAR(100)    NOT NULL,
+        expires_at      TIMESTAMP       WITH TIME ZONE NOT NULL,
+        revoked         BOOLEAN         NOT NULL DEFAULT FALSE,
+        created_at      TIMESTAMP       WITH TIME ZONE NOT NULL
+);
+
+CREATE INDEX idx_refresh_token_id ON refresh_tokens(token_id_hash);
+CREATE INDEX idx_refresh_user_id ON refresh_tokens(user_id);
+
+--=================================================================
+-- 17. Country
+--=======================================================================
+
+CREATE TABLE countries (
+       id       UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+       code     VARCHAR(2) NOT NULL,
+       name     VARCHAR(100) NOT NULL,
+       CONSTRAINT uk_countries_code UNIQUE (code)
+);
+
+CREATE INDEX idx_countries_code ON countries (code);
+CREATE INDEX idx_countries_name ON countries (name);
+
+INSERT INTO countries (code, name) VALUES
+                                       ('IN', 'India'),
+                                       ('US', 'United States'),
+                                       ('AE', 'United Arab Emirates'),
+                                       ('GB', 'United Kingdom'),
+                                       ('CA', 'Canada'),
+                                       ('AU', 'Australia'),
+                                       ('SG', 'Singapore'),
+                                       ('MY', 'Malaysia'),
+                                       ('SA', 'Saudi Arabia'),
+                                       ('QA', 'Qatar');
 
 -- ============================================================
--- 16. updated_at TRIGGER  (applied to all mutable tables)
+-- 18. updated_at TRIGGER  (applied to all mutable tables)
 -- ============================================================
 CREATE OR REPLACE FUNCTION fn_set_updated_at()
 RETURNS TRIGGER AS $$

@@ -37,8 +37,9 @@ public class Job {
     @Column(name = "location", length = 255)
     private String location;
 
-    @Column(name = "country", length = 100)
-    private String country;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "country_id")
+    private Country country;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "work_mode")

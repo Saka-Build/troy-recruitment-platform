@@ -14,6 +14,9 @@ import java.util.UUID;
 @Table(
         name = "candidates",
         indexes = {
+                @Index(name = "idx_candidates_full_name", columnList = "full_name"),
+                @Index(name = "idx_candidates_phone", columnList = "phone"),
+                @Index(name = "idx_candidates_skills", columnList = "skills"),
                 @Index(name = "idx_candidates_email", columnList = "email"),
                 @Index(name = "idx_candidates_cv_owner", columnList = "cv_owner_id"),
                 @Index(name = "idx_candidates_status", columnList = "status_id"),

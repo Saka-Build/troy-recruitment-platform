@@ -75,8 +75,9 @@ public class Employee {
     @Column(name = "locked_until")
     private Instant lockedUntil;
 
-    @Column(name = "country_code", nullable = false, length = 2)
-    private String countryCode;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "country_id")
+    private Country country;
 
 
     @PrePersist

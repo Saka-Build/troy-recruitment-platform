@@ -1,6 +1,9 @@
 package com.troy.ats.repository;
 
 import com.troy.ats.entity.Candidate;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -92,4 +95,12 @@ public interface CandidateRepository extends JpaRepository<Candidate, UUID>, Jpa
             "subStatus"
     })
     Optional<Candidate> findCandidateWithDetailsById(UUID id);
+
+    @Override
+    @EntityGraph(attributePaths = {"status"})
+    Page<Candidate> findAll(Specification<Candidate> spec, Pageable pageable);
+
+    @Override
+    @EntityGraph(attributePaths = {"status"})
+    Optional<Candidate> findById(UUID id);
 }

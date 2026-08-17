@@ -3,6 +3,7 @@ package com.troy.ats.populator;
 import com.troy.ats.dto.EmployeeCreateRequest;
 import com.troy.ats.entity.Employee;
 import com.troy.ats.enums.UserRole;
+import com.troy.ats.service.CountryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -15,6 +16,7 @@ import java.util.Objects;
 public class ReverseEmployeePopulator {
 
     private final PasswordEncoder passwordEncoder;
+    private final CountryService countryService;
 
     public void populate(EmployeeCreateRequest source, Employee target) {
 
@@ -46,7 +48,7 @@ public class ReverseEmployeePopulator {
             target.setPasswordHash(passwordEncoder.encode(source.getPassword()));
         }
         if(Objects.nonNull(source.getCountryCode())){
-            target.setCountryCode(source.getCountryCode());
+            target.setCountry(countryService.getCountryByCode(source.getCountryCode()));
         }
         if(Objects.nonNull(source.getActive())){
             target.setIsActive(source.getActive());
