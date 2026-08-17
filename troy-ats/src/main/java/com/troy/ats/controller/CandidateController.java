@@ -91,6 +91,19 @@ public class CandidateController {
 
     }
 
+    @PutMapping("update/{candidateId}")
+    public ResponseEntity<CandidateDto> updateCandidate(
+            @PathVariable UUID candidateId,
+            @RequestPart("candidate") CandidateCreateRequest candidate,
+            @RequestPart(value = "original_cv_file", required = false) MultipartFile originalCVFile,
+            @RequestPart(value = "troy_cv_file", required = false) MultipartFile troyCVFile) {
+
+
+        CandidateDto updatedCandidate = candidateService.updateCandidate(candidateId, candidate, originalCVFile,troyCVFile);
+
+        return ResponseEntity.ok(updatedCandidate);
+    }
+
     @PutMapping("/{id}")
     public Candidate updateCandidate(
             @PathVariable UUID id,
