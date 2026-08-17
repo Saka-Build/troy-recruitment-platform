@@ -42,5 +42,6 @@ public class CandidateCreateRequest {
 
     private String referredBy;
     private String referenceNote;
+    private boolean active;
 
 }

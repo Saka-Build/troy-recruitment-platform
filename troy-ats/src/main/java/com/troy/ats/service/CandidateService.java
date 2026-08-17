@@ -15,9 +15,11 @@ import com.troy.ats.repository.SubStatusRepository;
 import com.troy.ats.searchfilter.dto.CandidateFilter;
 import com.troy.ats.searchfilter.filter.CandidateSpecification;
 import com.troy.ats.util.CommonUtil;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
+import org.hibernate.sql.Delete;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -55,7 +57,7 @@ public class CandidateService {
 
     public Optional<CandidateDto> getCandidateDtoById(UUID id) {
 
-        Optional<CandidateDto> candidateDto = candidateRepository.findById(id)
+        Optional<CandidateDto> candidateDto = candidateRepository.findCandidateWithDetailsById(id)
                 .map(candidate -> {
                     CandidateDto dto = new CandidateDto();
                     candidatePopulator.populate(candidate, dto);
@@ -167,7 +169,7 @@ public class CandidateService {
             CvFormat troyCVformat = CommonUtil.determineCvFormat(troyCVFile);
             String troyCVFileUrl = fileStorageService.store(troyCVFile, candidate.getId(), Boolean.FALSE, Boolean.FALSE);
 
-            candidate.setOriginalCvUrl(troyCVFileUrl);
+            candidate.setTroyCvUrl(troyCVFileUrl);
             candidateRepository.save(candidate);
         }
 
@@ -175,6 +177,57 @@ public class CandidateService {
         candidatePopulator.populate(candidate, candidateDto);
 
         return candidateDto;
+    }
+
+    @Transactional
+    public CandidateDto updateCandidate(UUID candidateId, CandidateCreateRequest request, MultipartFile originalCVFile, MultipartFile troyCVFile) {
+
+        Candidate candidate = candidateRepository.findById(candidateId)
+                .orElseThrow(() -> new EntityNotFoundException("Candidate not found: " + candidateId));
+
+        reverseCandidatePopulator.populate(request, candidate);
+        // Save candidate first
+        candidate = candidateRepository.save(candidate);
+
+        if (originalCVFile != null && !originalCVFile.isEmpty()) {
+
+            CvFormat originalCVformat = CommonUtil.determineCvFormat(originalCVFile);
+            // Keep old URL before replacing
+            String oldCvUrl = candidate.getOriginalCvUrl();
+            // Delete old CV
+            if (oldCvUrl != null && !oldCvUrl.isBlank()) {
+
+                fileStorageService.delete(oldCvUrl);
+            }
+            // Store new file
+            String originalCVFileUrl = fileStorageService.store(originalCVFile, candidate.getId(), Boolean.TRUE, Boolean.FALSE);
+
+            candidate.setOriginalCvUrl(originalCVFileUrl);
+            candidate.setOriginalCvFormat(originalCVformat);
+            candidateRepository.save(candidate);
+        }
+
+        if (troyCVFile != null && !troyCVFile.isEmpty()) {
+
+            CvFormat troyCVformat = CommonUtil.determineCvFormat(troyCVFile);
+            // Keep old URL before replacing
+            String oldCvUrl = candidate.getTroyCvUrl();
+            // Delete old CV
+            if (oldCvUrl != null && !oldCvUrl.isBlank()) {
+
+                fileStorageService.delete(oldCvUrl);
+            }
+            // Store new file
+            String troyCVFileUrl = fileStorageService.store(troyCVFile, candidate.getId(), Boolean.FALSE, Boolean.FALSE);
+
+            candidate.setTroyCvUrl(troyCVFileUrl);
+            candidateRepository.save(candidate);
+        }
+        CandidateDto candidateDto = new CandidateDto();
+        candidatePopulator.populate(candidate, candidateDto);
+
+        return candidateDto;
+
     }
 
     public void sendCandidateEmail(UUID candidateId, String emailType, MultipartFile file) {

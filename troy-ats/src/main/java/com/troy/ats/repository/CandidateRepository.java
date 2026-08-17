@@ -1,6 +1,7 @@
 package com.troy.ats.repository;
 
 import com.troy.ats.entity.Candidate;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -8,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface CandidateRepository extends JpaRepository<Candidate, UUID>, JpaSpecificationExecutor<Candidate> {
@@ -81,4 +83,13 @@ public interface CandidateRepository extends JpaRepository<Candidate, UUID>, Jpa
             @Param("statusId") UUID statusId,
             @Param("skills") String skills
     );
+
+    @EntityGraph(attributePaths = {
+            "cvOwner",
+            "createdBy",
+            "updatedBy",
+            "status",
+            "subStatus"
+    })
+    Optional<Candidate> findCandidateWithDetailsById(UUID id);
 }

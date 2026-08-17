@@ -14,5 +14,11 @@ public interface FileStorageService {
      */
     String store(MultipartFile file, UUID id, boolean isOriginalCV, boolean isPhoto);
 
+    /**
+     *
+     * @param fileUrl
+     */
+    void delete(String fileUrl);
+
 }
 

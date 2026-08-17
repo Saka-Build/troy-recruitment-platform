@@ -79,4 +79,38 @@ public class FileStorageServiceImpl implements FileStorageService {
 
 
     }
+
+    /**
+     *
+     * @param fileUrl
+     */
+    @Override
+    public void delete(String fileUrl) {
+        if (fileUrl == null || fileUrl.isBlank()) {
+            return;
+        }
+
+        try {
+
+            String fileName = Paths.get(fileUrl)
+                    .getFileName()
+                    .toString();
+
+            Path file = uploadDirectory
+                    .resolve(fileName)
+                    .normalize();
+
+            if (!file.startsWith(uploadDirectory)) {
+                return;
+            }
+
+            Files.deleteIfExists(file);
+
+        } catch (IOException e) {
+            // Log instead of failing the candidate update
+            System.err.println(
+                    "Could not delete old CV: " + fileUrl
+            );
+        }
+    }
 }
