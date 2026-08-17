@@ -6,7 +6,6 @@ import com.troy.ats.entity.Candidate;
 import com.troy.ats.entity.Employee;
 import com.troy.ats.entity.Interview;
 import com.troy.ats.entity.Job;
-import com.troy.ats.enums.CountryEnum;
 import com.troy.ats.enums.JobStatus;
 import com.troy.ats.enums.OfferStatus;
 import com.troy.ats.enums.PipelineStage;

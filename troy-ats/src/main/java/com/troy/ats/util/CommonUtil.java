@@ -2,7 +2,6 @@ package com.troy.ats.util;
 
 import com.troy.ats.constants.CommonConstants;
 import com.troy.ats.entity.Employee;
-import com.troy.ats.enums.CountryEnum;
 import com.troy.ats.enums.CvFormat;
 import com.troy.ats.enums.PipelineStage;
 import com.troy.ats.service.SessionService;
@@ -33,7 +32,7 @@ public final class CommonUtil {
     public static ZoneId getZoneIdForCurrentUser(final SessionService sessionService){
 
         Employee user = sessionService.getCurrentUser();
-        String countryCode = CountryEnum.fromValue(user.getCountryCode()).getValue();
+        String countryCode = user.getCountry().getCode();
         ZoneId zoneId = getTimeZone(countryCode);
         return  zoneId;
     }

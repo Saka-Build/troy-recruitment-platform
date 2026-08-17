@@ -24,5 +24,7 @@ public class EmployeeDto {
     private String photoUrl;
     private UserRole role;
     private LocalDateTime lastLoginAt;
+    private Boolean active;
+    private CountryDto country;
 
 }

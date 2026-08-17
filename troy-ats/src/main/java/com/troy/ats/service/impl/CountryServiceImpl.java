@@ -1,79 +1,39 @@
 package com.troy.ats.service.impl;
 
-import com.troy.ats.constants.CommonConstants;
-import com.troy.ats.entity.Candidate;
-import com.troy.ats.service.EmailService;
-import com.troy.ats.util.CommonUtil;
-import jakarta.mail.MessagingException;
-import jakarta.mail.internet.MimeMessage;
+import com.troy.ats.entity.Country;
+import com.troy.ats.repository.CountryRepository;
+import com.troy.ats.service.CountryService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-import org.thymeleaf.context.Context;
-import org.thymeleaf.spring6.SpringTemplateEngine;
 
-import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
 
-@Service
+@Service("countryService")
 @RequiredArgsConstructor
-public class EmailServiceImpl implements EmailService {
+public class CountryServiceImpl implements CountryService {
 
-    private final JavaMailSender mailSender;
-    private final SessionServiceImpl sessionService;
-    private final SpringTemplateEngine templateEngine;
+    private final CountryRepository countryRepository;
 
     /**
      *
-     * @param candidate
-     * @param file
+     * @param id
+     * @return
      */
     @Override
-    public void sendCandidateEmail(Candidate candidate, String emailType, MultipartFile file) {
+    public Country getCountryById(UUID id) {
+        return countryRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Country not found with code: " + id));
+    }
 
-        try {
-            MimeMessage mimeMessage = mailSender.createMimeMessage();
-
-            MimeMessageHelper helper = new MimeMessageHelper(
-                    mimeMessage,
-                    true,
-                    "UTF-8"
-            );
-
-            helper.setTo(candidate.getEmail());
-
-            if(Objects.nonNull(sessionService.getCurrentUser()) && Objects.nonNull(sessionService.getCurrentUser().getOfficialEmail())){
-                helper.setCc(sessionService.getCurrentUser().getOfficialEmail());
-            }
-
-            helper.setSubject(CommonUtil.getEmailSubject(emailType));
-
-            // HTML template
-            Context context = new Context();
-
-            context.setVariable(CommonConstants.EMAIL_TEMPLATE_VARIABLE_CANDIDATE_NAME, candidate.getFullName());
-
-            context.setVariable(CommonConstants.EMAIL_TEMPLATE_VARIABLE_DESIGNATION, candidate.getCurrentDesignation());
-
-            context.setVariable(CommonConstants.EMAIL_TEMPLATE_VARIABLE_EXPERIENCE, candidate.getExperienceYears());
-
-            context.setVariable(CommonConstants.EMAIL_TEMPLATE_VARIABLE_LOCATION, candidate.getLocation());
-
-            String html = templateEngine.process(CommonConstants.EMAIL_TEMPLATE_PATH, context);
-
-            helper.setText(html, true);
-
-            // Attach MultipartFile directly
-            if (file != null && !file.isEmpty()) {
-
-                helper.addAttachment(file.getOriginalFilename(), file);
-            }
-
-            mailSender.send(mimeMessage);
-
-        } catch (MessagingException e) {
-            throw new RuntimeException("Failed to send email", e);
-        }
+    /**
+     *
+     * @param code
+     * @return
+     */
+    @Override
+    public Country getCountryByCode(String code) {
+        return countryRepository.findByCode(code)
+                .orElseThrow(() -> new RuntimeException("Country not found with code: " + code));
     }
 }

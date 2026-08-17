@@ -32,8 +32,9 @@ public class Client {
     @Column(name = "whatsapp", length = 30)
     private String whatsapp;
 
-    @Column(name = "country", length = 100)
-    private String country;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "country_id")
+    private Country country;
 
     @Column(name = "industry", length = 100)
     private String industry;

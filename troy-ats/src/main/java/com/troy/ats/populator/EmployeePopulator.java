@@ -1,26 +1,19 @@
 package com.troy.ats.populator;
 
-import com.troy.ats.constants.CommonConstants;
-import com.troy.ats.dto.DashboardSummaryDto;
+import com.troy.ats.dto.CountryDto;
 import com.troy.ats.dto.EmployeeDto;
-import com.troy.ats.dto.InterviewDataForDashboardDto;
-import com.troy.ats.entity.Candidate;
+import com.troy.ats.entity.Country;
 import com.troy.ats.entity.Employee;
-import com.troy.ats.entity.Interview;
-import com.troy.ats.enums.CountryEnum;
-import com.troy.ats.enums.JobStatus;
-import com.troy.ats.enums.OfferStatus;
-import com.troy.ats.enums.PipelineStage;
-import com.troy.ats.service.*;
+import com.troy.ats.service.SessionService;
 import com.troy.ats.util.CommonUtil;
 import jakarta.annotation.Resource;
-import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.time.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Objects;
 
 @Component
@@ -42,7 +35,19 @@ public class EmployeePopulator {
         target.setRole(source.getRole());
         target.setPhotoUrl(source.getPhotoUrl());
         target.setLastLoginAt(convertInstantToLocalDate(source.getLastLoginAt()));
+        target.setActive(source.getIsActive());
+        populateCountry(source, target);
 
+    }
+
+    private void populateCountry(Employee source, EmployeeDto target){
+
+        CountryDto countryDto = new CountryDto();
+        Country country = source.getCountry();
+        countryDto.setCode(country.getCode());
+        countryDto.setName(country.getName());
+
+        target.setCountry(countryDto);
     }
 
     private LocalDateTime convertInstantToLocalDate(Instant lastLoginAt){
