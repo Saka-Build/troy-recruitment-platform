@@ -2,6 +2,7 @@ package com.troy.ats.controller;
 
 import com.troy.ats.dto.*;
 import com.troy.ats.entity.Candidate;
+import com.troy.ats.exception.ApiResponse;
 import com.troy.ats.searchfilter.dto.CandidateFilter;
 import com.troy.ats.service.CandidateService;
 import com.troy.ats.util.CommonUtil;
@@ -24,7 +25,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.OffsetDateTime;
-import java.util.*;
+import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
+import java.util.UUID;
 
 import static com.troy.ats.constants.CommonConstants.CANDIDATE_CV_TYPE_TROY;
 
@@ -145,14 +149,14 @@ public class CandidateController {
     }
 
     @PostMapping("/{id}/send/email/{emailType}")
-    public ResponseEntity<Void> sendCandidateEmail(
+    public ResponseEntity<ApiResponse> sendCandidateEmail(
             @PathVariable UUID id,
             @PathVariable String emailType,
-            @RequestPart("file") MultipartFile file ) {
+            @RequestPart(value = "file", required = false) MultipartFile file) {
 
         candidateService.sendCandidateEmail(id, emailType, file);
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(ApiResponse.success("Email sent successfully"));
     }
 
     @PostMapping("/export")

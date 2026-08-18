@@ -19,15 +19,15 @@ public final class CommonConstants {
 
     public static final String EMAIL_TYPE_CV_REQUEST_SUBJECT = "Please find the candidate CV attached for your review.";
     public static final String EMAIL_TYPE_INTERVIEW_INVITATION_SUBJECT = "We would like to invite you for an interview.";
-    public static final String EMAIL_TYPE_FOLLOW_UP_SUBJECT = "Follow upP";
+    public static final String EMAIL_TYPE_FOLLOW_UP_SUBJECT = "Follow up";
     public static final String EMAIL_TYPE_OFFER_SUBJECT = "Offer Letter";
-    public static final String EMAIL_TYPE_JOINING_REMINDER_SUBJECT = "Joining Letter";
+    public static final String EMAIL_TYPE_JOINING_REMINDER_SUBJECT = "Joining Reminder Letter";
 
     public static final String EMAIL_TEMPLATE_VARIABLE_CANDIDATE_NAME = "candidateName";
     public static final String EMAIL_TEMPLATE_VARIABLE_DESIGNATION = "designation";
     public static final String EMAIL_TEMPLATE_VARIABLE_EXPERIENCE = "experience";
-    public static final String EMAIL_TEMPLATE_VARIABLE_LOCATION = "candidateName";
-    public static final String EMAIL_TEMPLATE_PATH = "email/candidate-submission";
+    public static final String EMAIL_TEMPLATE_VARIABLE_LOCATION = "joiningLocation";
+    public static final String EMAIL_TEMPLATE_PATH = "email/candidate/joiningreminder";
 
 
     private CommonConstants() {

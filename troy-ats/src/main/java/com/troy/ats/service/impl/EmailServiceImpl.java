@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring6.SpringTemplateEngine;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.util.Objects;
 
@@ -23,6 +24,9 @@ public class EmailServiceImpl implements EmailService {
     private final JavaMailSender mailSender;
     private final SessionServiceImpl sessionService;
     private final SpringTemplateEngine templateEngine;
+
+    @Value("${spring.mail.username}")
+    private String mailUsername;
 
     /**
      *
@@ -41,11 +45,12 @@ public class EmailServiceImpl implements EmailService {
                     "UTF-8"
             );
 
+            helper.setFrom(mailUsername);
             helper.setTo(candidate.getEmail());
 
-            if(Objects.nonNull(sessionService.getCurrentUser()) && Objects.nonNull(sessionService.getCurrentUser().getOfficialEmail())){
+            /*if(Objects.nonNull(sessionService.getCurrentUser()) && Objects.nonNull(sessionService.getCurrentUser().getOfficialEmail())){
                 helper.setCc(sessionService.getCurrentUser().getOfficialEmail());
-            }
+            }*/
 
             helper.setSubject(CommonUtil.getEmailSubject(emailType));
 
