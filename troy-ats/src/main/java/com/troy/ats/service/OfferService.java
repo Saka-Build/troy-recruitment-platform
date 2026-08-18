@@ -13,41 +13,45 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-@Service
-public class OfferService {
+public interface OfferService {
 
-    private final OfferRepository offerRepository;
+    /**
+     *
+     * @return
+     */
+    public List<Offer> getAllOffers();
 
-    public OfferService(OfferRepository offerRepository) {
-        this.offerRepository = offerRepository;
-    }
+    /**
+     *
+     * @param id
+     * @return
+     */
+    public Optional<Offer> getOfferById(UUID id);
 
-    public List<Offer> getAllOffers() {
-        return offerRepository.findAll();
-    }
+    /**
+     *
+     * @param offer
+     * @return
+     */
+    public Offer createOffer(Offer offer);
 
-    public Optional<Offer> getOfferById(UUID id) {
-        return offerRepository.findById(id);
-    }
+    /**
+     *
+     * @param id
+     */
+    public void deleteOffer(UUID id);
 
-    public Offer createOffer(Offer offer) {
-        return offerRepository.save(offer);
-    }
+    /**
+     *
+     * @param zoneId
+     * @return
+     */
+    public long getTotalJoiningTodayForZoneId(ZoneId zoneId);
 
-    public void deleteOffer(UUID id) {
-        offerRepository.deleteById(id);
-    }
-
-    public long getTotalJoiningTodayForZoneId(ZoneId zoneId) {
-
-        LocalDate today = LocalDate.now(zoneId);
-        Instant start = today.atStartOfDay(zoneId).toInstant();
-        Instant end = today.plusDays(1).atStartOfDay(zoneId).toInstant();
-
-        return offerRepository.countByJoiningDateGreaterThanEqualAndJoiningDateLessThan(start, end);
-    }
-
-    public long getTotalOffersByStaus(OfferStatus offerStatus){
-        return offerRepository.countByOfferStatus(offerStatus);
-    }
+    /**
+     *
+     * @param offerStatus
+     * @return
+     */
+    public long getTotalOffersByStaus(OfferStatus offerStatus);
 }

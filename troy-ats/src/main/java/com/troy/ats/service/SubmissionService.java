@@ -11,70 +11,45 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Service
-public class SubmissionService {
+public interface SubmissionService {
 
-    private final SubmissionRepository submissionRepository;
-    private final CandidatePipelinePopulator candidatePipelinePopulator;
+    /**
+     *
+     * @return
+     */
+    public List<Submission> getAllSubmissions();
 
-    public SubmissionService(SubmissionRepository submissionRepository, CandidatePipelinePopulator candidatePipelinePopulator) {
-        this.submissionRepository = submissionRepository;
-        this.candidatePipelinePopulator = candidatePipelinePopulator;
-    }
+    /**
+     *
+     * @param id
+     * @return
+     */
+    public Submission getSubmissionById(UUID id);
 
-    public List<Submission> getAllSubmissions() {
-        return submissionRepository.findAll();
-    }
+    /**
+     *
+     * @param submission
+     * @return
+     */
+    public Submission createSubmission(Submission submission);
 
-    public Optional<Submission> getSubmissionById(UUID id) {
-        return submissionRepository.findById(id);
-    }
+    /**
+     *
+     * @param id
+     */
+    public void deleteSubmission(UUID id) ;
 
-    public Submission createSubmission(Submission submission) {
-        return submissionRepository.save(submission);
-    }
+    /**
+     *
+     * @param pipelineStage
+     * @return
+     */
+    public long getTotalCVSubmissionsByPipelineStage(PipelineStage pipelineStage);
 
-    public void deleteSubmission(UUID id) {
-        submissionRepository.deleteById(id);
-    }
-
-    public long getTotalCVSubmissionsByPipelineStage(PipelineStage pipelineStage) {
-        return submissionRepository.countByPipelineStage(pipelineStage);
-    }
-
-    public List<PipelineDto> getCandidatePipelines() {
-
-        List<PipelineStage> stages = List.of(
-                PipelineStage.APPLIED,
-                PipelineStage.SCREENING,
-                PipelineStage.READY_TO_SUBMIT,
-                PipelineStage.SUBMITTED,
-                PipelineStage.INTERVIEW,
-                PipelineStage.OFFER
-        );
-
-        List<Submission> submissions = submissionRepository.findByPipelineStageIn(stages);
-
-        Map<PipelineStage, List<Submission>> groupedSubmissions = submissions.stream().collect(Collectors.groupingBy(Submission::getPipelineStage));
-
-        List<PipelineDto> pipelineDtoList = stages.stream().map(stage -> {
-            PipelineDto pipelineDto = new PipelineDto();
-            List<Submission> submissionList = groupedSubmissions.getOrDefault(stage, List.of());
-            pipelineDto.setPipelineStage(stage);
-            pipelineDto.setTotalCandidates(submissionList.size());
-            List<CandidatePipelineDto> CandidatePipelineDtoList = submissionList.stream()
-                    .map(submission -> {
-                        CandidatePipelineDto candidate = new CandidatePipelineDto();
-                        candidatePipelinePopulator.populate(submission, candidate);
-                        return candidate;
-                    }).toList();
-            pipelineDto.setCandidates(CandidatePipelineDtoList);
-            return pipelineDto;
-
-        }).toList();
-
-        return pipelineDtoList;
-
-    }
+    /**
+     *
+     * @return
+     */
+    public List<PipelineDto> getCandidatePipelines();
 
 }

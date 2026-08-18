@@ -26,9 +26,9 @@ public class SubmissionController {
 
     @GetMapping("/{id}")
     public ResponseEntity<Submission> getSubmissionById(@PathVariable UUID id) {
-        return submissionService.getSubmissionById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+
+        return ResponseEntity.ok(submissionService.getSubmissionById(id));
+
     }
 
     @PostMapping
