@@ -8,28 +8,31 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-@Service
-public class OnboardingService {
+public interface OnboardingService {
 
-    private final OnboardingRepository onboardingRepository;
+    /**
+     *
+     * @return
+     */
+    public List<Onboarding> getAllOnboarding();
 
-    public OnboardingService(OnboardingRepository onboardingRepository) {
-        this.onboardingRepository = onboardingRepository;
-    }
+    /**
+     *
+     * @param id
+     * @return
+     */
+    public Optional<Onboarding> getOnboardingById(UUID id);
 
-    public List<Onboarding> getAllOnboarding() {
-        return onboardingRepository.findAll();
-    }
+    /**
+     *
+     * @param onboarding
+     * @return
+     */
+    public Onboarding createOnboarding(Onboarding onboarding);
 
-    public Optional<Onboarding> getOnboardingById(UUID id) {
-        return onboardingRepository.findById(id);
-    }
-
-    public Onboarding createOnboarding(Onboarding onboarding) {
-        return onboardingRepository.save(onboarding);
-    }
-
-    public void deleteOnboarding(UUID id) {
-        onboardingRepository.deleteById(id);
-    }
+    /**
+     *
+     * @param id
+     */
+    public void deleteOnboarding(UUID id);
 }

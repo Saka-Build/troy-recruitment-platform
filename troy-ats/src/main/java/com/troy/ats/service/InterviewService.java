@@ -11,45 +11,51 @@ import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
 
-@Service
-public class InterviewService {
+public interface InterviewService {
 
-    private final InterviewRepository interviewRepository;
+    /**
+     *
+     * @return
+     */
+    public List<Interview> getAllInterviews();
 
-    public InterviewService(InterviewRepository interviewRepository) {
-        this.interviewRepository = interviewRepository;
-    }
+    /**
+     *
+     * @param id
+     * @return
+     */
+    public Optional<Interview> getInterviewById(Long id);
 
-    public List<Interview> getAllInterviews() {
-        return interviewRepository.findAll();
-    }
+    /**
+     *
+     * @param date
+     * @return
+     */
+    public List<Interview> getInterviewsByDate(LocalDate date);
 
-    public Optional<Interview> getInterviewById(Long id) {
-        return interviewRepository.findById(id);
-    }
+    /**
+     *
+     * @param interview
+     * @return
+     */
+    public Interview createInterview(Interview interview);
 
-    public List<Interview> getInterviewsByDate(LocalDate date) {
-        return interviewRepository.findByInterviewDate(date);
-    }
+    /**
+     *
+     * @param id
+     */
+    public void deleteInterview(Long id);
 
-    public Interview createInterview(Interview interview) {
-        return interviewRepository.save(interview);
-    }
+    /**
+     *
+     * @param zoneId
+     * @return
+     */
+    public List<Interview> getTodayInterviewsForZoneIdWithDescOrder(ZoneId zoneId);
 
-    public void deleteInterview(Long id) {
-        interviewRepository.deleteById(id);
-    }
-
-    public List<Interview> getTodayInterviewsForZoneIdWithDescOrder(ZoneId zoneId) {
-
-        LocalDate today = LocalDate.now(zoneId);
-        Instant start = today.atStartOfDay(zoneId).toInstant();
-        Instant end = today.plusDays(1).atStartOfDay(zoneId).toInstant();
-
-        return interviewRepository.findByInterviewDateTimeWithZoneGreaterThanEqualAndInterviewDateTimeWithZoneLessThanOrderByInterviewDateTimeWithZoneDesc(start, end);
-    }
-
-    public long getTotalClientFeedBackPending(){
-        return interviewRepository.countByOutcomeAndFeedbackEmpty(InterviewOutcome.completed);
-    }
+    /**
+     *
+     * @return
+     */
+    public long getTotalClientFeedBackPending();
 }

@@ -16,15 +16,46 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface EmployeeService {
+
+    /**
+     *
+     * @return
+     */
     public List<Employee> getAllEmployees() ;
+
+    /**
+     *
+     * @param id
+     * @return
+     */
     public Employee getEmployeeById(UUID id) ;
 
+    /**
+     *
+     * @param employee
+     * @return
+     */
     public Employee createEmployee(Employee employee);
 
+    /**
+     *
+     * @param id
+     * @param employee
+     * @return
+     */
     public Employee updateEmployee(UUID id, Employee employee) ;
 
+    /**
+     *
+     * @param id
+     */
     public void deleteEmployee(UUID id);
 
+    /**
+     *
+     * @param email
+     * @return
+     */
     public Optional<Employee> getEmployeeByEmail(String email);
 
     /**

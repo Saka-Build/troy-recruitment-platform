@@ -5,6 +5,7 @@ import com.troy.ats.entity.Client;
 import com.troy.ats.entity.Country;
 import com.troy.ats.entity.Employee;
 import com.troy.ats.entity.Job;
+import com.troy.ats.enums.JobStatus;
 import com.troy.ats.service.ClientService;
 import com.troy.ats.service.JobService;
 import com.troy.ats.service.impl.CountryServiceImpl;
@@ -43,8 +44,7 @@ public class ReverseJobPopulator {
         target.setSalaryCurrency(source.getSalaryCurrency());
 
         target.setSkillsRequired(source.getSkillsRequired());
-
-        target.setStatus(source.getStatus());
+        target.setStatus(source.getStatus() != null ? source.getStatus() : JobStatus.OPEN);
         target.setPriority(source.getPriority());
 
         target.setDescription(source.getDescription());

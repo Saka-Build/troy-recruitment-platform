@@ -17,7 +17,7 @@ import org.springframework.beans.factory.annotation.Value;
 
 import java.util.Objects;
 
-@Service
+@Service("emailService")
 @RequiredArgsConstructor
 public class EmailServiceImpl implements EmailService {
 
