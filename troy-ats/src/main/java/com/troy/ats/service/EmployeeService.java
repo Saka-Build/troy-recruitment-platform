@@ -17,7 +17,7 @@ import java.util.UUID;
 
 public interface EmployeeService {
     public List<Employee> getAllEmployees() ;
-    public Optional<Employee> getEmployeeById(UUID id) ;
+    public Employee getEmployeeById(UUID id) ;
 
     public Employee createEmployee(Employee employee);
 
@@ -56,7 +56,7 @@ public interface EmployeeService {
      * @param id
      * @return
      */
-    Optional<EmployeeDto> getEmployeeDtoById(UUID id);
+    EmployeeDto getEmployeeDtoById(UUID id);
 
     /**
      *

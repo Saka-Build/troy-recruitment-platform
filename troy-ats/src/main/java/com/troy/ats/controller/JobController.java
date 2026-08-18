@@ -1,7 +1,11 @@
 package com.troy.ats.controller;
 
+import com.troy.ats.dto.JobCreateRequest;
+import com.troy.ats.dto.JobDto;
 import com.troy.ats.entity.Job;
 import com.troy.ats.service.JobService;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,14 +29,18 @@ public class JobController {
 
     @GetMapping("/{id}")
     public ResponseEntity<Job> getJobById(@PathVariable UUID id) {
-        return jobService.getJobById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+
+        return ResponseEntity.ok(jobService.getJobById(id));
     }
 
-    @PostMapping
-    public Job createJob(@RequestBody Job job) {
-        return jobService.createJob(job);
+    @PostMapping("/create")
+    public ResponseEntity<JobDto> createJob(@RequestBody JobCreateRequest request) {
+
+        JobDto response = jobService.createJob(request);
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(response);
     }
 
     @PutMapping("/{id}")

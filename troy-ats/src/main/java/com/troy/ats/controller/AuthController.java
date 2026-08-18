@@ -111,8 +111,7 @@ public class AuthController {
             throw new ServiceException(HttpStatus.UNAUTHORIZED, "Invalid or expired refresh token");
         }
 
-        Optional<Employee> employee = employeeService.getEmployeeById(UUID.fromString(userId));
-        Employee user = employee.isPresent() ? employee.get() : null;
+        Employee user = employeeService.getEmployeeById(UUID.fromString(userId));
         if (user == null || ! user.getIsActive()) {
             log.warn("Refresh rejected - account {} missing or inactive", userId);
             throw new ServiceException(HttpStatus.UNAUTHORIZED, "Account unavailable");

@@ -42,10 +42,12 @@ public class Job {
     private Country country;
 
     @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Column(name = "work_mode")
     private JobWorkMode workMode;
 
     @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Column(name = "job_type")
     private JobType jobType;
 

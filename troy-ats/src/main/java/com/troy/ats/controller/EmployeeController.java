@@ -13,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -59,9 +60,8 @@ public class EmployeeController {
 
     @GetMapping("/{id}")
     public ResponseEntity<EmployeeDto> getEmployeeById(@PathVariable UUID id) {
-        return employeeService.getEmployeeDtoById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+
+        return ResponseEntity.ok(employeeService.getEmployeeDtoById(id));
     }
 
     @GetMapping("email/{email}")
@@ -78,7 +78,8 @@ public class EmployeeController {
 
         EmployeeDto employeeDto = employeeService.createEmployee(request, photo);
 
-        return ResponseEntity.ok(employeeDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(employeeDto);
+
     }
 
     @PutMapping(value = "/update/{employeeId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

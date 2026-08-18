@@ -52,8 +52,9 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public Optional<Employee> getEmployeeById(UUID id) {
-        return employeeRepository.findById(id);
+    public Employee getEmployeeById(UUID id) {
+        return employeeRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Employee not found: " + id));
     }
 
 
@@ -167,14 +168,14 @@ public class EmployeeServiceImpl implements EmployeeService {
      * @return
      */
     @Override
-    public Optional<EmployeeDto> getEmployeeDtoById(UUID id) {
+    public EmployeeDto getEmployeeDtoById(UUID id) {
 
-        Optional<EmployeeDto> employeeDto = employeeRepository.findById(id)
+        EmployeeDto employeeDto = employeeRepository.findById(id)
                 .map(employee -> {
                     EmployeeDto dto = new EmployeeDto();
                     employeePopulator.populate(employee, dto);
                     return dto;
-                });
+                }) .orElseThrow(() -> new EntityNotFoundException("Employee not found: " + id));
         return employeeDto;
     }
 

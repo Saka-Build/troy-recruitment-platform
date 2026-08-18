@@ -1,44 +1,53 @@
 package com.troy.ats.service;
 
+import com.troy.ats.dto.ClientCreateRequest;
+import com.troy.ats.dto.ClientDto;
+import com.troy.ats.dto.JobDto;
 import com.troy.ats.entity.Client;
-import com.troy.ats.repository.ClientRepository;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
-@Service
-public class ClientService {
+public interface ClientService {
 
-    private final ClientRepository clientRepository;
+    /**
+     *
+     * @return
+     */
+    public List<Client> getAllClients();
 
-    public ClientService(ClientRepository clientRepository) {
-        this.clientRepository = clientRepository;
-    }
+    /**
+     *
+     * @param id
+     * @return
+     */
+    public Client getClientById(UUID id);
 
-    public List<Client> getAllClients() {
-        return clientRepository.findAll();
-    }
+    /**
+     *
+     * @param id
+     * @param client
+     * @return
+     */
+    public Client updateClient(UUID id, Client client);
 
-    public Optional<Client> getClientById(UUID id) {
-        return clientRepository.findById(id);
-    }
+    /**
+     *
+     * @param id
+     */
+    public void deleteClient(UUID id);
 
-    public Client createClient(Client client) {
-        return clientRepository.save(client);
-    }
+    /**
+     *
+     * @param active
+     * @return
+     */
+    public long getTotalClientsByActive(boolean active);
 
-    public Client updateClient(UUID id, Client client) {
-       // client.setId(id);
-        return clientRepository.save(client);
-    }
-
-    public void deleteClient(UUID id) {
-        clientRepository.deleteById(id);
-    }
-
-    public long getTotalClientsByActive(boolean active) {
-        return clientRepository.countByIsActive(active);
-    }
+    /**
+     *
+     * @param request
+     * @return
+     */
+    ClientDto createClient(ClientCreateRequest request);
 }

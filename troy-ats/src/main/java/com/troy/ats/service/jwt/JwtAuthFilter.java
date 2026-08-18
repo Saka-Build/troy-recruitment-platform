@@ -60,12 +60,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
             UUID userId = UUID.fromString(claims.getSubject());
 
-            Employee user = employeeService.getEmployeeById(userId)
-                    .orElseThrow(() ->
-                            new UsernameNotFoundException(
-                                    "User not found: " + userId
-                            )
-                    );
+            Employee user = employeeService.getEmployeeById(userId);
             var auth = new UsernamePasswordAuthenticationToken(
                     user,
                     null,
