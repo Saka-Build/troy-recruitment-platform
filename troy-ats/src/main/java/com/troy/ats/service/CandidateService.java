@@ -233,8 +233,7 @@ public class CandidateService {
 
     public void sendCandidateEmail(UUID candidateId, String emailType, MultipartFile file) {
 
-        Candidate candidate = candidateRepository.findById(candidateId)
-                .orElseThrow(() -> new RuntimeException("Candidate not found"));
+        Candidate candidate = getCandidateById(candidateId);
 
         emailService.sendCandidateEmail(candidate, emailType, file);
     }
