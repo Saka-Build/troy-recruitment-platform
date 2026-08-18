@@ -22,19 +22,19 @@ CREATE TYPE job_status AS ENUM (
 );
 
 CREATE TYPE job_work_mode AS ENUM (
-    'onsite', 'remote', 'hybrid'
+    'ONSITE', 'REMOTE', 'HYBRID'
 );
 
 CREATE TYPE job_type AS ENUM (
-    'permanent', 'contract', 'temporary', 'freelance'
+    'PERMANENT', 'CONTRACT', 'TEMPORARY', 'FREELANCE'
 );
 
 CREATE TYPE interview_type AS ENUM (
-    'teams', 'zoom', 'phone', 'onsite'
+    'TEAMS', 'ZOOM', 'PHONE', 'ONSITE'
 );
 
 CREATE TYPE interview_round AS ENUM (
-    'technical', 'hr', 'final', 'screening', 'other'
+    'TECHNICAL', 'HR', 'FINAL', 'SCREENING', 'OTHER'
 );
 
 CREATE TYPE ai_recommendation AS ENUM (

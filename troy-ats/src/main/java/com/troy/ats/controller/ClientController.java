@@ -1,7 +1,11 @@
 package com.troy.ats.controller;
 
+import com.troy.ats.dto.ClientCreateRequest;
+import com.troy.ats.dto.ClientDto;
 import com.troy.ats.entity.Client;
 import com.troy.ats.service.ClientService;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
@@ -24,15 +28,18 @@ public class ClientController {
 
     @GetMapping("/{id}")
     public ResponseEntity<Client> getClientById(@PathVariable UUID id) {
-        return clientService.getClientById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+       return  ResponseEntity.ok(clientService.getClientById(id));
     }
 
-    @PostMapping
-    public Client createClient(@RequestBody Client client) {
-        return clientService.createClient(client);
+    @PostMapping("/create")
+    public ResponseEntity<ClientDto> createClient(
+            @Valid @RequestBody ClientCreateRequest request) {
+
+        ClientDto response = clientService.createClient(request);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
+
 
     @PutMapping("/{id}")
     public Client updateClient(@PathVariable UUID id, @RequestBody Client client) {

@@ -1,49 +1,75 @@
 package com.troy.ats.service;
 
+import com.troy.ats.dto.JobCreateRequest;
+import com.troy.ats.dto.JobDto;
 import com.troy.ats.entity.Job;
 import com.troy.ats.enums.JobStatus;
-import com.troy.ats.repository.JobRepository;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-@Service
-public class JobService {
+public interface JobService {
 
-    private final JobRepository jobRepository;
+    /**
+     *
+     * @return
+     */
+    public List<Job> getAllJobs();
 
-    public JobService(JobRepository jobRepository) {
-        this.jobRepository = jobRepository;
-    }
+    /**
+     *
+     * @param id
+     * @return
+     */
+    public Job getJobById(UUID id);
 
-    public List<Job> getAllJobs() {
-        return jobRepository.findAll();
-    }
+    /**
+     *
+     * @param job
+     * @return
+     */
+    public Job createJob(Job job);
 
-    public Optional<Job> getJobById(UUID id) {
-        return jobRepository.findById(id);
-    }
+    /**
+     *
+     * @param id
+     * @param job
+     * @return
+     */
 
-    public Job createJob(Job job) {
-        return jobRepository.save(job);
-    }
+    /**
+     *
+     * @param id
+     * @param job
+     * @return
+     */
+    public Job updateJob(Long id, Job job);
 
-    public Job updateJob(Long id, Job job) {
-       // job.setId(id);
-        return jobRepository.save(job);
-    }
+    /**
+     *
+     * @param id
+     */
+    public void deleteJob(UUID id);
 
-    public void deleteJob(UUID id) {
-        jobRepository.deleteById(id);
-    }
+    /**
+     *
+     * @param status
+     * @return
+     */
+    public long getTotalJobsByStatus(JobStatus status);
 
-    public long getTotalJobsByStatus(JobStatus status) {
-        return jobRepository.countByStatus(status);
-    }
+    /**
+     *
+     * @param priority
+     * @return
+     */
+    public long getTotalJobsByPriority(String priority);
 
-    public long getTotalJobsByPriority(String priority) {
-        return jobRepository.countByPriority(priority);
-    }
+    /**
+     *
+     * @param request
+     * @return
+     */
+    JobDto createJob(JobCreateRequest request);
 }

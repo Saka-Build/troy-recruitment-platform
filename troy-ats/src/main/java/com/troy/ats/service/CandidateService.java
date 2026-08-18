@@ -51,18 +51,19 @@ public class CandidateService {
         return candidateRepository.findAll();
     }
 
-    public Optional<Candidate> getCandidateById(UUID id) {
-        return candidateRepository.findById(id);
+    public Candidate getCandidateById(UUID id) {
+        return candidateRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Candidate not found: " + id));
     }
 
-    public Optional<CandidateDto> getCandidateDtoById(UUID id) {
+    public CandidateDto getCandidateDtoById(UUID id) {
 
-        Optional<CandidateDto> candidateDto = candidateRepository.findCandidateWithDetailsById(id)
+        CandidateDto candidateDto = candidateRepository.findCandidateWithDetailsById(id)
                 .map(candidate -> {
                     CandidateDto dto = new CandidateDto();
                     candidatePopulator.populate(candidate, dto);
                     return dto;
-                });
+                }).orElseThrow(() -> new EntityNotFoundException("Candidate not found: " + id));
         return candidateDto;
     }
 

@@ -12,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -70,9 +71,7 @@ public class CandidateController {
     @GetMapping("/{id}")
     public ResponseEntity<CandidateDto> getCandidateById(@PathVariable UUID id) {
 
-        return candidateService.getCandidateDtoById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        return ResponseEntity.ok(candidateService.getCandidateDtoById(id));
     }
 
     @PostMapping
@@ -86,9 +85,9 @@ public class CandidateController {
             @RequestPart(value = "original_cv_file", required = false) MultipartFile originalCVFile,
             @RequestPart(value = "troy_cv_file", required = false) MultipartFile troyCVFile) {
 
-        //return candidateService.createCandidate(candidate, originalCVFile,troyCVFile);
-        return ResponseEntity.ok(candidateService.createCandidate(candidate, originalCVFile,troyCVFile));
+        CandidateDto candidateDto = candidateService.createCandidate(candidate, originalCVFile,troyCVFile);
 
+        return ResponseEntity.status(HttpStatus.CREATED).body(candidateDto);
     }
 
     @PutMapping("update/{candidateId}")
@@ -121,8 +120,7 @@ public class CandidateController {
     public ResponseEntity<Resource> downloadCv(
             @PathVariable UUID candidateId, @PathVariable String cvType) {
 
-        Optional<Candidate> candidateOptional = candidateService.getCandidateById(candidateId);
-        Candidate candidate = candidateOptional.isPresent() ? candidateOptional.get() : null;
+        Candidate candidate = candidateService.getCandidateById(candidateId);
         if(Objects.isNull(candidate)){
             return ResponseEntity.notFound().build();
         }

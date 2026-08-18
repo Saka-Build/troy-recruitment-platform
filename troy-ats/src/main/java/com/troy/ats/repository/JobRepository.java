@@ -2,12 +2,36 @@ package com.troy.ats.repository;
 
 import com.troy.ats.entity.Job;
 import com.troy.ats.enums.JobStatus;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
+import java.util.Optional;
 import java.util.UUID;
 
-public interface JobRepository extends JpaRepository<Job, UUID> {
+public interface JobRepository extends JpaRepository<Job, UUID>, JpaSpecificationExecutor<Job> {
 
     long countByStatus(JobStatus status);
     long countByPriority(String priority);
+
+    @Override
+    @EntityGraph(attributePaths = {
+            "country",
+            "client",
+            "owner"
+    })
+    Page<Job> findAll(Specification<Job> specification, Pageable pageable);
+
+    @Override
+    @EntityGraph(attributePaths = {
+            "country",
+            "client",
+            "owner"
+    })
+    Optional<Job> findById(UUID id);
+
+
 }
