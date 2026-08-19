@@ -28,47 +28,80 @@ public class ReverseJobPopulator {
             return;
         }
 
-        target.setTitle(source.getTitle());
-        target.setLocation(source.getLocation());
+        if (source.getTitle() != null) {
+            target.setTitle(source.getTitle());
+        }
 
-        target.setWorkMode(source.getWorkMode());
-        target.setJobType(source.getJobType());
+        if (source.getLocation() != null) {
+            target.setLocation(source.getLocation());
+        }
 
-        target.setIndustry(source.getIndustry());
+        if (source.getWorkMode() != null) {
+            target.setWorkMode(source.getWorkMode());
+        }
 
-        target.setExperienceMin(source.getExperienceMin());
-        target.setExperienceMax(source.getExperienceMax());
+        if (source.getJobType() != null) {
+            target.setJobType(source.getJobType());
+        }
 
-        target.setSalaryMin(source.getSalaryMin());
-        target.setSalaryMax(source.getSalaryMax());
-        target.setSalaryCurrency(source.getSalaryCurrency());
+        if (source.getIndustry() != null) {
+            target.setIndustry(source.getIndustry());
+        }
 
-        target.setSkillsRequired(source.getSkillsRequired());
-        target.setStatus(source.getStatus() != null ? source.getStatus() : JobStatus.OPEN);
-        target.setPriority(source.getPriority());
+        if (source.getExperienceMin() != null) {
+            target.setExperienceMin(source.getExperienceMin());
+        }
 
-        target.setDescription(source.getDescription());
-        target.setDescriptionSource(source.getDescriptionSource());
+        if (source.getExperienceMax() != null) {
+            target.setExperienceMax(source.getExperienceMax());
+        }
 
-        target.setIsTemplate(
-                source.getIsTemplate() != null
-                        ? source.getIsTemplate()
-                        : false
-        );
+        if (source.getSalaryMin() != null) {
+            target.setSalaryMin(source.getSalaryMin());
+        }
 
-        target.setTemplateName(source.getTemplateName());
+        if (source.getSalaryMax() != null) {
+            target.setSalaryMax(source.getSalaryMax());
+        }
 
-        target.setAtsKeywords(
-                source.getAtsKeywords() != null
-                        ? source.getAtsKeywords()
-                        : new String[0]
-        );
+        if (source.getSalaryCurrency() != null) {
+            target.setSalaryCurrency(source.getSalaryCurrency());
+        }
 
-        target.setOpeningsCount(
-                source.getOpeningsCount() != null
-                        ? source.getOpeningsCount()
-                        : (short) 1
-        );
+        if (source.getSkillsRequired() != null) {
+            target.setSkillsRequired(source.getSkillsRequired());
+        }
+        if (source.getStatus() != null) {
+            target.setStatus(source.getStatus());
+        }
+
+        if (source.getPriority() != null) {
+            target.setPriority(source.getPriority());
+        }
+
+        if (source.getDescription() != null) {
+            target.setDescription(source.getDescription());
+        }
+
+        if (source.getDescriptionSource() != null) {
+            target.setDescriptionSource(source.getDescriptionSource());
+        }
+
+        if (source.getIsTemplate() != null) {
+            target.setIsTemplate(source.getIsTemplate());
+        }
+
+        if (source.getTemplateName() != null) {
+            target.setTemplateName(source.getTemplateName());
+        }
+
+        if (source.getAtsKeywords() != null) {
+            target.setAtsKeywords(source.getAtsKeywords());
+        }
+
+        if (source.getOpeningsCount() != null) {
+            target.setOpeningsCount(source.getOpeningsCount());
+        }
 
         // Don't overwrite filledCount during normal create/update
         if (target.getFilledCount() == null) {

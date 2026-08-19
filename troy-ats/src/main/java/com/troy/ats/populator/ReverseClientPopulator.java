@@ -16,17 +16,45 @@ public class ReverseClientPopulator {
 
     public void populate(ClientCreateRequest source, Client target) {
 
-        target.setName(source.getName());
-        target.setContactPerson(source.getContactPerson());
-        target.setEmail(source.getEmail());
-        target.setPhone(source.getPhone());
-        target.setWhatsapp(source.getWhatsapp());
-        target.setIndustry(source.getIndustry());
-        target.setStatus(source.getStatus());
-        target.setAddress(source.getAddress());
-        target.setNotes(source.getNotes());
+        if (source.getName() != null) {
+            target.setName(source.getName());
+        }
 
-        target.setIsActive(source.getIsActive() != null ? source.getIsActive() : true);
+        if (source.getContactPerson() != null) {
+            target.setContactPerson(source.getContactPerson());
+        }
+
+        if (source.getEmail() != null) {
+            target.setEmail(source.getEmail());
+        }
+
+        if (source.getPhone() != null) {
+            target.setPhone(source.getPhone());
+        }
+
+        if (source.getWhatsapp() != null) {
+            target.setWhatsapp(source.getWhatsapp());
+        }
+
+        if (source.getIndustry() != null) {
+            target.setIndustry(source.getIndustry());
+        }
+
+        if (source.getStatus() != null) {
+            target.setStatus(source.getStatus());
+        }
+
+        if (source.getAddress() != null) {
+            target.setAddress(source.getAddress());
+        }
+
+        if (source.getNotes() != null) {
+            target.setNotes(source.getNotes());
+        }
+
+        if (source.getIsActive() != null) {
+            target.setIsActive(source.getIsActive());
+        }
 
         // country
         if (source.getCountryCode() != null) {

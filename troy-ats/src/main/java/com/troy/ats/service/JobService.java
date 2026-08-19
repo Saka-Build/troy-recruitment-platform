@@ -1,12 +1,18 @@
 package com.troy.ats.service;
 
+import com.troy.ats.dto.ClientCreateRequest;
+import com.troy.ats.dto.ClientDto;
 import com.troy.ats.dto.JobCreateRequest;
 import com.troy.ats.dto.JobDto;
 import com.troy.ats.entity.Job;
 import com.troy.ats.enums.JobStatus;
+import com.troy.ats.searchfilter.dto.JobExportFilter;
+import com.troy.ats.searchfilter.dto.JobFilter;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
+import java.io.IOException;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 public interface JobService {
@@ -72,4 +78,35 @@ public interface JobService {
      * @return
      */
     JobDto createJob(JobCreateRequest request);
+
+    /**
+     *
+     * @param jobId
+     * @param request
+     * @return
+     */
+    JobDto updateJob(UUID jobId, JobCreateRequest request);
+
+    /**
+     *
+     * @param filter
+     * @param pageable
+     * @return
+     */
+    Page<JobDto> getJobs(JobFilter filter, Pageable pageable);
+
+    /**
+     *
+     * @param id
+     * @return
+     */
+    JobDto getJobDtoById(UUID id);
+
+    /**
+     *
+     * @param filter
+     * @return
+     * @throws IOException
+     */
+    byte[] exportJobs(JobExportFilter filter) throws IOException;
 }
