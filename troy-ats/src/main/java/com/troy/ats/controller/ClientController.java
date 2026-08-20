@@ -2,8 +2,9 @@ package com.troy.ats.controller;
 
 import com.troy.ats.dto.ClientCreateRequest;
 import com.troy.ats.dto.ClientDto;
+import com.troy.ats.dto.ClientsFiltersDto;
 import com.troy.ats.entity.Client;
-import com.troy.ats.entity.EndClient;
+import com.troy.ats.exception.ApiResponse;
 import com.troy.ats.searchfilter.dto.ClientExportFilter;
 import com.troy.ats.searchfilter.dto.ClientFilter;
 import com.troy.ats.service.ClientService;
@@ -51,6 +52,12 @@ public class ClientController {
         return ResponseEntity.ok(clientService.getClients(filter, pageable));
     }
 
+    @GetMapping("/clientheader/clientfilters")
+    public ResponseEntity<ClientsFiltersDto> getCandidateFilters() {
+
+        return ResponseEntity.ok(clientService.getClientFilters());
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<ClientDto> getClientById(@PathVariable UUID id) {
 
@@ -83,9 +90,11 @@ public class ClientController {
         return clientService.updateClient(id, client);
     }
 
-    @DeleteMapping("/{id}")
-    public void deleteClient(@PathVariable UUID id) {
+    @DeleteMapping("delete/{id}")
+    public ResponseEntity<ApiResponse> deleteClient(@PathVariable UUID id) {
+
         clientService.deleteClient(id);
+        return ResponseEntity.ok(ApiResponse.success("Deleted successfully"));
     }
 
     @PostMapping("/export")

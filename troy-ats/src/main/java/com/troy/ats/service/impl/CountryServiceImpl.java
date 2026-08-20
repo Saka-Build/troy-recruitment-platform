@@ -6,6 +6,7 @@ import com.troy.ats.service.CountryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -35,5 +36,14 @@ public class CountryServiceImpl implements CountryService {
     public Country getCountryByCode(String code) {
         return countryRepository.findByCode(code)
                 .orElseThrow(() -> new RuntimeException("Country not found with code: " + code));
+    }
+
+    /**
+     *
+     * @return
+     */
+    @Override
+    public List<Country> getAllCountries() {
+        return countryRepository.findAll();
     }
 }

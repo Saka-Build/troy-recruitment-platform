@@ -1,15 +1,10 @@
 package com.troy.ats.dto;
 
-import com.troy.ats.entity.EndClient;
-import com.troy.ats.enums.JobStatus;
-import com.troy.ats.enums.JobType;
-import com.troy.ats.enums.JobWorkMode;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -32,6 +27,6 @@ public class ClientDto {
     private String notes;
     private Boolean isActive;
     private String source;
-    private UUID[] endClientIds;
+    private List<EndClientDto> endClients;
 
 }

@@ -49,4 +49,12 @@ public interface EndClientService {
      * @return
      */
     EndClientDto updateEndClient(UUID endClientId, EndClientCreateRequest request);
+
+    /**
+     *
+     * @param endClientIds
+     * @return
+     */
+    List<EndClient> getEndClients(List<UUID> endClientIds);
+
 }
