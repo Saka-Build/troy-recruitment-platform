@@ -80,7 +80,7 @@ public class CandidateService {
         candidateRepository.deleteById(id);
     }
 
-    public long getTotalCandidatesByStatus(boolean active) {
+    public long getTotalCandidatesByActive(boolean active) {
         return candidateRepository.countByActive(active);
     }
     public long getTotalCandidatesByStatusName(String statusName) {

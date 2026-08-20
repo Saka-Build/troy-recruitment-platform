@@ -7,6 +7,9 @@ import com.troy.ats.service.impl.CountryServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.Locale;
+import java.util.Objects;
+
 
 @Component
 @RequiredArgsConstructor
@@ -41,7 +44,7 @@ public class ReverseClientPopulator {
         }
 
         if (source.getStatus() != null) {
-            target.setStatus(source.getStatus());
+            target.setStatus(source.getStatus().toLowerCase(Locale.ROOT));
         }
 
         if (source.getAddress() != null) {
@@ -61,6 +64,16 @@ public class ReverseClientPopulator {
             Country country = countryService.getCountryByCode(source.getCountryCode());
             target.setCountry(country);
 
+        }
+
+        //end clients
+        if(Objects.nonNull(source.getEndClientIds())){
+            target.setEndClientIds(source.getEndClientIds());
+        }
+
+        //source
+        if(Objects.nonNull(source.getSource())){
+            target.setSource(source.getSource());
         }
 
     }

@@ -39,6 +39,9 @@ public class Status {
     @Column(name = "is_active", nullable = false)
     private Boolean active = true;
 
+    @Column(name = "show_in_pipeline", nullable = false)
+    private Boolean showInPipeline = false;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private OffsetDateTime createdAt;
 

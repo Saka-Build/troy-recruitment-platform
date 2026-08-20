@@ -2,9 +2,8 @@ package com.troy.ats.controller;
 
 import com.troy.ats.dto.ClientCreateRequest;
 import com.troy.ats.dto.ClientDto;
-import com.troy.ats.dto.EmployeeCreateRequest;
-import com.troy.ats.dto.EmployeeDto;
 import com.troy.ats.entity.Client;
+import com.troy.ats.entity.EndClient;
 import com.troy.ats.searchfilter.dto.ClientExportFilter;
 import com.troy.ats.searchfilter.dto.ClientFilter;
 import com.troy.ats.service.ClientService;
@@ -18,7 +17,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.OffsetDateTime;
@@ -35,7 +33,7 @@ public class ClientController {
         this.clientService = clientService;
     }
 
-    @GetMapping("/allEmployees")
+    @GetMapping("/allClients")
     public List<Client> getAllClients() {
         return clientService.getAllClients();
     }
@@ -99,4 +97,5 @@ public class ClientController {
                 .contentType(MediaType.parseMediaType("application/vnd.ms-excel"))
                 .body(excelFile);
     }
+
 }
