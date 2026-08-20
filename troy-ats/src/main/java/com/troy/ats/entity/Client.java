@@ -1,7 +1,13 @@
 package com.troy.ats.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -47,6 +53,13 @@ public class Client {
 
     @Column(name = "notes", columnDefinition = "TEXT")
     private String notes;
+
+    @JdbcTypeCode(SqlTypes.ARRAY)
+    @Column(name = "end_client_ids", columnDefinition = "uuid[]")
+    private UUID[] endClientIds;
+
+    @Column(name = "source", columnDefinition = "TEXT")
+    private String source;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;

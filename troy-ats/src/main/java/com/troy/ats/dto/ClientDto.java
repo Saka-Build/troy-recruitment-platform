@@ -1,5 +1,6 @@
 package com.troy.ats.dto;
 
+import com.troy.ats.entity.EndClient;
 import com.troy.ats.enums.JobStatus;
 import com.troy.ats.enums.JobType;
 import com.troy.ats.enums.JobWorkMode;
@@ -30,5 +31,7 @@ public class ClientDto {
     private String address;
     private String notes;
     private Boolean isActive;
+    private String source;
+    private UUID[] endClientIds;
 
 }

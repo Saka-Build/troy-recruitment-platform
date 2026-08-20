@@ -25,5 +25,7 @@ public class ClientCreateRequest {
     private String address;
     private String notes;
     private Boolean isActive;
+    private String source;
+    private UUID[] endClientIds;
 
 }

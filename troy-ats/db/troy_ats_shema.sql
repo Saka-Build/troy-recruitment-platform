@@ -77,6 +77,8 @@ CREATE TABLE clients (
                                     CHECK (status IN ('active', 'inactive', 'prospect')),
     address         TEXT,
     notes           TEXT,
+    end_client_ids     UUID[],
+    source          TEXT,
     is_active BOOLEAN  NOT NULL DEFAULT TRUE,
     created_at      TIMESTAMPTZ     NOT NULL DEFAULT NOW(),
     updated_at      TIMESTAMPTZ     NOT NULL DEFAULT NOW(),
@@ -86,6 +88,17 @@ CREATE TABLE clients (
 CREATE INDEX idx_clients_name    ON clients (name);
 CREATE INDEX idx_clients_status  ON clients (status);
 CREATE INDEX idx_clients_country ON clients (country);
+
+-- ============================================================
+-- 1.1 END CLIENTS
+-- ============================================================
+CREATE TABLE end_clients (
+                             id      UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                             name    VARCHAR(255) NOT NULL UNIQUE,
+                             active  BOOLEAN      NOT NULL DEFAULT TRUE
+);
+
+CREATE INDEX idx_end_clients_name   ON end_clients (name);
 
 
 -- ============================================================
@@ -139,25 +152,26 @@ CREATE TABLE statuses (
                                 CHECK (colour_hex ~* '^#[0-9A-Fa-f]{6}$'),
     sort_order  SMALLINT        NOT NULL DEFAULT 0,
     is_active   BOOLEAN         NOT NULL DEFAULT TRUE,
+    show_in_pipeline BOOLEAN    NOT NULL DEFAULT FALSE
     created_at  TIMESTAMPTZ     NOT NULL DEFAULT NOW()
 );
 
 CREATE UNIQUE INDEX idx_statuses_name_active ON statuses (name) WHERE is_active = TRUE;
 
 -- Seed common statuses
-INSERT INTO statuses (name, colour_hex, sort_order) VALUES
-    ('Pipeline',          '#6B7280', 1),
-    ('Actively Sourcing', '#3B82F6', 2),
-    ('Ready to Submit',   '#8B5CF6', 3),
-    ('Submitted',         '#F59E0B', 4),
-    ('Interview',         '#EF4444', 5),
-    ('Selected',          '#10B981', 6),
-    ('Offer Released',    '#059669', 7),
-    ('Onboarding',        '#0EA5E9', 8),
-    ('Onboarded',         '#16A34A', 9),
-    ('Hold',              '#D97706', 10),
-    ('Rejected',          '#DC2626', 11),
-    ('Offboarded',            '#374151', 12);
+INSERT INTO statuses (name, colour_hex, sort_order, show_in_pipeline) VALUES
+    ('Applied',          '#6B7280', 1, TRUE),
+    ('Screening', '#3B82F6', 2, TRUE),
+    ('Ready to Submit',   '#8B5CF6', 3, TRUE),
+    ('Submitted',         '#F59E0B', 4, TRUE),
+    ('Interview',         '#EF4444', 5, TRUE),
+    ('Selected',          '#10B981', 6, TRUE),
+    ('Offer Released',    '#059669', 7, FALSE),
+    ('Onboarding',        '#0EA5E9', 8, FALSE),
+    ('Onboarded',         '#16A34A', 9, TRUE),
+    ('Hold',              '#D97706', 10, FALSE),
+    ('Rejected',          '#DC2626', 11, FALSE),
+    ('Offboarded',            '#374151', 12, FALSE);
 
 
 -- ============================================================

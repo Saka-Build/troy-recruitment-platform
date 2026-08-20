@@ -4,6 +4,8 @@ import com.troy.ats.dto.ClientDto;
 import com.troy.ats.entity.Client;
 import org.springframework.stereotype.Component;
 
+import java.util.Objects;
+
 
 @Component
 public class ClientPopulator {
@@ -23,6 +25,8 @@ public class ClientPopulator {
         target.setAddress(source.getAddress());
         target.setNotes(source.getNotes());
         target.setIsActive(source.getIsActive());
+        target.setEndClientIds(source.getEndClientIds());
+        target.setSource(source.getSource());
 
         // Country
         if (source.getCountry() != null) {

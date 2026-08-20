@@ -49,16 +49,16 @@ public class DashBoardSummaryPopulator {
 
     public void populate(DashboardSummaryDto dashboardSummaryDto) {
 
-        dashboardSummaryDto.setTotalCandidates(candidateService.getTotalCandidatesByStatus(Boolean.TRUE));
+        dashboardSummaryDto.setTotalCandidates(candidateService.getTotalCandidatesByActive(Boolean.TRUE));
         dashboardSummaryDto.setOpenJobs(jobService.getTotalJobsByStatus(JobStatus.OPEN));
         dashboardSummaryDto.setActiveClients(clientService.getTotalClientsByActive(Boolean.TRUE));
         dashboardSummaryDto.setTotalPlacements(candidateService.getTotalCandidatesByStatusName(CommonConstants.CANDIDATE_STATUS_ONBOARDED));
-        dashboardSummaryDto.setTotalCvSubmissionPending(submissionService.getTotalCVSubmissionsByPipelineStage(PipelineStage.READY_TO_SUBMIT));
-        dashboardSummaryDto.setTotalJoiningToday(offerService.getTotalJoiningTodayForZoneId(CommonUtil.getZoneIdForCurrentUser(sessionService)));
+       // dashboardSummaryDto.setTotalCvSubmissionPending(submissionService.getTotalCVSubmissionsByPipelineStage(PipelineStage.READY_TO_SUBMIT));
+       // dashboardSummaryDto.setTotalJoiningToday(offerService.getTotalJoiningTodayForZoneId(CommonUtil.getZoneIdForCurrentUser(sessionService)));
         dashboardSummaryDto.setTotalUrgentRoles(jobService.getTotalJobsByPriority(CommonConstants.JOB_PRIORITY_URGENT));
-        dashboardSummaryDto.setTotalClientFeedbackPending(interviewService.getTotalClientFeedBackPending());
-        dashboardSummaryDto.setTotalOffersPending(offerService.getTotalOffersByStaus(OfferStatus.PENDING));
-        dashboardSummaryDto.setTotalOfferAwaitingCandidateResponse(offerService.getTotalOffersByStaus(OfferStatus.RELEASED));
+       // dashboardSummaryDto.setTotalClientFeedbackPending(interviewService.getTotalClientFeedBackPending());
+        //dashboardSummaryDto.setTotalOffersPending(offerService.getTotalOffersByStaus(OfferStatus.PENDING));
+       // dashboardSummaryDto.setTotalOfferAwaitingCandidateResponse(offerService.getTotalOffersByStaus(OfferStatus.RELEASED));
 
         List<String> candidatesNotConfirmed = new ArrayList<>();
         List<Candidate> candidates = candidateService.getCandidatesByStatusNameANDSubStatusName(CommonConstants.CANDIDATE_STATUS_READY_TO_SUBMIT, CommonConstants.CANDIDATE_SUBSTATUS_CANDIDATE_CONFIRMATION_AWAITED);
