@@ -1,8 +1,6 @@
 package com.troy.ats.service.impl;
 
-import com.troy.ats.dto.ClientCreateRequest;
-import com.troy.ats.dto.ClientDto;
-import com.troy.ats.dto.EmployeeDto;
+import com.troy.ats.dto.*;
 import com.troy.ats.entity.Client;
 import com.troy.ats.entity.Employee;
 import com.troy.ats.entity.Job;
@@ -161,6 +159,24 @@ public class ClientServiceImpl implements ClientService {
         List<Client> clients = clientRepository.findAll(specification, Sort.by(Sort.Direction.DESC, "createdAt"));
 
         return createExcel(clients);
+    }
+
+    /**
+     *
+     * @return
+     */
+    @Override
+    public ClientsFiltersDto getClientFilters() {
+
+        long totalActiveClients = clientRepository.countByIsActive(Boolean.TRUE);
+        long totalInActiveClients = clientRepository.countByIsActive(Boolean.FALSE);
+
+        ClientsFiltersDto clientsFiltersDto = new ClientsFiltersDto();
+        clientsFiltersDto.setTotalActiveClients(totalActiveClients);
+        clientsFiltersDto.setTotalInActiveClients(totalInActiveClients);
+
+        return clientsFiltersDto;
+
     }
 
     private byte[] createExcel(List<Client> clients) throws IOException {

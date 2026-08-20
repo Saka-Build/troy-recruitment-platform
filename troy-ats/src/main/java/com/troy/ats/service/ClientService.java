@@ -1,9 +1,6 @@
 package com.troy.ats.service;
 
-import com.troy.ats.dto.ClientCreateRequest;
-import com.troy.ats.dto.ClientDto;
-import com.troy.ats.dto.EmployeeCreateRequest;
-import com.troy.ats.dto.EmployeeDto;
+import com.troy.ats.dto.*;
 import com.troy.ats.entity.Client;
 import com.troy.ats.searchfilter.dto.ClientExportFilter;
 import com.troy.ats.searchfilter.dto.ClientFilter;
@@ -88,4 +85,10 @@ public interface ClientService {
      * @throws IOException
      */
     byte[] exportClients(ClientExportFilter filter) throws IOException;
+
+    /**
+     *
+     * @return
+     */
+    ClientsFiltersDto getClientFilters();
 }

@@ -1,15 +1,24 @@
 package com.troy.ats.populator;
 
 import com.troy.ats.dto.ClientDto;
+import com.troy.ats.dto.EndClientDto;
 import com.troy.ats.entity.Client;
+import com.troy.ats.entity.EndClient;
+import com.troy.ats.service.EndClientService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.util.Objects;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 
 @Component
+@RequiredArgsConstructor
 public class ClientPopulator {
 
+    private final EndClientService endClientService;
+    private final EndClientPopulator endClientPopulator;
 
     public void populate(Client source, ClientDto target) {
 
@@ -19,13 +28,15 @@ public class ClientPopulator {
         target.setEmail(source.getEmail());
         target.setPhone(source.getPhone());
         target.setWhatsapp(source.getWhatsapp());
-
         target.setIndustry(source.getIndustry());
-        target.setStatus(source.getStatus());
+
+        String result = source.getStatus() == null || source.getStatus().isEmpty() ? source.getStatus()
+                : source.getStatus().substring(0, 1).toUpperCase() + source.getStatus().substring(1).toLowerCase();
+        target.setStatus(result);
+
         target.setAddress(source.getAddress());
         target.setNotes(source.getNotes());
         target.setIsActive(source.getIsActive());
-        target.setEndClientIds(source.getEndClientIds());
         target.setSource(source.getSource());
 
         // Country
@@ -35,6 +46,26 @@ public class ClientPopulator {
             target.setCountryName(source.getCountry().getName());
         }
 
+        populateEndClients(source, target);
+
+    }
+
+    private void  populateEndClients(Client source, ClientDto target){
+
+        if (source.getEndClientIds() == null || source.getEndClientIds().length == 0) {
+
+            target.setEndClients(Collections.emptyList());
+            return;
+        }
+        List<EndClient> endClients = endClientService.getEndClients( Arrays.asList(source.getEndClientIds()));
+
+        List<EndClientDto> endClientDtos =  endClients.stream().map(endClient -> {
+            EndClientDto endClientDto = new EndClientDto();
+            endClientPopulator.populate(endClient, endClientDto);
+            return endClientDto;
+        }).toList();
+
+        target.setEndClients(endClientDtos);
     }
 
 }

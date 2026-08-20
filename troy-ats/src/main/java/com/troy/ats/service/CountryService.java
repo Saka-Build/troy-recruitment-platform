@@ -30,7 +30,13 @@ public interface CountryService {
      * @param code
      * @return
      */
-    public Country getCountryByCode(String code) ;
+    public Country getCountryByCode(String code);
+
+    /**
+     *
+     * @return
+     */
+    public List<Country> getAllCountries();
 
 }
 
