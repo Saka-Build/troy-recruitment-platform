@@ -223,8 +223,7 @@ CREATE TABLE candidates (
     source              VARCHAR(100),
 
     -- Status
-    status_id           UUID            REFERENCES statuses (id) ON DELETE RESTRICT,
-    sub_status_id       UUID            REFERENCES sub_statuses (id) ON DELETE RESTRICT,
+    status              VARCHAR(100)    NOT NULL,
 
     -- Ownership
     cv_owner_id         UUID            NOT NULL REFERENCES employees (id) ON DELETE RESTRICT,
@@ -236,23 +235,23 @@ CREATE TABLE candidates (
     original_cv_format  cv_format,
     troy_cv_url         TEXT,
     troy_cv_pdf_url     TEXT,
-
-    is_active           BOOLEAN         NOT NULL DEFAULT TRUE,
+    current_salary_amount NUMERIC(12,2),
+    current_salary_currency VARCHAR(3),
+    current_salary_period VARCHAR(20),
+    expected_salary_amount NUMERIC(12,2),
+    expected_salary_currency VARCHAR(3),
+    expected_salary_period VARCHAR(20),
     created_at          TIMESTAMPTZ     NOT NULL DEFAULT NOW(),
     updated_at          TIMESTAMPTZ     NOT NULL DEFAULT NOW(),
     created_by          UUID            REFERENCES employees (id) ON DELETE SET NULL,
     updated_by          UUID            REFERENCES employees (id) ON DELETE SET NULL,
 
-    -- Guard: sub_status requires a status to be set
-    CONSTRAINT chk_sub_status_requires_status CHECK (
-        sub_status_id IS NULL OR status_id IS NOT NULL
-    )
 );
 
 CREATE INDEX idx_candidates_skills_gin   ON candidates USING GIN (skills);
 CREATE INDEX idx_candidates_full_name    ON candidates (full_name);
 CREATE INDEX idx_candidates_phone       ON candidates (phone);
-CREATE INDEX idx_candidates_status_id   ON candidates (status_id);
+CREATE INDEX idx_candidates_status   ON candidates (status);
 CREATE INDEX idx_candidates_cv_owner_id ON candidates (cv_owner_id);
 CREATE INDEX idx_candidates_location    ON candidates (location);
 CREATE INDEX idx_candidates_created_at  ON candidates (created_at DESC);

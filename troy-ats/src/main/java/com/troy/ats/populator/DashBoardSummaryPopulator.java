@@ -49,7 +49,7 @@ public class DashBoardSummaryPopulator {
 
     public void populate(DashboardSummaryDto dashboardSummaryDto) {
 
-        dashboardSummaryDto.setTotalCandidates(candidateService.getTotalCandidatesByActive(Boolean.TRUE));
+        //dashboardSummaryDto.setTotalCandidates(candidateService.getTotalCandidatesByActive(Boolean.TRUE));
         dashboardSummaryDto.setOpenJobs(jobService.getTotalJobsByStatus(JobStatus.OPEN));
         dashboardSummaryDto.setActiveClients(clientService.getTotalClientsByActive(Boolean.TRUE));
         dashboardSummaryDto.setTotalPlacements(candidateService.getTotalCandidatesByStatusName(CommonConstants.CANDIDATE_STATUS_ONBOARDED));
@@ -61,8 +61,8 @@ public class DashBoardSummaryPopulator {
        // dashboardSummaryDto.setTotalOfferAwaitingCandidateResponse(offerService.getTotalOffersByStaus(OfferStatus.RELEASED));
 
         List<String> candidatesNotConfirmed = new ArrayList<>();
-        List<Candidate> candidates = candidateService.getCandidatesByStatusNameANDSubStatusName(CommonConstants.CANDIDATE_STATUS_READY_TO_SUBMIT, CommonConstants.CANDIDATE_SUBSTATUS_CANDIDATE_CONFIRMATION_AWAITED);
-        candidatesNotConfirmed = candidates.stream().map(Candidate::getFullName).toList();
+        //List<Candidate> candidates = candidateService.getCandidatesByStatusNameANDSubStatusName(CommonConstants.CANDIDATE_STATUS_READY_TO_SUBMIT, CommonConstants.CANDIDATE_SUBSTATUS_CANDIDATE_CONFIRMATION_AWAITED);
+        //candidatesNotConfirmed = candidates.stream().map(Candidate::getFullName).toList();
         dashboardSummaryDto.setCandidatesNotConfirmed(candidatesNotConfirmed);
 
         populateTodayInterviews(dashboardSummaryDto);

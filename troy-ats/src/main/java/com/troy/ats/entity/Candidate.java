@@ -1,6 +1,9 @@
 package com.troy.ats.entity;
 
+import com.troy.ats.enums.CandidateStatus;
+import com.troy.ats.enums.Currency;
 import com.troy.ats.enums.CvFormat;
+import com.troy.ats.enums.RatePeriod;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.JdbcTypeCode;
@@ -19,8 +22,7 @@ import java.util.UUID;
                 @Index(name = "idx_candidates_skills", columnList = "skills"),
                 @Index(name = "idx_candidates_email", columnList = "email"),
                 @Index(name = "idx_candidates_cv_owner", columnList = "cv_owner_id"),
-                @Index(name = "idx_candidates_status", columnList = "status_id"),
-                @Index(name = "idx_candidates_sub_status", columnList = "sub_status_id")
+                @Index(name = "idx_candidates_status", columnList = "status"),
         }
 )
 @Getter
@@ -94,13 +96,31 @@ public class Candidate {
     private String source;
 
     // Status
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "status_id")
-    private Status status;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", length = 100, nullable = false)
+    private CandidateStatus status;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "sub_status_id")
-    private SubStatus subStatus;
+    @Column(name = "current_salary_amount", precision = 12, scale = 2)
+    private BigDecimal currentSalaryAmount;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "current_salary_currency", length = 3)
+    private Currency currentSalaryCurrency;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "current_salary_period", length = 20)
+    private RatePeriod currentSalaryPeriod;
+
+    @Column(name = "expected_salary_amount", precision = 12, scale = 2)
+    private BigDecimal expectedSalaryAmount;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "expected_salary_currency", length = 3)
+    private Currency expectedSalaryCurrency;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "expected_salary_period", length = 20)
+    private RatePeriod expectedSalaryPeriod;
 
     // Ownership
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -128,9 +148,6 @@ public class Candidate {
     @Column(name = "troy_cv_pdf_url", columnDefinition = "text")
     private String troyCvPdfUrl;
 
-    @Column(name = "is_active", nullable = false)
-    private Boolean active = true;
-
     @Column(name = "created_at", nullable = false, updatable = false)
     private OffsetDateTime createdAt;
 
@@ -150,10 +167,6 @@ public class Candidate {
         OffsetDateTime now = OffsetDateTime.now();
         createdAt = now;
         updatedAt = now;
-
-        if (active == null) {
-            active = true;
-        }
 
         if (salaryCurrency == null) {
             salaryCurrency = "USD";

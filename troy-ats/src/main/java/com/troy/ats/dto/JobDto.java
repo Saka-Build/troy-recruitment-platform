@@ -30,24 +30,31 @@ public class JobDto {
     String location;
     String workMode;
     String jobType;
-    String industry;
-    BigDecimal experienceMin;
-    BigDecimal experienceMax;
-    BigDecimal salaryMin;
-    BigDecimal salaryMax;
-    String salaryCurrency;
+    BigDecimal clientRateAmount;
+    String clientRateCurrency;
+    String clientRatePeriod;
+    BigDecimal candidateRateAmount;
+    String candidateRateCurrency;
+    String candidateRatePeriod;
     String[] skillsRequired;
     String status;
     String priority;
     String description;
     String descriptionSource;
+    String industry;
     Boolean isTemplate;
     String templateName;
-    String[] atsKeywords;
-    Short openingsCount;
-    Short filledCount;
+    BigDecimal experienceMin;
+    BigDecimal experienceMax;
     UUID ownerId;
     String ownerName;
     List<EmployeeDto> assignedRecruiters;
+
+    /*BigDecimal salaryMin;
+    BigDecimal salaryMax;
+    String salaryCurrency;
+    String[] atsKeywords;
+    Short openingsCount;
+    Short filledCount;*/
 
 }

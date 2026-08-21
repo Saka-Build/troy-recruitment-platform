@@ -16,7 +16,6 @@ public class CandidateExportRequest {
     private OffsetDateTime toDate;
     private String skill;
     private String location;
-    private Boolean active;
-    private UUID statusId;
+    private String status;
 
 }

@@ -13,7 +13,10 @@ import java.util.UUID;
 @AllArgsConstructor
 public class CandidatesFiltersDto {
 
-    Map<String, Long> countByStatus;
-    Map<String, List<Map<UUID, String>>> filterDropDowns;
+   long totalCandidates;
+   long totalActiveCandidates;
+   long totalInActiveCandidates;
+   long totalBackListedCandidates;
+   List<String> statusList;
 
 }

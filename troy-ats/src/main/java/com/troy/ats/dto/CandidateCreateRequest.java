@@ -11,37 +11,31 @@ import java.util.UUID;
 @Setter
 public class CandidateCreateRequest {
 
+    private String cvId;
     private String fullName;
+    private String currentDesignation;
+    private UUID cvOwnerId;
+    private String referredBy;
+    private String referenceNote;
     private String email;
     private String phone;
     private String whatsapp;
     private String location;
     private String nationality;
-    private String cvId;
-
-    private String currentDesignation;
     private String currentEmployer;
-
     private BigDecimal experienceYears;
-    private Short noticePeriodDays;
-
-    private BigDecimal currentSalary;
-    private BigDecimal expectedSalary;
-    private String salaryCurrency;
-
     private String[] skills;
-    private String education;
-
+    private Short noticePeriodDays;
     private String visaStatus;
-    private String linkedinUrl;
     private String source;
-
-    private UUID statusId;
-    private UUID subStatusId;
-    private UUID cvOwnerId;
-
-    private String referredBy;
-    private String referenceNote;
-    private boolean active;
+    private String linkedinUrl;
+    private String status;
+    private String education;
+    BigDecimal currentSalaryAmount;
+    String currentSalaryCurrency;
+    String currentSalaryPeriod;
+    BigDecimal expectedSalaryAmount;
+    String expectedSalaryCurrency;
+    String expectedSalaryPeriod;
 
 }

@@ -9,8 +9,11 @@ import com.troy.ats.entity.SubStatus;
 import org.springframework.stereotype.Component;
 
 import java.time.OffsetDateTime;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.UUID;
+
+import static com.troy.ats.util.CommonUtil.enumToStringFormat;
 
 
 @Component
@@ -19,45 +22,36 @@ public class CandidatePopulator {
 
     public void populate(Candidate source, CandidateDto target) {
 
-        CandidateHeaderDto candidateHeaderDto = new CandidateHeaderDto();
-        CandidateProfileDto candidateProfileDto = new CandidateProfileDto();
-        populateCandidateHeader(source, candidateHeaderDto);
-        populateCandidateProfile(source, candidateProfileDto);
-
-        target.setCandidateHeader(candidateHeaderDto);
-        target.setCandidateProfile(candidateProfileDto);
-    }
-
-    private void populateCandidateHeader(Candidate source, CandidateHeaderDto target){
         target.setId(source.getId());
-        target.setFullName(source.getFullName());
-        target.setLocation(source.getLocation());
-        target.setCurrentDesignation(source.getCurrentDesignation());
-        target.setActive(source.getActive());
-        Status status = source.getStatus();
-        if(Objects.nonNull(status)){
-            target.setStatusId(status.getId());
-            target.setStatusName(status.getName());
-            target.setStatusColour(status.getColourHex());
-        }
-        SubStatus subStatus = source.getSubStatus();
-        if(Objects.nonNull(subStatus)){
-            target.setSubStatusId(subStatus.getId());
-            target.setSubStatusName(subStatus.getName());
-        }
-
-    }
-
-    private void populateCandidateProfile(Candidate source, CandidateProfileDto target){
-
         target.setCvId(source.getCvId());
-        target.setCvOwner(source.getCvOwner().getFullName());
+        target.setFullName(source.getFullName());
+        target.setCurrentDesignation(source.getCurrentDesignation());
+        if(Objects.nonNull(source.getCvOwner())){
+            target.setCvOwnerId(source.getCvOwner().getId());
+            target.setCvOwnerName(source.getCvOwner().getFullName());
+        }
         target.setReferredBy(source.getReferredBy());
+        target.setReferenceNote(source.getReferenceNote());
         target.setEmail(source.getEmail());
         target.setPhone(source.getPhone());
         target.setWhatsapp(source.getWhatsapp());
         target.setLocation(source.getLocation());
+        target.setNationality(source.getNationality());
+        target.setCurrentEmployer(source.getCurrentEmployer());
+        target.setExperienceYears(source.getExperienceYears());
         target.setSkills(source.getSkills());
+        target.setNoticePeriodDays(source.getNoticePeriodDays());
+        target.setVisaStatus(source.getVisaStatus());
+        target.setSource(source.getSource());
+        target.setLinkedinUrl(source.getLinkedinUrl());
+        target.setStatus(enumToStringFormat(source.getStatus().name()));
+        target.setEducation(source.getEducation());
+        target.setCurrentSalaryAmount(source.getCurrentSalaryAmount());
+        target.setCurrentSalaryCurrency(source.getCurrentSalaryCurrency().name());
+        target.setCurrentSalaryPeriod(source.getCurrentSalaryPeriod().name().toLowerCase(Locale.ROOT));
+        target.setExpectedSalaryAmount(source.getExpectedSalaryAmount());
+        target.setExpectedSalaryCurrency(source.getExpectedSalaryCurrency().name());
+        target.setExpectedSalaryPeriod(source.getExpectedSalaryPeriod().name().toLowerCase(Locale.ROOT));
         target.setCreatedAt(source.getCreatedAt());
 
     }
