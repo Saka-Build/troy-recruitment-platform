@@ -41,6 +41,10 @@ public class EmployeeSpecification {
                 predicates.add(cb.equal(root.get("isActive"), filter.active()));
             }
 
+            if (filter.designation() != null) {
+                predicates.add(cb.equal(root.get("designation"), filter.designation()));
+            }
+
             // Created from
             if (filter.createdFrom() != null) {
 

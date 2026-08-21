@@ -42,12 +42,12 @@ public class EmployeeController {
     @GetMapping
     public ResponseEntity<Page<EmployeeDto>> getEmployees(@RequestParam(required = false) String search,
                                                            @RequestParam(required = false) Boolean active,
-                                                           @RequestParam(required = false) String location,
+                                                           @RequestParam(required = false) String designation,
                                                            @RequestParam(required = false) OffsetDateTime createdFrom,
                                                            @RequestParam(required = false) OffsetDateTime createdTo,
                                                            @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
 
-        EmployeeFilter filter = new EmployeeFilter(search, active, location, createdFrom, createdTo);
+        EmployeeFilter filter = new EmployeeFilter(search, active, designation, createdFrom, createdTo);
 
         return ResponseEntity.ok(employeeService.getEmployees(filter, pageable));
     }
