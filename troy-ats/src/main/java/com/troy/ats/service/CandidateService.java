@@ -206,7 +206,7 @@ public class CandidateService {
         }
         Long number = candidateRepository.getNextCandidateNumber();
 
-        String cvId = String.format("J%s%s%03d",
+        String cvId = String.format("%s%s%03d",
                 getCode(ownerName),
                 getCodeWithOneLetter(sourceName),
                 number
