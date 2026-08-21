@@ -18,6 +18,7 @@ import com.troy.ats.service.FileStorageService;
 import com.troy.ats.util.CommonUtil;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
 import org.springframework.data.domain.Page;
@@ -31,6 +32,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.time.format.DateTimeFormatter;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -244,6 +246,20 @@ public class EmployeeServiceImpl implements EmployeeService {
         List<Employee> employees = employeeRepository.findAll(specification, Sort.by(Sort.Direction.DESC, "createdAt"));
 
         return createExcel(employees);
+    }
+
+    /**
+     *
+     * @param employeesId
+     * @return
+     */
+    @Override
+    public List<Employee> getEmployeesByIds(List<UUID> employeesIds) {
+
+        if(CollectionUtils.isNotEmpty(employeesIds)){
+            return employeeRepository.findAllByIdIn(employeesIds);
+        }
+        return Collections.emptyList();
     }
 
     private byte[] createExcel(List<Employee> employees) throws IOException {

@@ -61,7 +61,7 @@ public class EndClientServiceImpl implements EndClientService {
      */
     @Override
     public void deleteEndClient(UUID id) {
-
+        endClientRepository.deleteById(id);
     }
 
     /**

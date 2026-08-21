@@ -13,6 +13,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import static org.thymeleaf.util.StringUtils.substring;
+
 public final class CommonUtil {
 
     private CommonUtil() {
@@ -127,5 +129,21 @@ public final class CommonUtil {
         if (!ALLOWED_IMAGE_TYPES.contains(contentType)) {
             throw new IllegalArgumentException("Only JPG, PNG and WebP images are allowed");
         }
+    }
+
+    public static String enumToStringFormat(String source){
+
+        String newValue = source.substring(0, 1).toUpperCase() + source.substring(1).toLowerCase();
+        return newValue;
+    }
+
+    public static String getCode(String name) {
+        String cleaned = name.replaceAll("[^A-Za-z]", "").toUpperCase();
+
+        if (cleaned.length() >= 2) {
+            return cleaned.substring(0, 2);
+        }
+
+        return (cleaned + "X").substring(0, 2);
     }
 }

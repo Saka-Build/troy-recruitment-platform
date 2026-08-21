@@ -1,8 +1,6 @@
 package com.troy.ats.entity;
 
-import com.troy.ats.enums.JobStatus;
-import com.troy.ats.enums.JobType;
-import com.troy.ats.enums.JobWorkMode;
+import com.troy.ats.enums.*;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -27,12 +25,19 @@ public class Job {
     @Column(name = "id", updatable = false, nullable = false)
     private UUID id;
 
+    @Column(name = "job_id", nullable = false, unique = true, length = 20)
+    private String jobId;
+
     @Column(name = "title", nullable = false, length = 255)
     private String title;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "client_id", nullable = false)
     private Client client;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "end_client_id", nullable = false)
+    private EndClient endClient;
 
     @Column(name = "location", length = 255)
     private String location;
@@ -104,6 +109,32 @@ public class Job {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_id")
     private Employee owner;
+
+    @JdbcTypeCode(SqlTypes.ARRAY)
+    @Column(name = "assigned_recruiters_id", columnDefinition = "uuid[]")
+    private UUID[] assignedRecruiters;
+
+    @Column(name = "candidate_rate_amount", precision = 12, scale = 2)
+    private BigDecimal candidateRateAmount;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "candidate_rate_currency", length = 3)
+    private Currency candidateRateCurrency;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "candidate_rate_period", length = 20)
+    private RatePeriod candidateRatePeriod;
+
+    @Column(name = "client_rate_amount", precision = 12, scale = 2)
+    private BigDecimal clientRateAmount;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "client_rate_currency", length = 3)
+    private Currency clientRateCurrency;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "client_rate_period", length = 20)
+    private RatePeriod clientRatePeriod;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;

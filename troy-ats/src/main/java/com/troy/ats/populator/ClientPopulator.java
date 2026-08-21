@@ -12,6 +12,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import static com.troy.ats.util.CommonUtil.enumToStringFormat;
+
 
 @Component
 @RequiredArgsConstructor
@@ -31,7 +33,7 @@ public class ClientPopulator {
         target.setIndustry(source.getIndustry());
 
         String result = source.getStatus() == null || source.getStatus().isEmpty() ? source.getStatus()
-                : source.getStatus().substring(0, 1).toUpperCase() + source.getStatus().substring(1).toLowerCase();
+                : enumToStringFormat( source.getStatus());
         target.setStatus(result);
 
         target.setAddress(source.getAddress());

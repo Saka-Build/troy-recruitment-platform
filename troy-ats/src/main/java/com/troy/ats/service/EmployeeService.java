@@ -2,6 +2,7 @@ package com.troy.ats.service;
 
 import com.troy.ats.dto.*;
 import com.troy.ats.entity.Employee;
+import com.troy.ats.entity.EndClient;
 import com.troy.ats.enums.UserRole;
 import com.troy.ats.searchfilter.dto.EmployeeExportFilter;
 import com.troy.ats.searchfilter.dto.EmployeeFilter;
@@ -110,6 +111,13 @@ public interface EmployeeService {
      * @throws IOException
      */
     byte[] exportEmployees(EmployeeExportFilter filter) throws IOException;
+
+    /**
+     *
+     * @param employeesId
+     * @return
+     */
+    List<Employee> getEmployeesByIds(List<UUID> employeesIds);
 
 }
 

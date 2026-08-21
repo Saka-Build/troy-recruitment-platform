@@ -1,9 +1,6 @@
 package com.troy.ats.service;
 
-import com.troy.ats.dto.ClientCreateRequest;
-import com.troy.ats.dto.ClientDto;
-import com.troy.ats.dto.JobCreateRequest;
-import com.troy.ats.dto.JobDto;
+import com.troy.ats.dto.*;
 import com.troy.ats.entity.Job;
 import com.troy.ats.enums.JobStatus;
 import com.troy.ats.searchfilter.dto.JobExportFilter;
@@ -109,4 +106,19 @@ public interface JobService {
      * @throws IOException
      */
     byte[] exportJobs(JobExportFilter filter) throws IOException;
+
+    /**
+     *
+     * @param clientName
+     * @param endClientName
+     * @param number
+     * @return
+     */
+    String generateJobId(String clientName, String endClientName);
+
+    /**
+     *
+     * @return
+     */
+    JobsFiltersDto getJobFilters();
 }

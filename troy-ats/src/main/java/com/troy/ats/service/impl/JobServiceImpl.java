@@ -1,9 +1,6 @@
 package com.troy.ats.service.impl;
 
-import com.troy.ats.dto.ClientDto;
-import com.troy.ats.dto.EmployeeDto;
-import com.troy.ats.dto.JobCreateRequest;
-import com.troy.ats.dto.JobDto;
+import com.troy.ats.dto.*;
 import com.troy.ats.entity.Client;
 import com.troy.ats.entity.Employee;
 import com.troy.ats.entity.Job;
@@ -30,7 +27,10 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
+
+import static com.troy.ats.util.CommonUtil.getCode;
 
 @Service("jobService")
 @RequiredArgsConstructor
@@ -90,6 +90,13 @@ public class JobServiceImpl implements JobService {
         Job job = new Job();
         reverseJobPopulator.populate(request,job);
         job.setStatus(JobStatus.OPEN);
+
+        //job ID
+        String clientName = job.getClient().getName();
+        String endClientName = job.getEndClient().getName();
+        String jobId = generateJobId(clientName, endClientName);
+        job.setJobId(jobId);
+
         Job savedJob = jobRepository.save(job);
 
         // 8. Convert to DTO
@@ -165,6 +172,49 @@ public class JobServiceImpl implements JobService {
         return createExcel(jobs);
     }
 
+    /**
+     *
+     * @param clientName
+     * @param endClientName
+     * @param number
+     * @return
+     */
+    @Override
+    public String generateJobId(String clientName, String endClientName) {
+
+        if(Objects.isNull(clientName) || Objects.isNull(endClientName)){
+            return null;
+        }
+        Long number = jobRepository.getNextJobNumber();
+
+        String jobId = String.format("J%s%s%03d",
+                getCode(clientName),
+                getCode(endClientName),
+                number
+        );
+
+        return jobId;
+    }
+
+    /**
+     *
+     * @return
+     */
+    @Override
+    public JobsFiltersDto getJobFilters() {
+
+       long totalOpenJobs = getTotalJobsByStatus(JobStatus.OPEN);
+        long totalClosedJobs = getTotalJobsByStatus(JobStatus.CLOSED);
+        long totalOnHoldJobs = getTotalJobsByStatus(JobStatus.ON_HOLD);
+
+        JobsFiltersDto jobsFiltersDto = new JobsFiltersDto();
+        jobsFiltersDto.setTotalOpenJobs(totalOpenJobs);
+        jobsFiltersDto.setTotalClosedJobs(totalClosedJobs);
+        jobsFiltersDto.setTotalOnHoldJobs(totalOnHoldJobs);
+
+        return jobsFiltersDto;
+    }
+
     private byte[] createExcel(List<Job> jobs) throws IOException {
 
         try (Workbook workbook = new HSSFWorkbook();
@@ -184,26 +234,30 @@ public class JobServiceImpl implements JobService {
             Row header = sheet.createRow(0);
 
             String[] columns = {
+                    "Job Id",
                     "Title",
                     "Client",
+                    "End Client",
                     "Location",
                     "Country",
                     "Work Mode",
                     "Job Type",
-                    "Industry",
-                    "Experience Min",
-                    "Experience Max",
-                    "Salary Min",
-                    "Salary Max",
-                    "Currency",
-                    "Status",
+                    "clientRateAmount",
+                    "clientRateCurrency",
+                    "clientRatePeriod",
+                    "candidateRateAmount",
+                    "candidateRateCurrency",
+                    "candidateRatePeriod",
+                    "skillsRequired",
                     "Priority",
+                    "Status",
+                    "Lead",
+                    "assignedRecruiters",
+                    "Industry",
                     "Description",
                     "Description Source",
                     "Template",
                     "Template Name",
-                    "Openings",
-                    "Filled",
                     "Created At",
                     "Updated At"
             };
@@ -221,29 +275,62 @@ public class JobServiceImpl implements JobService {
             for (Job job : jobs) {
 
                 Row row = sheet.createRow(rowNum++);
+                int col = 0;
 
-                row.createCell(0).setCellValue(safe(job.getTitle()));
-                row.createCell(1).setCellValue(job.getClient() != null ? safe(job.getClient().getName()) : "");
-                row.createCell(2).setCellValue(safe(job.getLocation()));
-                row.createCell(3).setCellValue(job.getCountry() != null ? safe(job.getCountry().getName()) : "");
-                row.createCell(4).setCellValue(job.getWorkMode() != null ? job.getWorkMode().name() : "");
-                row.createCell(5).setCellValue(job.getJobType() != null ? job.getJobType().name() : "");
-                row.createCell(6).setCellValue(safe(job.getIndustry()));
-                row.createCell(7).setCellValue(job.getExperienceMin() != null ? job.getExperienceMin().doubleValue() : 0);
-                row.createCell(8).setCellValue(job.getExperienceMax() != null ? job.getExperienceMax().doubleValue() : 0);
-                row.createCell(9).setCellValue(job.getSalaryMin() != null ? job.getSalaryMin().doubleValue() : 0);
-                row.createCell(10).setCellValue(job.getSalaryMax() != null ? job.getSalaryMax().doubleValue() : 0);
-                row.createCell(11).setCellValue(safe(job.getSalaryCurrency()));
-                row.createCell(12).setCellValue(job.getStatus() != null ? job.getStatus().name() : "");
-                row.createCell(13).setCellValue(safe(job.getPriority()));
-                row.createCell(14).setCellValue(safe(job.getDescription()));
-                row.createCell(15).setCellValue(safe(job.getDescriptionSource()));
-                row.createCell(16).setCellValue(Boolean.TRUE.equals(job.getIsTemplate()));
-                row.createCell(17).setCellValue(safe(job.getTemplateName()));
-                row.createCell(18).setCellValue(job.getOpeningsCount() != null ? job.getOpeningsCount() : 0);
-                row.createCell(19).setCellValue(job.getFilledCount() != null ? job.getFilledCount() : 0);
-                row.createCell(20).setCellValue(job.getCreatedAt() != null ? job.getCreatedAt().toString() : "");
-                row.createCell(21).setCellValue(job.getUpdatedAt() != null ? job.getUpdatedAt().toString() : "");
+                row.createCell(col++).setCellValue(safe(job.getJobId()));
+                row.createCell(col++).setCellValue(safe(job.getTitle()));
+                row.createCell(col++).setCellValue(job.getClient() != null ? safe(job.getClient().getName()) : "");
+                row.createCell(col++).setCellValue(job.getEndClient() != null ? safe(job.getEndClient().getName()) : "");
+                row.createCell(col++).setCellValue(safe(job.getLocation()));
+                row.createCell(col++).setCellValue(job.getCountry() != null ? safe(job.getCountry().getName()) : "");
+                row.createCell(col++).setCellValue(job.getWorkMode() != null ? job.getWorkMode().name() : "");
+                row.createCell(col++).setCellValue(job.getJobType() != null ? job.getJobType().name() : "");
+                row.createCell(col++).setCellValue(job.getClientRateAmount() != null ? job.getClientRateAmount().toString() : "");
+                row.createCell(col++).setCellValue(job.getClientRateCurrency() != null ? job.getClientRateCurrency().name() : "");
+                row.createCell(col++).setCellValue(job.getClientRatePeriod() != null ? job.getClientRatePeriod().name() : "");
+                row.createCell(col++).setCellValue(job.getCandidateRateAmount() != null ? job.getCandidateRateAmount().toString() : "");
+                row.createCell(col++).setCellValue(job.getCandidateRateCurrency() != null ? job.getCandidateRateCurrency().name() : "");
+                row.createCell(col++).setCellValue(job.getCandidateRatePeriod() != null ? job.getCandidateRatePeriod().name() : "");
+                if(Objects.nonNull(job.getSkillsRequired())){
+                    StringBuffer skills= new StringBuffer();
+                    int count = 1;
+                    for(String skill : job.getSkillsRequired()){
+                        skills.append(skill);
+                        if(count != job.getSkillsRequired().length){
+                            skills.append(',');
+                        }
+                        count ++;
+                    }
+                    row.createCell(col++).setCellValue(skills.toString());
+                }else {
+                    row.createCell(col++).setCellValue("");
+                }
+                row.createCell(col++).setCellValue(safe(job.getPriority()));
+                row.createCell(col++).setCellValue(job.getStatus() != null ? job.getStatus().name() : "");
+                row.createCell(col++).setCellValue(job.getOwner() != null ? safe(job.getOwner().getFullName()) : "");
+
+                if(Objects.nonNull(job.getAssignedRecruiters())){
+                    StringBuffer recruiters= new StringBuffer();
+                    int count = 1;
+                    for(UUID recruiter : job.getAssignedRecruiters()){
+                        recruiters.append(recruiter);
+                        if(count != job.getAssignedRecruiters().length){
+                            recruiters.append(',');
+                        }
+                        count ++;
+                    }
+                    row.createCell(col++).setCellValue(recruiters.toString());
+                }else {
+                    row.createCell(col++).setCellValue("");
+                }
+                row.createCell(col++).setCellValue(safe(job.getIndustry()));
+                row.createCell(col++).setCellValue(safe(job.getDescription()));
+                row.createCell(col++).setCellValue(safe(job.getDescriptionSource()));
+                row.createCell(col++).setCellValue(Boolean.TRUE.equals(job.getIsTemplate()));
+                row.createCell(col++).setCellValue(safe(job.getTemplateName()));
+                row.createCell(col++).setCellValue(job.getCreatedAt() != null ? job.getCreatedAt().toString() : "");
+                row.createCell(col++).setCellValue(job.getUpdatedAt() != null ? job.getUpdatedAt().toString() : "");
+
             }
 
             // Auto-size columns

@@ -8,6 +8,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -21,6 +22,7 @@ public interface JobRepository extends JpaRepository<Job, UUID>, JpaSpecificatio
     @EntityGraph(attributePaths = {
             "country",
             "client",
+            "endClient",
             "owner"
     })
     Page<Job> findAll(Specification<Job> specification, Pageable pageable);
@@ -29,9 +31,13 @@ public interface JobRepository extends JpaRepository<Job, UUID>, JpaSpecificatio
     @EntityGraph(attributePaths = {
             "country",
             "client",
+            "endClient",
             "owner"
     })
     Optional<Job> findById(UUID id);
+
+    @Query(value = "SELECT nextval('job_number_seq')", nativeQuery = true)
+    Long getNextJobNumber();
 
 
 }

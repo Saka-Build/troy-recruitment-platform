@@ -10,7 +10,7 @@ import java.time.OffsetDateTime;
 public class JobExportFilter {
 
     private String countryCode;
-    private JobStatus status;
+    private String status;
     private LocalDateTime fromDate;
     private LocalDateTime toDate;
 }
