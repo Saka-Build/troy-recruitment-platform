@@ -4,16 +4,22 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 
 import java.util.Locale;
 
-public enum InterviewRound {
-    TECHNICAL, HR, FINAL, SCREENING, OTHER;
+public enum Currency {
+    USD,
+    QAR,
+    GBP,
+    INR,
+    PLN,
+    EUR,
+    CAD;
 
     @JsonCreator
-    public static InterviewRound fromValue(String value) {
+    public static Currency fromValue(String value) {
         if (value == null) {
             return null;
         }
 
-        return InterviewRound.valueOf(
+        return Currency.valueOf(
                 value.trim().toUpperCase(Locale.ROOT));
     }
 }

@@ -1,11 +1,9 @@
 package com.troy.ats.controller;
 
-import com.troy.ats.dto.ClientCreateRequest;
-import com.troy.ats.dto.ClientDto;
-import com.troy.ats.dto.JobCreateRequest;
-import com.troy.ats.dto.JobDto;
+import com.troy.ats.dto.*;
 import com.troy.ats.entity.Job;
 import com.troy.ats.enums.JobStatus;
+import com.troy.ats.exception.ApiResponse;
 import com.troy.ats.searchfilter.dto.JobExportFilter;
 import com.troy.ats.searchfilter.dto.JobFilter;
 import com.troy.ats.service.JobService;
@@ -42,14 +40,21 @@ public class JobController {
     @GetMapping
     public ResponseEntity<Page<JobDto>> getJobs(@RequestParam(required = false) String search,
                                                 @RequestParam(required = false) String countryCode,
-                                                @RequestParam(required = false) JobStatus status,
+                                                @RequestParam(required = false) String status,
+                                                @RequestParam(required = false) String priority,
                                                 @RequestParam(required = false) OffsetDateTime createdFrom,
                                                 @RequestParam(required = false) OffsetDateTime createdTo,
                                                 @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
 
-        JobFilter filter = new JobFilter(search, countryCode,status, createdFrom, createdTo);
+        JobFilter filter = new JobFilter(search, countryCode,status, priority, createdFrom, createdTo);
 
         return ResponseEntity.ok(jobService.getJobs(filter, pageable));
+    }
+
+    @GetMapping("/jobheader/jobfilters")
+    public ResponseEntity<JobsFiltersDto> getJobFilters() {
+
+        return ResponseEntity.ok(jobService.getJobFilters());
     }
 
     @GetMapping("/{id}")
@@ -84,9 +89,11 @@ public class JobController {
         return jobService.updateJob(id, job);
     }
 
-    @DeleteMapping("/{id}")
-    public void deleteJob(@PathVariable UUID id) {
+    @DeleteMapping("delete/{id}")
+    public ResponseEntity<ApiResponse> deleteJob(@PathVariable UUID id) {
+
         jobService.deleteJob(id);
+        return ResponseEntity.ok(ApiResponse.success("Deleted successfully"));
     }
 
     @PostMapping("/export")

@@ -1,17 +1,18 @@
 package com.troy.ats.populator;
 
 import com.troy.ats.dto.JobCreateRequest;
-import com.troy.ats.entity.Client;
-import com.troy.ats.entity.Country;
-import com.troy.ats.entity.Employee;
-import com.troy.ats.entity.Job;
-import com.troy.ats.enums.JobStatus;
+import com.troy.ats.entity.*;
+import com.troy.ats.enums.*;
 import com.troy.ats.service.ClientService;
-import com.troy.ats.service.JobService;
+import com.troy.ats.service.EndClientService;
 import com.troy.ats.service.impl.CountryServiceImpl;
 import com.troy.ats.service.impl.EmployeeServiceImpl;
+import com.troy.ats.service.impl.JobServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+
+import java.util.Locale;
+import java.util.Objects;
 
 
 @Component
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Component;
 public class ReverseJobPopulator {
 
     private final ClientService clientService;
+    private final EndClientService endClientService;
     private final CountryServiceImpl countryService;
     private final EmployeeServiceImpl employeeService;
 
@@ -37,11 +39,11 @@ public class ReverseJobPopulator {
         }
 
         if (source.getWorkMode() != null) {
-            target.setWorkMode(source.getWorkMode());
+            target.setWorkMode(JobWorkMode.fromValue(source.getWorkMode()));
         }
 
         if (source.getJobType() != null) {
-            target.setJobType(source.getJobType());
+            target.setJobType(JobType.fromValue(source.getJobType()));
         }
 
         if (source.getIndustry() != null) {
@@ -72,11 +74,11 @@ public class ReverseJobPopulator {
             target.setSkillsRequired(source.getSkillsRequired());
         }
         if (source.getStatus() != null) {
-            target.setStatus(source.getStatus());
+            target.setStatus(JobStatus.fromValue(source.getStatus()));
         }
 
         if (source.getPriority() != null) {
-            target.setPriority(source.getPriority());
+            target.setPriority(source.getPriority().toLowerCase(Locale.ROOT));
         }
 
         if (source.getDescription() != null) {
@@ -103,6 +105,26 @@ public class ReverseJobPopulator {
             target.setOpeningsCount(source.getOpeningsCount());
         }
 
+        if (source.getClientRateAmount() != null) {
+            target.setClientRateAmount(source.getClientRateAmount());
+        }
+        if (source.getClientRateCurrency() != null) {
+            target.setClientRateCurrency(Currency.fromValue(source.getClientRateCurrency()));
+        }
+        if (source.getClientRatePeriod() != null) {
+            target.setClientRatePeriod(RatePeriod.fromValue(source.getClientRatePeriod()));
+        }
+
+        if (source.getCandidateRateAmount() != null) {
+            target.setCandidateRateAmount(source.getCandidateRateAmount());
+        }
+        if (source.getCandidateRateCurrency() != null) {
+            target.setCandidateRateCurrency(Currency.fromValue(source.getCandidateRateCurrency()));
+        }
+        if (source.getCandidateRatePeriod() != null) {
+            target.setCandidateRatePeriod(RatePeriod.fromValue(source.getCandidateRatePeriod()));
+        }
+
         // Don't overwrite filledCount during normal create/update
         if (target.getFilledCount() == null) {
             target.setFilledCount((short) 0);
@@ -111,8 +133,12 @@ public class ReverseJobPopulator {
         // client
         if (source.getClientId() != null) {
             Client client = clientService.getClientById(source.getClientId());
-               target.setClient(client);
-
+            target.setClient(client);
+        }
+        //end client
+        if (source.getEndClientId() != null) {
+            EndClient endClient = endClientService.getEndClientById(source.getEndClientId());
+            target.setEndClient(endClient);
         }
         // country
         if (source.getCountryCode() != null) {
@@ -124,8 +150,12 @@ public class ReverseJobPopulator {
         if (source.getOwnerId() != null) {
             Employee employee = employeeService.getEmployeeById(source.getOwnerId());
             target.setOwner(employee);
-
         }
+        //assigned Recruiters
+        if(Objects.nonNull(source.getAssignedRecruiters())){
+            target.setAssignedRecruiters(source.getAssignedRecruiters());
+        }
+
     }
 
 

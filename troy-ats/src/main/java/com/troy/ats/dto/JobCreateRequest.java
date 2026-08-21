@@ -18,26 +18,34 @@ public class JobCreateRequest {
 
     String title;
     UUID clientId;
+    UUID endClientId;
     String countryCode;
     String location;
-    JobWorkMode workMode;
-    JobType jobType;
+    String jobType;
+    String workMode;
+    BigDecimal clientRateAmount;
+    String clientRateCurrency;
+    String clientRatePeriod;
+    BigDecimal candidateRateAmount;
+    String candidateRateCurrency;
+    String candidateRatePeriod;
+    String[] skillsRequired;
+    String priority;
+    String status;
+    UUID ownerId;
+    UUID[] assignedRecruiters;
+    String description;
+    String descriptionSource;
     String industry;
     BigDecimal experienceMin;
     BigDecimal experienceMax;
     BigDecimal salaryMin;
     BigDecimal salaryMax;
     String salaryCurrency;
-    String[] skillsRequired;
-    JobStatus status;
-    String priority;
-    String description;
-    String descriptionSource;
     Boolean isTemplate;
     String templateName;
     String[] atsKeywords;
     Short openingsCount;
     Short filledCount;
-    UUID ownerId;
 
 }

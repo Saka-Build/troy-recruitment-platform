@@ -1,15 +1,17 @@
 package com.troy.ats.searchfilter.filter;
 
 
-import com.troy.ats.entity.Employee;
 import com.troy.ats.entity.Job;
+import com.troy.ats.enums.JobStatus;
 import com.troy.ats.searchfilter.dto.JobExportFilter;
 import com.troy.ats.searchfilter.dto.JobFilter;
+import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class JobSpecification {
 
@@ -27,13 +29,17 @@ public class JobSpecification {
 
                 String search = "%" + filter.search().toLowerCase() + "%";
                 Predicate titlePredicate = cb.like(cb.lower(root.get("title")), search);
+                Predicate jobIdPredicate = cb.like(cb.lower(root.get("jobId")), search);
                 Predicate clientPersonPredicate = cb.like(cb.lower(root.get("client").get("name")), search);
-                Predicate skillsRequiredPredicate = cb.like(cb.lower(root.get("skillsRequired")), search);
+
+                Expression<String> skills = cb.function("array_to_string", String.class, root.get("skillsRequired"), cb.literal(","));
+                Predicate skillsRequiredPredicate = cb.like(cb.lower(skills), "%" + search.toLowerCase() + "%");
+
                 Predicate locationPredicate = cb.like(cb.lower(root.get("location")), search);
                 Predicate countryCodePredicate = cb.like(cb.lower(root.get("country").get("code")), search);
                 Predicate countryNamePredicate = cb.like(cb.lower(root.get("country").get("name")), search);
 
-                predicates.add(cb.or(titlePredicate, clientPersonPredicate, skillsRequiredPredicate,locationPredicate,countryCodePredicate, countryNamePredicate));
+                predicates.add(cb.or(titlePredicate, jobIdPredicate, clientPersonPredicate, skillsRequiredPredicate,locationPredicate,countryCodePredicate, countryNamePredicate));
             }
 
             //Country
@@ -42,7 +48,11 @@ public class JobSpecification {
             }
             //status
             if (filter.status() != null) {
-                predicates.add(cb.equal(root.get("status"), filter.status()));
+                predicates.add(cb.equal(root.get("status"), JobStatus.fromValue(filter.status())));
+            }
+            //priority
+            if (filter.priority() != null) {
+                predicates.add(cb.equal(cb.lower(root.get("priority")), filter.priority().toLowerCase(Locale.ROOT)));
             }
             // Created from
             if (filter.createdFrom() != null) {
@@ -79,7 +89,7 @@ public class JobSpecification {
             }
             // Status
             if (filter.getStatus() != null) {
-                predicates.add(cb.equal(root.get("status"), filter.getStatus()));
+                predicates.add(cb.equal(root.get("status"), JobStatus.fromValue(filter.getStatus())));
             }
 
             query.orderBy(cb.desc(root.get("createdAt")));

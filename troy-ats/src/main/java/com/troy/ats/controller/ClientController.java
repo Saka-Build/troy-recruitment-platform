@@ -53,7 +53,7 @@ public class ClientController {
     }
 
     @GetMapping("/clientheader/clientfilters")
-    public ResponseEntity<ClientsFiltersDto> getCandidateFilters() {
+    public ResponseEntity<ClientsFiltersDto> getClientFilters() {
 
         return ResponseEntity.ok(clientService.getClientFilters());
     }

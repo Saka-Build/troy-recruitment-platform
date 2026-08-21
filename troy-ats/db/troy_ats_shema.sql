@@ -264,8 +264,10 @@ CREATE INDEX idx_candidates_is_active   ON candidates (is_active);
 -- ============================================================
 CREATE TABLE jobs (
     id                  UUID            PRIMARY KEY DEFAULT gen_random_uuid(),
+    job_id              VARCHAR(20)     NOT NULL UNIQUE,
     title               VARCHAR(255)    NOT NULL,
     client_id           UUID            NOT NULL REFERENCES clients (id) ON DELETE RESTRICT,
+    end_client_id       UUID            NOT NULL REFERENCES end_clients (id) ON DELETE RESTRICT,
     location            VARCHAR(255),
     country_id             UUID    NOT NULL REFERENCES countries(id) ON DELETE RESTRICT,
     work_mode           job_work_mode,
@@ -290,6 +292,13 @@ CREATE TABLE jobs (
     openings_count      SMALLINT        NOT NULL DEFAULT 1 CHECK (openings_count >= 1),
     filled_count        SMALLINT        NOT NULL DEFAULT 0 CHECK (filled_count >= 0),
     owner_id            UUID            REFERENCES employees (id) ON DELETE SET NULL,
+    assigned_recruiters_id     UUID[],
+    candidate_rate_amount NUMERIC(12,2),
+    candidate_rate_currency VARCHAR(3),
+    candidate_rate_period VARCHAR(20),
+    client_rate_amount NUMERIC(12,2),
+    client_rate_currency VARCHAR(3),
+    client_rate_period VARCHAR(20),
     created_at          TIMESTAMPTZ     NOT NULL DEFAULT NOW(),
     updated_at          TIMESTAMPTZ     NOT NULL DEFAULT NOW(),
     created_by          UUID            REFERENCES employees (id) ON DELETE SET NULL,
@@ -311,7 +320,9 @@ CREATE INDEX idx_jobs_priority   ON jobs (priority);
 CREATE INDEX idx_jobs_skills_gin ON jobs USING GIN (skills_required);
 CREATE INDEX idx_jobs_created_at ON jobs (created_at DESC);
 CREATE INDEX idx_jobs_is_template ON jobs (is_template);
+CREATE INDEX idx_jobs_job_id  ON jobs (job_id);
 
+CREATE SEQUENCE job_number_seq START WITH 1 INCREMENT BY 1;
 
 -- ============================================================
 -- 7. SUBMISSIONS  (Candidate ↔ Job link)

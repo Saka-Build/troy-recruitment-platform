@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -17,15 +18,18 @@ import java.util.UUID;
 public class JobDto {
 
     UUID id;
+    String jobId;
     String title;
     UUID clientId;
     String clientName;
+    UUID endClientId;
+    String endClientName;
     UUID countryId;
     String countryCode;
     String countryName;
     String location;
-    JobWorkMode workMode;
-    JobType jobType;
+    String workMode;
+    String jobType;
     String industry;
     BigDecimal experienceMin;
     BigDecimal experienceMax;
@@ -33,7 +37,7 @@ public class JobDto {
     BigDecimal salaryMax;
     String salaryCurrency;
     String[] skillsRequired;
-    JobStatus status;
+    String status;
     String priority;
     String description;
     String descriptionSource;
@@ -44,5 +48,6 @@ public class JobDto {
     Short filledCount;
     UUID ownerId;
     String ownerName;
+    List<EmployeeDto> assignedRecruiters;
 
 }

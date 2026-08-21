@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -26,6 +27,9 @@ public interface EmployeeRepository extends JpaRepository<Employee, UUID>, JpaSp
     @Override
     @EntityGraph(attributePaths = {"country"})
     Optional<Employee> findById(UUID id);
+
+    @EntityGraph(attributePaths = {"country"})
+    List<Employee> findAllByIdIn(List<UUID> ids);
 
 }
 

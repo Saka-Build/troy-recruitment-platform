@@ -7,7 +7,8 @@ import java.time.OffsetDateTime;
 public record JobFilter(
         String search,
         String countryCode,
-        JobStatus status,
+        String status,
+        String priority,
         OffsetDateTime createdFrom,
         OffsetDateTime createdTo
 ) {

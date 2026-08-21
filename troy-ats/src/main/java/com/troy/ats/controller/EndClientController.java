@@ -6,6 +6,7 @@ import com.troy.ats.dto.EndClientCreateRequest;
 import com.troy.ats.dto.EndClientDto;
 import com.troy.ats.entity.Client;
 import com.troy.ats.entity.EndClient;
+import com.troy.ats.exception.ApiResponse;
 import com.troy.ats.searchfilter.dto.ClientExportFilter;
 import com.troy.ats.service.impl.EndClientServiceImpl;
 import jakarta.validation.Valid;
@@ -65,9 +66,11 @@ public class EndClientController {
         return ResponseEntity.ok(endclientDto);
     }
 
-    @DeleteMapping("/{id}")
-    public void deleteEndClient(@PathVariable UUID id) {
+    @DeleteMapping("delete/{id}")
+    public ResponseEntity<ApiResponse> deleteEndClient(@PathVariable UUID id) {
+
         endClientService.deleteEndClient(id);
+        return ResponseEntity.ok(ApiResponse.success("Deleted successfully"));
     }
 
 
