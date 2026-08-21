@@ -1,5 +1,6 @@
 package com.troy.ats.repository;
 
+import com.troy.ats.entity.Candidate;
 import com.troy.ats.entity.Job;
 import com.troy.ats.enums.JobStatus;
 import org.springframework.data.domain.Page;

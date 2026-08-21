@@ -43,18 +43,13 @@ public class CandidateController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<CandidatesDto>> getCandidates(@RequestParam(required = false) String search,
-                                                             @RequestParam(required = false) UUID statusId,
-                                                             @RequestParam(required = false) UUID subStatusId,
-                                                             @RequestParam(required = false) UUID jobId,
-                                                             @RequestParam(required = false) Boolean active,
-                                                             @RequestParam(required = false) String location,
-                                                             @RequestParam(required = false) String source,
+    public ResponseEntity<Page<CandidateDto>> getCandidates(@RequestParam(required = false) String search,
+                                                             @RequestParam(required = false) String status,
                                                              @RequestParam(required = false) OffsetDateTime createdFrom,
                                                              @RequestParam(required = false) OffsetDateTime createdTo,
                                                              @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
 
-        CandidateFilter filter = new CandidateFilter(search, statusId, subStatusId, jobId, active, location, source, createdFrom, createdTo);
+        CandidateFilter filter = new CandidateFilter(search, status, createdFrom, createdTo);
 
         return ResponseEntity.ok(candidateService.getCandidates(filter, pageable));
     }

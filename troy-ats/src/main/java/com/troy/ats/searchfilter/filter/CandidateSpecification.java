@@ -2,6 +2,7 @@ package com.troy.ats.searchfilter.filter;
 
 
 import com.troy.ats.entity.Candidate;
+import com.troy.ats.enums.CandidateStatus;
 import com.troy.ats.searchfilter.dto.CandidateFilter;
 import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Predicate;
@@ -26,6 +27,8 @@ public class CandidateSpecification {
 
                 String search = "%" + filter.search().toLowerCase() + "%";
                 Predicate namePredicate = cb.like(cb.lower(root.get("fullName")), search);
+                Predicate cvIdPredicate = cb.like(cb.lower(root.get("cvId")), search);
+                Predicate cvOwnerPredicate = cb.like(cb.lower(root.get("cvOwner").get("fullName")), search);
                 Predicate emailPredicate = cb.like(cb.lower(root.get("email")), search);
                 Predicate designationPredicate = cb.like(cb.lower(root.get("currentDesignation")), search);
                 /*
@@ -39,39 +42,10 @@ public class CandidateSpecification {
                 predicates.add(cb.or(namePredicate, emailPredicate,designationPredicate, skillPredicate));
             }
 
-            //Active
-            if (filter.active() != null) {
-                predicates.add(cb.equal(root.get("active"), filter.active()));
-            }
-
             // Status
-            if (filter.statusId() != null) {
+            if (filter.status() != null) {
 
-                predicates.add(cb.equal(root.get("status").get("id"), filter.statusId()));
-            }
-
-            // Sub Status
-            if (filter.subStatusId() != null) {
-
-                predicates.add(cb.equal(root.get("subStatus").get("id"), filter.subStatusId()));
-            }
-
-            // Job
-            if (filter.jobId() != null) {
-
-                predicates.add(cb.equal(root.get("job").get("id"), filter.jobId()));
-            }
-
-            // Location
-            if (filter.location() != null && !filter.location().isBlank()) {
-
-                predicates.add(cb.like(cb.lower(root.get("location")), "%" + filter.location().toLowerCase() + "%"));
-            }
-
-            // Source
-            if (filter.source() != null && !filter.source().isBlank()) {
-
-                predicates.add(cb.equal(cb.lower(root.get("source")), filter.source().toLowerCase()));
+                predicates.add(cb.equal(root.get("status"), CandidateStatus.fromValue(filter.status())));
             }
 
             // Created from

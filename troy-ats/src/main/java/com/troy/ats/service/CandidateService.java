@@ -1,17 +1,12 @@
 package com.troy.ats.service;
 
-import com.troy.ats.constants.CommonConstants;
 import com.troy.ats.dto.*;
 import com.troy.ats.entity.Candidate;
-import com.troy.ats.entity.Status;
+import com.troy.ats.enums.CandidateStatus;
 import com.troy.ats.enums.CvFormat;
 import com.troy.ats.populator.CandidatePopulator;
-import com.troy.ats.populator.CandidatesPopulator;
 import com.troy.ats.populator.ReverseCandidatePopulator;
 import com.troy.ats.repository.CandidateRepository;
-import com.troy.ats.repository.JobRepository;
-import com.troy.ats.repository.StatusRepository;
-import com.troy.ats.repository.SubStatusRepository;
 import com.troy.ats.searchfilter.dto.CandidateFilter;
 import com.troy.ats.searchfilter.filter.CandidateSpecification;
 import com.troy.ats.util.CommonUtil;
@@ -19,7 +14,6 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
-import org.hibernate.sql.Delete;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -29,7 +23,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.*;
-import java.util.stream.Collectors;
+
+import static com.troy.ats.util.CommonUtil.*;
 
 
 @Service
@@ -37,10 +32,6 @@ import java.util.stream.Collectors;
 public class CandidateService {
 
     private final CandidateRepository candidateRepository;
-    private final StatusRepository statusRepository;
-    private final SubStatusRepository subStatusRepository;
-    private final JobRepository jobRepository;
-    private final CandidatesPopulator candidatesPopulator;
     private final CandidatePopulator candidatePopulator;
     private final ReverseCandidatePopulator reverseCandidatePopulator;
     private final FileStorageService fileStorageService;
@@ -80,66 +71,40 @@ public class CandidateService {
         candidateRepository.deleteById(id);
     }
 
-    public long getTotalCandidatesByActive(boolean active) {
-        return candidateRepository.countByActive(active);
-    }
     public long getTotalCandidatesByStatusName(String statusName) {
-        return candidateRepository.countByStatus_Name(statusName);
-    }
-    public List<Candidate> getCandidatesByStatusNameANDSubStatusName(String statusName, String subStatusName) {
-        return candidateRepository.findByStatus_NameAndSubStatus_Name(statusName, subStatusName);
+        return candidateRepository.countByStatus(CandidateStatus.fromValue(statusName));
     }
 
-    public Page<CandidatesDto> getCandidates(CandidateFilter filter, Pageable pageable) {
+    public Page<CandidateDto> getCandidates(CandidateFilter filter, Pageable pageable) {
 
         return candidateRepository.findAll(CandidateSpecification.filter(filter), pageable)
                 .map(candidate -> {
-                    CandidatesDto dto = new CandidatesDto();
-                    candidatesPopulator.populate(candidate, dto);
+                    CandidateDto dto = new CandidateDto();
+                    candidatePopulator.populate(candidate, dto);
                     return dto;
                 });
     }
 
     public CandidatesFiltersDto getCandidateFilters() {
-
-        Map<UUID, Long> counts = candidateRepository.countCandidatesByStatus().stream()
-                .collect(Collectors.toMap(
-                        row -> (UUID) row[0],
-                        row -> (Long) row[1]
-                ));
-
-        List<Status> statusList = statusRepository.findAll();
-        long totalActiveCandidates = candidateRepository.countByActive(Boolean.TRUE);
-        long countTotalCandidates = candidateRepository.count();
-
-        Map<String, Long> countByCandidateStatus = new HashMap<>();
-        countByCandidateStatus.put("Total",countTotalCandidates);
-        countByCandidateStatus.put("ActiveCandidates",totalActiveCandidates);
-        statusList.forEach(status -> {
-            countByCandidateStatus.put(status.getName(), counts.getOrDefault(status.getId(),0L));
-        });
-
-        List<Map<UUID, String>> statuses = statusList.stream().map(status -> Map.of(
-                        status.getId(),
-                        status.getName()
-                )).toList();
-        List<Map<UUID, String>> subStatuses = subStatusRepository.findAll().stream().map(status -> Map.of(
-                status.getId(),
-                status.getName()
-        )).toList();
-        List<Map<UUID, String>> jobs = jobRepository.findAll().stream().map(status -> Map.of(
-                status.getId(),
-                status.getTitle()
-        )).toList();
-
-        Map<String, List<Map<UUID, String>>> filterDropDowns = new HashMap<>();
-        filterDropDowns.put(CommonConstants.STATUS_DROPDOWN, statuses);
-        filterDropDowns.put(CommonConstants.SUB_STATUS_DROPDOWN, subStatuses);
-        filterDropDowns.put(CommonConstants.JOB_DROPDOWN, jobs);
-
         CandidatesFiltersDto candidatesFiltersDto = new CandidatesFiltersDto();
-        candidatesFiltersDto.setCountByStatus(countByCandidateStatus);
-        candidatesFiltersDto.setFilterDropDowns(filterDropDowns);
+
+        long totalCandidates = candidateRepository.count();
+        long totalActiveCandidates = candidateRepository.countByStatus(CandidateStatus.ACTIVE);
+        long totalInActiveCandidates = candidateRepository.countByStatus(CandidateStatus.INACTIVE);
+        long totalBlackListedCandidates = candidateRepository.countByStatus(CandidateStatus.BLACKLISTED);
+
+        List<String> statuses = List.of(
+              enumToStringFormat(CandidateStatus.ACTIVE.name()),
+                enumToStringFormat(CandidateStatus.INACTIVE.name()),
+                enumToStringFormat(CandidateStatus.BLACKLISTED.name())
+        );
+
+        candidatesFiltersDto.setTotalCandidates(totalCandidates);
+        candidatesFiltersDto.setTotalActiveCandidates(totalActiveCandidates);
+        candidatesFiltersDto.setTotalInActiveCandidates(totalInActiveCandidates);
+        candidatesFiltersDto.setTotalBackListedCandidates(totalBlackListedCandidates);
+        candidatesFiltersDto.setStatusList(statuses);
+
 
         return candidatesFiltersDto;
     }
@@ -149,7 +114,10 @@ public class CandidateService {
 
         Candidate candidate = new Candidate();
         reverseCandidatePopulator.populate(request, candidate);
-        candidate.setActive(Boolean.TRUE);
+
+        String ownerName = Objects.nonNull(candidate.getCvOwner()) ? candidate.getCvOwner().getFullName() : "";
+        String cvId = generateCandidateCVId(ownerName, candidate.getSource());
+        candidate.setCvId(cvId);
 
         // Save candidate first
         candidate = candidateRepository.save(candidate);
@@ -231,6 +199,22 @@ public class CandidateService {
 
     }
 
+    public String generateCandidateCVId(String ownerName, String sourceName) {
+
+        if(Objects.isNull(ownerName) || Objects.isNull(sourceName)){
+            return null;
+        }
+        Long number = candidateRepository.getNextCandidateNumber();
+
+        String cvId = String.format("J%s%s%03d",
+                getCode(ownerName),
+                getCodeWithOneLetter(sourceName),
+                number
+        );
+
+        return cvId;
+    }
+
     public void sendCandidateEmail(UUID candidateId, String emailType, MultipartFile file) {
 
         Candidate candidate = getCandidateById(candidateId);
@@ -247,8 +231,7 @@ public class CandidateService {
                         request.getFromDate(),
                         request.getToDate(),
                         request.getLocation(),
-                        request.getActive(),
-                        request.getStatusId(),
+                        CandidateStatus.fromValue(request.getStatus()),
                         request.getSkill()
                 );
 
@@ -267,44 +250,35 @@ public class CandidateService {
 
                 setCell(row, column++, candidate.getCvId());
                 setCell(row, column++, candidate.getFullName());
+                setCell(row, column++, candidate.getCurrentDesignation());
+                // CV Owner
+                setCell(row, column++, candidate.getCvOwner() != null ? candidate.getCvOwner().getFullName() : "");
+                setCell(row, column++, candidate.getReferredBy());
+                setCell(row, column++, candidate.getReferenceNote());
                 setCell(row, column++, candidate.getEmail());
                 setCell(row, column++, candidate.getPhone());
                 setCell(row, column++, candidate.getWhatsapp());
                 setCell(row, column++, candidate.getLocation());
                 setCell(row, column++, candidate.getNationality());
-                setCell(row, column++, candidate.getCurrentDesignation());
                 setCell(row, column++, candidate.getCurrentEmployer());
-
                 setCell(row, column++, candidate.getExperienceYears() != null ? candidate.getExperienceYears().toString() : "");
-                setCell(row, column++, candidate.getNoticePeriodDays() != null ? candidate.getNoticePeriodDays().toString() : "");
-                setCell(row, column++, candidate.getCurrentSalary() != null ? candidate.getCurrentSalary().toString() : "");
-                setCell(row, column++, candidate.getExpectedSalary() != null ? candidate.getExpectedSalary().toString() : "");
-                setCell(row, column++, candidate.getSalaryCurrency());
                 setCell(row, column++, candidate.getSkills() != null ? String.join(", ", candidate.getSkills()) : "");
-
-                setCell(row, column++, candidate.getEducation());
+                setCell(row, column++, candidate.getNoticePeriodDays() != null ? candidate.getNoticePeriodDays().toString() : "");
                 setCell(row, column++, candidate.getVisaStatus());
-                setCell(row, column++, candidate.getLinkedinUrl());
                 setCell(row, column++, candidate.getSource());
-
-                // Status
-                setCell(row, column++, candidate.getStatus() != null ? candidate.getStatus().getName() : "");
-
-                // Sub status
-                setCell(row, column++, candidate.getSubStatus() != null ? candidate.getSubStatus().getName() : "");
-
-                // CV Owner
-                setCell(row, column++, candidate.getCvOwner() != null ? candidate.getCvOwner().getFullName() : "");
-
-                setCell(row, column++, candidate.getReferredBy());
-                setCell(row, column++, candidate.getReferenceNote());
-                setCell(row, column++, candidate.getOriginalCvUrl());
-                setCell(row, column++, candidate.getOriginalCvFormat() != null ? candidate.getOriginalCvFormat().name() : "");
-                setCell(row, column++, candidate.getTroyCvUrl());
-                setCell(row, column++, candidate.getTroyCvPdfUrl());
-                setCell(row, column++, candidate.getActive() != null ? candidate.getActive().toString() : "");
+                setCell(row, column++, candidate.getLinkedinUrl());
+                setCell(row, column++, candidate.getStatus() != null ? candidate.getStatus().name(): "");
+                setCell(row, column++, candidate.getEducation());
+                setCell(row, column++, candidate.getCurrentSalaryAmount() != null ? candidate.getCurrentSalaryAmount().toString(): "");
+                setCell(row, column++, candidate.getCurrentSalaryCurrency() != null ? candidate.getCurrentSalaryCurrency().name(): "");
+                setCell(row, column++, candidate.getCurrentSalaryPeriod() != null ? candidate.getCurrentSalaryPeriod().name(): "");
+                setCell(row, column++, candidate.getExpectedSalaryAmount() != null ? candidate.getExpectedSalaryAmount().toString(): "");
+                setCell(row, column++, candidate.getExpectedSalaryCurrency() != null ? candidate.getExpectedSalaryCurrency().name(): "");
+                setCell(row, column++, candidate.getExpectedSalaryPeriod() != null ? candidate.getExpectedSalaryPeriod().name(): "");
                 setCell(row, column++, candidate.getCreatedAt() != null ? candidate.getCreatedAt().toString() : "");
                 setCell(row, column++, candidate.getUpdatedAt() != null ? candidate.getUpdatedAt().toString() : "");
+
+
             }
 
             // Auto-size columns
@@ -325,35 +299,33 @@ public class CandidateService {
         String[] columns = {
                 "CV ID",
                 "Full Name",
+                "Current Designation",
+                "CV Owner",
+                "Referred By",
+                "Reference Note",
                 "Email",
                 "Phone",
                 "WhatsApp",
                 "Location",
                 "Nationality",
-                "Current Designation",
                 "Current Employer",
                 "Experience Years",
-                "Notice Period Days",
-                "Current Salary",
-                "Expected Salary",
-                "Salary Currency",
                 "Skills",
-                "Education",
+                "Notice Period Days",
                 "Visa Status",
-                "LinkedIn",
                 "Source",
+                "LinkedIn",
                 "Status",
-                "Sub Status",
-                "CV Owner",
-                "Referred By",
-                "Reference Note",
-                "Original CV URL",
-                "Original CV Format",
-                "Troy CV URL",
-                "Troy CV PDF URL",
-                "Active",
+                "Education",
+                "currentSalaryAmount",
+                "currentSalaryCurrency",
+                "currentSalaryPeriod",
+                "expectedSalaryAmount",
+                "expectedSalaryCurrency",
+                "expectedSalaryPeriod",
                 "Created At",
                 "Updated At"
+
         };
 
         CellStyle style = sheet.getWorkbook().createCellStyle();

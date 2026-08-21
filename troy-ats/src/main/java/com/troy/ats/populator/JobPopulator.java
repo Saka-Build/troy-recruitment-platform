@@ -70,10 +70,6 @@ public class JobPopulator {
         target.setExperienceMin(source.getExperienceMin());
         target.setExperienceMax(source.getExperienceMax());
 
-        target.setSalaryMin(source.getSalaryMin());
-        target.setSalaryMax(source.getSalaryMax());
-        target.setSalaryCurrency(source.getSalaryCurrency());
-
         target.setSkillsRequired(source.getSkillsRequired());
 
         target.setStatus(enumToStringFormat(source.getStatus().name()));
@@ -85,10 +81,12 @@ public class JobPopulator {
         target.setIsTemplate(source.getIsTemplate());
         target.setTemplateName(source.getTemplateName());
 
-        target.setAtsKeywords(source.getAtsKeywords());
-
-        target.setOpeningsCount(source.getOpeningsCount());
-        target.setFilledCount(source.getFilledCount());
+        target.setClientRateAmount(source.getClientRateAmount());
+        target.setClientRateCurrency(source.getClientRateCurrency().name());
+        target.setClientRatePeriod(source.getClientRatePeriod().name().toLowerCase(Locale.ROOT));
+        target.setCandidateRateAmount(source.getCandidateRateAmount());
+        target.setCandidateRateCurrency(source.getCandidateRateCurrency().name());
+        target.setCandidateRatePeriod(source.getCandidateRatePeriod().name().toLowerCase(Locale.ROOT));
 
         // Owner
         if (source.getOwner() != null) {
@@ -97,6 +95,13 @@ public class JobPopulator {
         }
 
         populateAssignedRecruiters(source, target);
+
+       /* target.setAtsKeywords(source.getAtsKeywords());
+        target.setOpeningsCount(source.getOpeningsCount());
+        target.setFilledCount(source.getFilledCount());
+        target.setSalaryMin(source.getSalaryMin());
+        target.setSalaryMax(source.getSalaryMax());
+        target.setSalaryCurrency(source.getSalaryCurrency());*/
 
     }
 

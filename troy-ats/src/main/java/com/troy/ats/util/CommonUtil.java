@@ -146,4 +146,14 @@ public final class CommonUtil {
 
         return (cleaned + "X").substring(0, 2);
     }
+
+    public static String getCodeWithOneLetter(String name) {
+        String cleaned = name.replaceAll("[^A-Za-z]", "").toUpperCase();
+
+        if (cleaned.length() >= 1) {
+            return cleaned.substring(0, 1);
+        }
+
+        return (cleaned + "X").substring(0, 1);
+    }
 }
