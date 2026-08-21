@@ -5,7 +5,7 @@ import java.time.OffsetDateTime;
 public record EmployeeFilter(
         String search,
         Boolean active,
-        String location,
+        String designation,
         OffsetDateTime createdFrom,
         OffsetDateTime createdTo
 ) {
