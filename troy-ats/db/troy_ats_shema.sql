@@ -255,7 +255,8 @@ CREATE INDEX idx_candidates_status   ON candidates (status);
 CREATE INDEX idx_candidates_cv_owner_id ON candidates (cv_owner_id);
 CREATE INDEX idx_candidates_location    ON candidates (location);
 CREATE INDEX idx_candidates_created_at  ON candidates (created_at DESC);
-CREATE INDEX idx_candidates_is_active   ON candidates (is_active);
+
+CREATE UNIQUE INDEX uk_candidates_email ON candidates (LOWER(email)) WHERE email IS NOT NULL;
 
 
 -- ============================================================
