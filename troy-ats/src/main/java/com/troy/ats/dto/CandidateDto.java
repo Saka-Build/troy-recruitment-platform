@@ -1,5 +1,6 @@
 package com.troy.ats.dto;
 
+import com.troy.ats.enums.CvFormat;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -41,5 +42,8 @@ public class CandidateDto {
     BigDecimal expectedSalaryAmount;
     String expectedSalaryCurrency;
     String expectedSalaryPeriod;
+    String originalCvUrl;
+    CvFormat originalCvFormat;
+    String troyCvUrl;
     OffsetDateTime createdAt;
 }

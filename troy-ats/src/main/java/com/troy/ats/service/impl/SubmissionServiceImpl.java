@@ -1,30 +1,50 @@
 package com.troy.ats.service.impl;
 
-import com.troy.ats.dto.CandidatePipelineDto;
-import com.troy.ats.dto.PipelineDto;
+import com.troy.ats.dto.*;
+import com.troy.ats.entity.Client;
+import com.troy.ats.entity.Status;
+import com.troy.ats.entity.SubStatus;
 import com.troy.ats.entity.Submission;
 import com.troy.ats.enums.PipelineStage;
 import com.troy.ats.populator.CandidatePipelinePopulator;
+import com.troy.ats.populator.ReverseSubmissionPopulator;
+import com.troy.ats.populator.SubmissionPopulator;
 import com.troy.ats.repository.SubmissionRepository;
+import com.troy.ats.searchfilter.dto.SubmissionFilter;
+import com.troy.ats.searchfilter.filter.SubmissionSpecification;
 import com.troy.ats.service.SubmissionService;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
+import static com.troy.ats.constants.CommonConstants.STATUS_APPLIED;
+import static com.troy.ats.constants.CommonConstants.SUBSTATUS_READY_FOR_SUBMISSION;
 
 @Service("submissionService")
 public class SubmissionServiceImpl implements SubmissionService {
 
     private final SubmissionRepository submissionRepository;
     private final CandidatePipelinePopulator candidatePipelinePopulator;
+    private final ReverseSubmissionPopulator reverseSubmissionPopulator;
+    private final SubmissionStatusServiceImpl submissionStatusService;
+    private final SessionServiceImpl sessionService;
+    private final SubmissionPopulator submissionPopulator;
 
-    public SubmissionServiceImpl(SubmissionRepository submissionRepository, CandidatePipelinePopulator candidatePipelinePopulator) {
+    public SubmissionServiceImpl(SubmissionRepository submissionRepository, CandidatePipelinePopulator candidatePipelinePopulator, ReverseSubmissionPopulator reverseSubmissionPopulator, SubmissionStatusServiceImpl submissionStatusService, SessionServiceImpl sessionService, SubmissionPopulator submissionPopulator) {
         this.submissionRepository = submissionRepository;
         this.candidatePipelinePopulator = candidatePipelinePopulator;
+        this.reverseSubmissionPopulator = reverseSubmissionPopulator;
+        this.submissionStatusService = submissionStatusService;
+        this.sessionService = sessionService;
+        this.submissionPopulator = submissionPopulator;
     }
 
     @Override
@@ -39,8 +59,48 @@ public class SubmissionServiceImpl implements SubmissionService {
     }
 
     @Override
-    public Submission createSubmission(Submission submission) {
-        return submissionRepository.save(submission);
+    @Transactional
+    public SubmissionDto createSubmission(SubmissionCreateRequest request) {
+        Submission submission = new Submission();
+        reverseSubmissionPopulator.populate(request, submission);
+        submission.setPipelineStage(PipelineStage.APPLIED);
+
+        Status status = submissionStatusService.getStatusByName(STATUS_APPLIED);
+        SubStatus subStatus = submissionStatusService.getSUbStatusByName(SUBSTATUS_READY_FOR_SUBMISSION);
+
+        submission.setStatus(status);
+        submission.setSubStatus(subStatus);
+        submission.setSubmittedBy(sessionService.getCurrentUser());
+        submission.setSubmittedAt(Instant.now());
+
+        submission = submissionRepository.save(submission);
+
+        SubmissionDto submissionDto = new SubmissionDto();
+        submissionPopulator.populate(submission, submissionDto);
+        return submissionDto;
+
+    }
+
+    /**
+     *
+     * @param submissionId
+     * @param request
+     * @return
+     */
+    @Override
+    @Transactional
+    public SubmissionDto updateSubmission(UUID submissionId, SubmissionCreateRequest request) {
+
+        Submission submission = getSubmissionById(submissionId);
+
+        reverseSubmissionPopulator.populate(request, submission);
+        // Save submission first
+        submission = submissionRepository.save(submission);
+
+        SubmissionDto submissionDto = new SubmissionDto();
+        submissionPopulator.populate(submission, submissionDto);
+
+        return submissionDto;
     }
 
     @Override
@@ -86,6 +146,57 @@ public class SubmissionServiceImpl implements SubmissionService {
         }).toList();
 
         return pipelineDtoList;
+
+    }
+
+    /**
+     *
+     * @param filter
+     * @param pageable
+     * @return
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public Page<SubmissionDto> getSubmissions(SubmissionFilter filter, Pageable pageable) {
+
+        return submissionRepository.findAll(SubmissionSpecification.filter(filter), pageable)
+                .map(submission -> {
+                    SubmissionDto dto = new SubmissionDto();
+                    submissionPopulator.populate(submission, dto);
+                    return dto;
+                });
+    }
+
+    /**
+     *
+     * @param pipelineStage
+     * @return
+     */
+    @Override
+    public List<String> findJobNamesByPipelineStage(String pipelineStage) {
+
+        PipelineStage pipeline = PipelineStage.fromValue(pipelineStage);
+        List<String> jobNames = submissionRepository.findJobTitlesByPipelineStage(pipeline);
+        return jobNames;
+    }
+
+    /**
+     *
+     * @return
+     */
+    @Override
+    public CountSubmissionsByPipelineStageDto submissionCountsByPipelines() {
+
+        CountSubmissionsByPipelineStageDto dto = new CountSubmissionsByPipelineStageDto();
+        dto.setTotalApplied(getTotalCVSubmissionsByPipelineStage(PipelineStage.APPLIED));
+        dto.setTotalScreening(getTotalCVSubmissionsByPipelineStage(PipelineStage.SCREENING));
+        dto.setTotalReadyToSubmit(getTotalCVSubmissionsByPipelineStage(PipelineStage.READY_TO_SUBMIT));
+        dto.setTotalSubmitted(getTotalCVSubmissionsByPipelineStage(PipelineStage.SUBMITTED));
+        dto.setTotalInterview(getTotalCVSubmissionsByPipelineStage(PipelineStage.INTERVIEW));
+        dto.setTotalOffer(getTotalCVSubmissionsByPipelineStage(PipelineStage.OFFER));
+        dto.setTotalJoined(getTotalCVSubmissionsByPipelineStage(PipelineStage.JOINED));
+
+        return dto;
 
     }
 

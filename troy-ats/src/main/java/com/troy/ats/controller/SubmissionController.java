@@ -1,11 +1,19 @@
 package com.troy.ats.controller;
 
-import com.troy.ats.dto.PipelineDto;
+import com.troy.ats.dto.*;
 import com.troy.ats.entity.Submission;
+import com.troy.ats.exception.ApiResponse;
+import com.troy.ats.searchfilter.dto.SubmissionFilter;
 import com.troy.ats.service.SubmissionService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -19,7 +27,7 @@ public class SubmissionController {
         this.submissionService = submissionService;
     }
 
-    @GetMapping
+    @GetMapping("/allSubmissions")
     public List<Submission> getAllSubmissions() {
         return submissionService.getAllSubmissions();
     }
@@ -31,9 +39,54 @@ public class SubmissionController {
 
     }
 
-    @PostMapping
-    public Submission createSubmission(@RequestBody Submission submission) {
-        return submissionService.createSubmission(submission);
+    @GetMapping
+    public ResponseEntity<Page<SubmissionDto>> getSubmissions(@RequestParam(required = false) String search,
+                                                      @RequestParam(required = false) String pipelineStage,
+                                                      @RequestParam(required = false) UUID candidateId,
+                                                      @RequestParam(required = false) UUID jobId,
+                                                      @RequestParam(required = false) OffsetDateTime createdFrom,
+                                                      @RequestParam(required = false) OffsetDateTime createdTo,
+                                                      @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+
+        SubmissionFilter filter = new SubmissionFilter(search, pipelineStage, candidateId, jobId, createdFrom, createdTo);
+
+        return ResponseEntity.ok(submissionService.getSubmissions(filter, pageable));
+    }
+
+    @GetMapping("/allJobsName")
+    public List<String> getJobsNameByPipelineStage( @RequestParam(required = true) String pipelineStage) {
+
+        return submissionService.findJobNamesByPipelineStage(pipelineStage);
+    }
+
+    @GetMapping("/submissionCounts")
+    public  ResponseEntity<CountSubmissionsByPipelineStageDto> submissionCountsByPipelines() {
+
+        return ResponseEntity.ok(submissionService.submissionCountsByPipelines());
+    }
+
+    @PostMapping("/create")
+    public ResponseEntity<SubmissionDto> createSubmission(@RequestBody SubmissionCreateRequest request) {
+
+        SubmissionDto response =  submissionService.createSubmission(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @PutMapping("/update/{submissionId}")
+    public ResponseEntity<SubmissionDto> updateSubmission(
+            @PathVariable UUID submissionId,
+            @RequestBody SubmissionCreateRequest request) {
+
+        SubmissionDto submissionDto = submissionService.updateSubmission(submissionId, request);
+
+        return ResponseEntity.ok(submissionDto);
+    }
+
+    @DeleteMapping("delete/{id}")
+    public ResponseEntity<ApiResponse> deleteSubmission(@PathVariable UUID id) {
+
+        submissionService.deleteSubmission(id);
+        return ResponseEntity.ok(ApiResponse.success("Deleted successfully"));
     }
 
     @GetMapping("/pipeline")

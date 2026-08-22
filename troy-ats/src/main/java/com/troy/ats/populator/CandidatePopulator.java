@@ -6,6 +6,7 @@ import com.troy.ats.dto.CandidateProfileDto;
 import com.troy.ats.entity.Candidate;
 import com.troy.ats.entity.Status;
 import com.troy.ats.entity.SubStatus;
+import com.troy.ats.enums.CvFormat;
 import org.springframework.stereotype.Component;
 
 import java.time.OffsetDateTime;
@@ -52,6 +53,9 @@ public class CandidatePopulator {
         target.setExpectedSalaryAmount(source.getExpectedSalaryAmount());
         target.setExpectedSalaryCurrency(source.getExpectedSalaryCurrency().name());
         target.setExpectedSalaryPeriod(source.getExpectedSalaryPeriod().name().toLowerCase(Locale.ROOT));
+        target.setOriginalCvUrl(source.getOriginalCvUrl());
+        target.setOriginalCvFormat(source.getOriginalCvFormat());
+        target.setTroyCvUrl(source.getTroyCvUrl());
         target.setCreatedAt(source.getCreatedAt());
 
     }
