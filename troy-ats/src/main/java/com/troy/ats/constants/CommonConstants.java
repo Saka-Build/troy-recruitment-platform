@@ -29,6 +29,9 @@ public final class CommonConstants {
     public static final String EMAIL_TEMPLATE_VARIABLE_LOCATION = "joiningLocation";
     public static final String EMAIL_TEMPLATE_PATH = "email/candidate/joiningreminder";
 
+    public static final String STATUS_APPLIED = "Applied";
+    public static final String SUBSTATUS_READY_FOR_SUBMISSION = "Ready For Submission";
+
 
     private CommonConstants() {
         // Prevent instantiation

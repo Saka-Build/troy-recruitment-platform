@@ -1,15 +1,15 @@
 package com.troy.ats.service;
 
-import com.troy.ats.dto.CandidatePipelineDto;
-import com.troy.ats.dto.PipelineDto;
+import com.troy.ats.dto.*;
 import com.troy.ats.entity.Submission;
 import com.troy.ats.enums.PipelineStage;
-import com.troy.ats.populator.CandidatePipelinePopulator;
-import com.troy.ats.repository.SubmissionRepository;
-import org.springframework.stereotype.Service;
+import com.troy.ats.searchfilter.dto.ClientFilter;
+import com.troy.ats.searchfilter.dto.SubmissionFilter;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.List;
+import java.util.UUID;
 
 public interface SubmissionService {
 
@@ -28,10 +28,18 @@ public interface SubmissionService {
 
     /**
      *
-     * @param submission
+     * @param request
      * @return
      */
-    public Submission createSubmission(Submission submission);
+    public SubmissionDto createSubmission(SubmissionCreateRequest request);
+
+    /**
+     *
+     * @param submissionId
+     * @param request
+     * @return
+     */
+    SubmissionDto updateSubmission(UUID submissionId, SubmissionCreateRequest request);
 
     /**
      *
@@ -51,5 +59,26 @@ public interface SubmissionService {
      * @return
      */
     public List<PipelineDto> getCandidatePipelines();
+
+    /**
+     *
+     * @param filter
+     * @param pageable
+     * @return
+     */
+    Page<SubmissionDto> getSubmissions(SubmissionFilter filter, Pageable pageable);
+
+    /**
+     *
+     * @param pipelineStage
+     * @return
+     */
+    List<String> findJobNamesByPipelineStage(String pipelineStage);
+
+    /**
+     *
+     * @return
+     */
+    CountSubmissionsByPipelineStageDto submissionCountsByPipelines();
 
 }

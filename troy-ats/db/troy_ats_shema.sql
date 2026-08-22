@@ -257,6 +257,7 @@ CREATE INDEX idx_candidates_location    ON candidates (location);
 CREATE INDEX idx_candidates_created_at  ON candidates (created_at DESC);
 
 CREATE UNIQUE INDEX uk_candidates_email ON candidates (LOWER(email)) WHERE email IS NOT NULL;
+CREATE SEQUENCE candidate_number_seq START WITH 1 INCREMENT BY 1;
 
 
 -- ============================================================
