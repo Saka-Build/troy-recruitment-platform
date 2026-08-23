@@ -32,7 +32,6 @@ public final class CommonConstants {
     public static final String STATUS_APPLIED = "Applied";
     public static final String SUBSTATUS_READY_FOR_SUBMISSION = "Ready For Submission";
 
-
     private CommonConstants() {
         // Prevent instantiation
     }

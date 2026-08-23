@@ -1,19 +1,22 @@
 package com.troy.ats.util;
 
 import com.troy.ats.constants.CommonConstants;
+import com.troy.ats.dto.ActivityLogRequest;
+import com.troy.ats.entity.ActivityLog;
 import com.troy.ats.entity.Employee;
 import com.troy.ats.enums.CvFormat;
-import com.troy.ats.enums.PipelineStage;
 import com.troy.ats.service.SessionService;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.http.MediaType;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.beans.Introspector;
+import java.lang.reflect.Method;
+import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-
-import static org.thymeleaf.util.StringUtils.substring;
+import java.time.ZonedDateTime;
+import java.util.*;
 
 public final class CommonUtil {
 
@@ -37,6 +40,22 @@ public final class CommonUtil {
         String countryCode = user.getCountry().getCode();
         ZoneId zoneId = getTimeZone(countryCode);
         return  zoneId;
+    }
+
+    public static LocalDateTime convertInstantToLocalDate(Instant dateTime, final SessionService sessionService){
+
+        try{
+            ZoneId zoneId = getZoneIdForCurrentUser(sessionService);
+            ZonedDateTime DateTime = dateTime.atZone(zoneId);
+            LocalDateTime date = DateTime.toLocalDateTime();
+            return  date;
+
+        } catch (RuntimeException e) {
+            Instant instant = Objects.nonNull(dateTime) ? dateTime : Instant.now();
+            return LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
+        }
+
+
     }
 
     public static MediaType getMediaType(CvFormat format) {
@@ -155,5 +174,55 @@ public final class CommonUtil {
         }
 
         return (cleaned + "X").substring(0, 1);
+    }
+
+    public static void populateActivityLog(String entityType, UUID entityId, String filed, String oldValue,String newValue, List<ActivityLogRequest> activityLogs){
+
+        ActivityLogRequest log = new ActivityLogRequest();
+        log.setEntityType(entityType);
+        log.setEntityId(entityId);
+        log.setField(filed);
+        log.setOldValue(oldValue);
+        log.setNewValue(newValue);
+
+        activityLogs.add(log);
+    }
+
+    public static String getFieldName(Class<?> clazz, String setterName, Class<?> parameterType) {
+
+        Method setter = null;
+        try {
+            setter = clazz.getMethod(setterName, parameterType);
+        } catch (NoSuchMethodException e) {
+            throw new RuntimeException(e);
+        }
+
+        return Introspector.decapitalize(setter.getName().substring(3));
+    }
+
+    public static   List<ActivityLog> logActivity(List<ActivityLogRequest> activityLogs, SessionService sessionService, boolean isUpdated) {
+
+        List<ActivityLog> newActivityLogs = new ArrayList<>();
+        for(ActivityLogRequest logRequest : CollectionUtils.emptyIfNull(activityLogs)){
+
+            ActivityLog log = new ActivityLog();
+            log.setEntityType(logRequest.getEntityType());
+            log.setEntityId(logRequest.getEntityId());
+            log.setOldValue(logRequest.getOldValue());
+            log.setNewValue(logRequest.getNewValue());
+            log.setPerformedBy(sessionService.getCurrentUser());
+            log.setPerformedAt(Instant.now());
+            if(isUpdated){
+                log.setAction("Updated "+ logRequest.getField());
+                log.setDescription("Updated "+ logRequest.getField() + " from " + logRequest.getOldValue() + " to "+logRequest.getNewValue());
+            } else {
+                log.setAction("Created "+ logRequest.getEntityType());
+                log.setDescription("Created New "+ logRequest.getEntityType());
+            }
+            newActivityLogs.add(log);
+        }
+
+        //activityLogService.saveAll(logs);
+        return newActivityLogs;
     }
 }

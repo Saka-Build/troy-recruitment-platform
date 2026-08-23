@@ -42,12 +42,13 @@ public class ClientController {
     @GetMapping
     public ResponseEntity<Page<ClientDto>> getClients(@RequestParam(required = false) String search,
                                                           @RequestParam(required = false) Boolean active,
+                                                          @RequestParam(required = false) String status,
                                                           @RequestParam(required = false) String countryCode,
                                                           @RequestParam(required = false) OffsetDateTime createdFrom,
                                                           @RequestParam(required = false) OffsetDateTime createdTo,
                                                           @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
 
-        ClientFilter filter = new ClientFilter(search, active, countryCode, createdFrom, createdTo);
+        ClientFilter filter = new ClientFilter(search, active, status, countryCode, createdFrom, createdTo);
 
         return ResponseEntity.ok(clientService.getClients(filter, pageable));
     }
