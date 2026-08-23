@@ -3,6 +3,7 @@ package com.troy.ats.service.impl;
 import com.troy.ats.entity.Country;
 import com.troy.ats.repository.CountryRepository;
 import com.troy.ats.service.CountryService;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -24,7 +25,7 @@ public class CountryServiceImpl implements CountryService {
     @Override
     public Country getCountryById(UUID id) {
         return countryRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Country not found with code: " + id));
+                .orElseThrow(() -> new EntityNotFoundException("Country not found with code: " + id));
     }
 
     /**
@@ -35,7 +36,7 @@ public class CountryServiceImpl implements CountryService {
     @Override
     public Country getCountryByCode(String code) {
         return countryRepository.findByCode(code)
-                .orElseThrow(() -> new RuntimeException("Country not found with code: " + code));
+                .orElseThrow(() -> new EntityNotFoundException("Country not found with code: " + code));
     }
 
     /**

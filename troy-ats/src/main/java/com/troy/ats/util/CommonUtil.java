@@ -7,6 +7,7 @@ import com.troy.ats.entity.Employee;
 import com.troy.ats.enums.CvFormat;
 import com.troy.ats.service.SessionService;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.MediaType;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -212,7 +213,10 @@ public final class CommonUtil {
             log.setNewValue(logRequest.getNewValue());
             log.setPerformedBy(sessionService.getCurrentUser());
             log.setPerformedAt(Instant.now());
-            if(isUpdated){
+            if(StringUtils.isNotEmpty(logRequest.getAction())){
+                log.setAction(logRequest.getAction());
+                log.setDescription(logRequest.getDescription());
+            } else if(isUpdated){
                 log.setAction("Updated "+ logRequest.getField());
                 log.setDescription("Updated "+ logRequest.getField() + " from " + logRequest.getOldValue() + " to "+logRequest.getNewValue());
             } else {

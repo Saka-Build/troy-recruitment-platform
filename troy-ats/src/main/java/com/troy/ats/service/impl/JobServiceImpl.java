@@ -1,8 +1,10 @@
 package com.troy.ats.service.impl;
 
-import com.troy.ats.dto.*;
-import com.troy.ats.entity.Client;
-import com.troy.ats.entity.Employee;
+import com.troy.ats.dto.ActivityLogRequest;
+import com.troy.ats.dto.JobCreateRequest;
+import com.troy.ats.dto.JobDto;
+import com.troy.ats.dto.JobsFiltersDto;
+import com.troy.ats.entity.ActivityLog;
 import com.troy.ats.entity.Job;
 import com.troy.ats.enums.JobStatus;
 import com.troy.ats.populator.JobPopulator;
@@ -10,9 +12,10 @@ import com.troy.ats.populator.ReverseJobPopulator;
 import com.troy.ats.repository.JobRepository;
 import com.troy.ats.searchfilter.dto.JobExportFilter;
 import com.troy.ats.searchfilter.dto.JobFilter;
-import com.troy.ats.searchfilter.filter.EmployeeSpecification;
 import com.troy.ats.searchfilter.filter.JobSpecification;
+import com.troy.ats.service.ActivityLogService;
 import com.troy.ats.service.JobService;
+import com.troy.ats.service.SessionService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -27,10 +30,12 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.UUID;
 
 import static com.troy.ats.util.CommonUtil.getCode;
+import static com.troy.ats.util.CommonUtil.logActivity;
 
 @Service("jobService")
 @RequiredArgsConstructor
@@ -39,6 +44,8 @@ public class JobServiceImpl implements JobService {
     private final JobRepository jobRepository;
     private final ReverseJobPopulator reverseJobPopulator;
     private final JobPopulator jobPopulator;
+    private final SessionService sessionService;
+    private final ActivityLogService activityLogService;
 
     @Override
     public List<Job> getAllJobs() {
@@ -99,6 +106,12 @@ public class JobServiceImpl implements JobService {
 
         Job savedJob = jobRepository.save(job);
 
+        ActivityLogRequest activityLogRequest = new ActivityLogRequest();
+        activityLogRequest.setEntityType( savedJob.getClass().getSimpleName().toLowerCase(Locale.ROOT));
+        activityLogRequest.setEntityId(savedJob.getId());
+        List<ActivityLog> logs = logActivity(List.of(activityLogRequest), sessionService,false);
+        activityLogService.saveAll(logs);
+
         // 8. Convert to DTO
         JobDto jobDto = new JobDto();
         jobPopulator.populate(savedJob, jobDto);
@@ -115,6 +128,9 @@ public class JobServiceImpl implements JobService {
         reverseJobPopulator.populate(request, job);
         // Save employee first
         job = jobRepository.save(job);
+
+        List<ActivityLog> logs = logActivity(request.getActivityLogs(), sessionService,true);
+        activityLogService.saveAll(logs);
 
         JobDto jobDto = new JobDto();
         jobPopulator.populate(job, jobDto);
