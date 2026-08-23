@@ -2,8 +2,11 @@ package com.troy.ats.populator;
 
 import com.troy.ats.dto.SubmissionDto;
 import com.troy.ats.entity.Submission;
+import com.troy.ats.service.ActivityLogService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+
+import java.util.Locale;
 
 import static com.troy.ats.util.CommonUtil.enumToStringFormat;
 
@@ -12,6 +15,7 @@ import static com.troy.ats.util.CommonUtil.enumToStringFormat;
 @RequiredArgsConstructor
 public class SubmissionPopulator {
 
+    private final ActivityLogService activityLogService;
 
     public void populate(Submission source, SubmissionDto target) {
 
@@ -35,6 +39,9 @@ public class SubmissionPopulator {
         target.setSubStatusName(source.getSubStatus().getName());
 
         target.setNotes(source.getNotes());
+
+        String entityType = source.getClass().getSimpleName().toLowerCase(Locale.ROOT);
+        target.setHistoryCounts(activityLogService.countByEntityTypeAndEntityId(entityType, source.getId()));
     }
 
 }

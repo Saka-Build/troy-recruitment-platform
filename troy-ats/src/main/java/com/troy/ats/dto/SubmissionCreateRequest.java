@@ -1,9 +1,9 @@
 package com.troy.ats.dto;
 
-import jakarta.validation.constraints.Email;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -16,6 +16,8 @@ public class SubmissionCreateRequest {
     private UUID statusId;
     private UUID subStatusId;
     private String notes;
+
+    private List<ActivityLogRequest> activityLogs;
 
 
 }

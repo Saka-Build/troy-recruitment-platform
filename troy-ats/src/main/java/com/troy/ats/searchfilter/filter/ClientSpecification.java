@@ -10,6 +10,7 @@ import org.springframework.data.jpa.domain.Specification;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class ClientSpecification {
 
@@ -41,6 +42,11 @@ public class ClientSpecification {
             if (filter.active() != null) {
                 predicates.add(cb.equal(root.get("isActive"), filter.active()));
             }
+            //Active
+            if (filter.status() != null) {
+                predicates.add(cb.equal(root.get("status"), filter.status().toLowerCase(Locale.ROOT)));
+            }
+
             // country
             if (filter.countryCode() != null) {
                 predicates.add(cb.equal(root.get("country").get("code"), filter.countryCode()));
@@ -83,6 +89,10 @@ public class ClientSpecification {
             // IMPORTANT: use != null, NOT if (filter.getActive())
             if (filter.getActive() != null) {
                 predicates.add(cb.equal(root.get("isActive"), filter.getActive()));
+            }
+            //status
+            if (filter.getStatus() != null) {
+                predicates.add(cb.equal(root.get("status"), filter.getStatus().toLowerCase(Locale.ROOT)));
             }
 
             query.orderBy(cb.desc(root.get("createdAt")));

@@ -10,6 +10,7 @@ import java.time.OffsetDateTime;
 public class ClientExportFilter {
 
     private Boolean active;
+    private String status;
     private String countryCode;
     private LocalDateTime fromDate;
     private LocalDateTime toDate;

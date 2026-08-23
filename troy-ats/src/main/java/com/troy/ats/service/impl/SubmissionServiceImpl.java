@@ -1,7 +1,7 @@
 package com.troy.ats.service.impl;
 
 import com.troy.ats.dto.*;
-import com.troy.ats.entity.Client;
+import com.troy.ats.entity.ActivityLog;
 import com.troy.ats.entity.Status;
 import com.troy.ats.entity.SubStatus;
 import com.troy.ats.entity.Submission;
@@ -14,20 +14,26 @@ import com.troy.ats.searchfilter.dto.SubmissionFilter;
 import com.troy.ats.searchfilter.filter.SubmissionSpecification;
 import com.troy.ats.service.SubmissionService;
 import jakarta.persistence.EntityNotFoundException;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
+import org.apache.poi.ss.formula.functions.T;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.time.Instant;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.troy.ats.constants.CommonConstants.STATUS_APPLIED;
 import static com.troy.ats.constants.CommonConstants.SUBSTATUS_READY_FOR_SUBMISSION;
+import static com.troy.ats.util.CommonUtil.logActivity;
 
+@Slf4j
 @Service("submissionService")
 public class SubmissionServiceImpl implements SubmissionService {
 
@@ -37,14 +43,16 @@ public class SubmissionServiceImpl implements SubmissionService {
     private final SubmissionStatusServiceImpl submissionStatusService;
     private final SessionServiceImpl sessionService;
     private final SubmissionPopulator submissionPopulator;
+    private final ActivityLogServiceImpl activityLogService;
 
-    public SubmissionServiceImpl(SubmissionRepository submissionRepository, CandidatePipelinePopulator candidatePipelinePopulator, ReverseSubmissionPopulator reverseSubmissionPopulator, SubmissionStatusServiceImpl submissionStatusService, SessionServiceImpl sessionService, SubmissionPopulator submissionPopulator) {
+    public SubmissionServiceImpl(SubmissionRepository submissionRepository, CandidatePipelinePopulator candidatePipelinePopulator, ReverseSubmissionPopulator reverseSubmissionPopulator, SubmissionStatusServiceImpl submissionStatusService, SessionServiceImpl sessionService, SubmissionPopulator submissionPopulator, ActivityLogServiceImpl activityLogService) {
         this.submissionRepository = submissionRepository;
         this.candidatePipelinePopulator = candidatePipelinePopulator;
         this.reverseSubmissionPopulator = reverseSubmissionPopulator;
         this.submissionStatusService = submissionStatusService;
         this.sessionService = sessionService;
         this.submissionPopulator = submissionPopulator;
+        this.activityLogService = activityLogService;
     }
 
     @Override
@@ -75,6 +83,12 @@ public class SubmissionServiceImpl implements SubmissionService {
 
         submission = submissionRepository.save(submission);
 
+        ActivityLogRequest activityLogRequest = new ActivityLogRequest();
+        activityLogRequest.setEntityType( submission.getClass().getSimpleName().toLowerCase(Locale.ROOT));
+        activityLogRequest.setEntityId(submission.getId());
+        List<ActivityLog> logs = logActivity(List.of(activityLogRequest), sessionService,false);
+        activityLogService.saveAll(logs);
+
         SubmissionDto submissionDto = new SubmissionDto();
         submissionPopulator.populate(submission, submissionDto);
         return submissionDto;
@@ -92,10 +106,13 @@ public class SubmissionServiceImpl implements SubmissionService {
     public SubmissionDto updateSubmission(UUID submissionId, SubmissionCreateRequest request) {
 
         Submission submission = getSubmissionById(submissionId);
-
         reverseSubmissionPopulator.populate(request, submission);
+
         // Save submission first
         submission = submissionRepository.save(submission);
+
+        List<ActivityLog> logs = logActivity(request.getActivityLogs(), sessionService,true);
+        activityLogService.saveAll(logs);
 
         SubmissionDto submissionDto = new SubmissionDto();
         submissionPopulator.populate(submission, submissionDto);

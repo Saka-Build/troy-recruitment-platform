@@ -118,6 +118,7 @@ public class ClientServiceImpl implements ClientService {
      * @return
      */
     @Override
+    @Transactional(readOnly = true)
     public Page<ClientDto> getClients(ClientFilter filter, Pageable pageable) {
         return clientRepository.findAll(ClientSpecification.filter(filter), pageable)
                 .map(client -> {
@@ -209,7 +210,6 @@ public class ClientServiceImpl implements ClientService {
                     "Status",
                     "Address",
                     "Notes",
-                    "Active",
                     "Created At",
                     "Updated At"
             };
@@ -239,7 +239,7 @@ public class ClientServiceImpl implements ClientService {
                 row.createCell(8).setCellValue(safe(client.getStatus()));
                 row.createCell(9).setCellValue(safe(client.getAddress()));
                 row.createCell(10).setCellValue(safe(client.getNotes()));
-                row.createCell(11).setCellValue(Boolean.TRUE.equals(client.getIsActive()));
+               // row.createCell(11).setCellValue(Boolean.TRUE.equals(client.getIsActive()));
                 row.createCell(12).setCellValue(client.getCreatedAt() != null ? client.getCreatedAt().toString() : "");
                 row.createCell(13).setCellValue(client.getUpdatedAt() != null ? client.getUpdatedAt().toString() : "");
             }

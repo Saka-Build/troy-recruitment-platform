@@ -16,6 +16,8 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Objects;
 
+import static com.troy.ats.util.CommonUtil.convertInstantToLocalDate;
+
 @Component
 public class EmployeePopulator {
 
@@ -34,7 +36,7 @@ public class EmployeePopulator {
         target.setWhatsapp(source.getWhatsapp());
         target.setRole(source.getRole());
         target.setPhotoUrl(source.getPhotoUrl());
-        target.setLastLoginAt(convertInstantToLocalDate(source.getLastLoginAt()));
+        target.setLastLoginAt(convertInstantToLocalDate(source.getLastLoginAt(), sessionService));
         target.setActive(source.getIsActive());
         populateCountry(source, target);
 
@@ -50,19 +52,4 @@ public class EmployeePopulator {
         target.setCountry(countryDto);
     }
 
-    private LocalDateTime convertInstantToLocalDate(Instant lastLoginAt){
-
-        try{
-            ZoneId zoneId = CommonUtil.getZoneIdForCurrentUser(sessionService);
-            ZonedDateTime DateTime = lastLoginAt.atZone(zoneId);
-            LocalDateTime date = DateTime.toLocalDateTime();
-            return  date;
-
-        } catch (RuntimeException e) {
-            Instant instant = Objects.nonNull(lastLoginAt) ? lastLoginAt : Instant.now();
-            return LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
-        }
-
-
-    }
 }

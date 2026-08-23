@@ -23,6 +23,7 @@ public class SubmissionDto {
     private UUID subStatusId;
     private String subStatusName;
     private String notes;
+    private long historyCounts;
 
 
 }
