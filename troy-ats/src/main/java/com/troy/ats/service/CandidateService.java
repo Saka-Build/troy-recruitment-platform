@@ -1,6 +1,7 @@
 package com.troy.ats.service;
 
 import com.troy.ats.dto.*;
+import com.troy.ats.entity.ActivityLog;
 import com.troy.ats.entity.Candidate;
 import com.troy.ats.enums.CandidateStatus;
 import com.troy.ats.enums.CvFormat;
@@ -36,6 +37,8 @@ public class CandidateService {
     private final ReverseCandidatePopulator reverseCandidatePopulator;
     private final FileStorageService fileStorageService;
     private final EmailService emailService;
+    private final SessionService sessionService;
+    private final ActivityLogService activityLogService;
 
 
     public List<Candidate> getAllCandidates() {
@@ -122,6 +125,11 @@ public class CandidateService {
         // Save candidate first
         candidate = candidateRepository.save(candidate);
 
+        List<ActivityLogRequest> activityLogs = new ArrayList<>();
+        ActivityLogRequest log = createActivityLog();
+        log.setEntityId(candidate.getId());
+        activityLogs.add(log);
+
         // Upload CV
         if (originalCVFile != null && !originalCVFile.isEmpty()) {
 
@@ -131,6 +139,11 @@ public class CandidateService {
             candidate.setOriginalCvUrl(originalCVFileUrl);
             candidate.setOriginalCvFormat(originalCVformat);
             candidateRepository.save(candidate);
+
+            ActivityLogRequest originalCVlog = createActivityLog();
+            originalCVlog.setEntityId(candidate.getId());
+            originalCVlog.setAction("Original CV uploaded");
+            activityLogs.add(originalCVlog);
         }
 
         if (troyCVFile != null && !troyCVFile.isEmpty()) {
@@ -140,12 +153,29 @@ public class CandidateService {
 
             candidate.setTroyCvUrl(troyCVFileUrl);
             candidateRepository.save(candidate);
+
+            ActivityLogRequest troyCVlog = createActivityLog();
+            troyCVlog.setEntityId(candidate.getId());
+            troyCVlog.setAction("Troy CV uploaded");
+            activityLogs.add(troyCVlog);
         }
+
+
+        List<ActivityLog> logs = logActivity(activityLogs, sessionService,false);
+        activityLogService.saveAll(logs);
 
         CandidateDto candidateDto = new CandidateDto();
         candidatePopulator.populate(candidate, candidateDto);
 
         return candidateDto;
+    }
+
+    private ActivityLogRequest createActivityLog(){
+
+        ActivityLogRequest activityLogRequest = new ActivityLogRequest();
+        activityLogRequest.setEntityType(Candidate.class.getSimpleName().toLowerCase(Locale.ROOT));
+
+        return activityLogRequest;
     }
 
     @Transactional
@@ -157,6 +187,8 @@ public class CandidateService {
         reverseCandidatePopulator.populate(request, candidate);
         // Save candidate first
         candidate = candidateRepository.save(candidate);
+
+        List<ActivityLogRequest> activityLogRequests = request.getActivityLogs();
 
         if (originalCVFile != null && !originalCVFile.isEmpty()) {
 
@@ -174,6 +206,13 @@ public class CandidateService {
             candidate.setOriginalCvUrl(originalCVFileUrl);
             candidate.setOriginalCvFormat(originalCVformat);
             candidateRepository.save(candidate);
+
+            ActivityLogRequest originalCVlog = createActivityLog();
+            originalCVlog.setEntityId(candidate.getId());
+            originalCVlog.setAction("Original CV uploaded");
+            originalCVlog.setOldValue(oldCvUrl);
+            originalCVlog.setNewValue(originalCVFileUrl);
+            activityLogRequests.add(originalCVlog);
         }
 
         if (troyCVFile != null && !troyCVFile.isEmpty()) {
@@ -191,7 +230,18 @@ public class CandidateService {
 
             candidate.setTroyCvUrl(troyCVFileUrl);
             candidateRepository.save(candidate);
+
+            ActivityLogRequest troyCVlog = createActivityLog();
+            troyCVlog.setEntityId(candidate.getId());
+            troyCVlog.setAction("Troy CV uploaded");
+            troyCVlog.setOldValue(oldCvUrl);
+            troyCVlog.setNewValue(troyCVFileUrl);
+            activityLogRequests.add(troyCVlog);
         }
+
+        List<ActivityLog> logs = logActivity(activityLogRequests, sessionService,true);
+        activityLogService.saveAll(logs);
+
         CandidateDto candidateDto = new CandidateDto();
         candidatePopulator.populate(candidate, candidateDto);
 

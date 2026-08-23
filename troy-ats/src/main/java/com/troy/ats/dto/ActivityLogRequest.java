@@ -17,4 +17,6 @@ public class ActivityLogRequest {
     private String field;
     private String oldValue;
     private String newValue;
+    private String action;
+    private String description;
 }
