@@ -81,6 +81,10 @@ public class ReverseJobPopulator {
             target.setPriority(source.getPriority().toLowerCase(Locale.ROOT));
         }
 
+        if (source.getLeadNote() != null) {
+            target.setLeadNote(source.getLeadNote());
+        }
+
         if (source.getDescription() != null) {
             target.setDescription(source.getDescription());
         }

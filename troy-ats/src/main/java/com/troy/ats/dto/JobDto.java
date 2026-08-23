@@ -39,6 +39,7 @@ public class JobDto {
     String[] skillsRequired;
     String status;
     String priority;
+    String leadNote;
     String description;
     String descriptionSource;
     String industry;
