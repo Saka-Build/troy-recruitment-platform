@@ -71,7 +71,7 @@ public class EmployeeController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @PostMapping(value = "/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/create")
     public ResponseEntity<EmployeeDto> createEmployee(
             @RequestPart("employee") @Valid EmployeeCreateRequest request,
             @RequestPart(value = "photo", required = false) MultipartFile photo) {
@@ -82,7 +82,7 @@ public class EmployeeController {
 
     }
 
-    @PutMapping(value = "/update/{employeeId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PutMapping(value = "/update/{employeeId}")
     public ResponseEntity<EmployeeDto> updateEmployee(
             @PathVariable UUID employeeId,
             @RequestPart("employee") @Valid EmployeeCreateRequest request,

@@ -78,7 +78,7 @@ public class CandidateController {
         return candidateService.createCandidate(candidate);
     }
 
-    @PostMapping(value = "/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/create")
     public ResponseEntity<CandidateDto> createCandidateWithCV(
             @RequestPart("candidate") CandidateCreateRequest candidate,
             @RequestPart(value = "original_cv_file", required = false) MultipartFile originalCVFile,
