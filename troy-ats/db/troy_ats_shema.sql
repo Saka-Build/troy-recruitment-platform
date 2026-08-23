@@ -283,6 +283,7 @@ CREATE TABLE jobs (
     status              job_status      NOT NULL DEFAULT 'OPEN',
     priority            VARCHAR(20)     NOT NULL DEFAULT 'medium'
                                         CHECK (priority IN ('low', 'medium', 'high', 'urgent')),
+    lead_note           TEXT,
     description         TEXT,
     description_source  VARCHAR(30)     DEFAULT 'manual'
                                         CHECK (description_source IN

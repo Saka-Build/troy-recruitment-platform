@@ -85,6 +85,9 @@ public class Job {
     @Column(name = "priority", nullable = false, length = 20)
     private String priority;
 
+    @Column(name = "lead_note", columnDefinition = "TEXT")
+    private String leadNote;
+
     @Column(name = "description", columnDefinition = "TEXT")
     private String description;
 

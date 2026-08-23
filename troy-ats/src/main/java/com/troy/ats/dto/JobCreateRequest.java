@@ -34,6 +34,7 @@ public class JobCreateRequest {
     String status;
     UUID ownerId;
     UUID[] assignedRecruiters;
+    String leadNote;
     String description;
     String descriptionSource;
     String industry;

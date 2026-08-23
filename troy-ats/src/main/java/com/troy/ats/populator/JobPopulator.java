@@ -75,6 +75,7 @@ public class JobPopulator {
         target.setStatus(enumToStringFormat(source.getStatus().name()));
         target.setPriority(enumToStringFormat(source.getPriority()));
 
+        target.setLeadNote(source.getLeadNote());
         target.setDescription(source.getDescription());
         target.setDescriptionSource(source.getDescriptionSource());
 
