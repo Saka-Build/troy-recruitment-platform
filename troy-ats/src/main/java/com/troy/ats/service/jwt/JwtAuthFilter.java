@@ -1,6 +1,7 @@
 package com.troy.ats.service.jwt;
 
 import com.troy.ats.entity.Employee;
+import com.troy.ats.service.EmployeeAuthorizationService;
 import com.troy.ats.service.EmployeeService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
@@ -9,37 +10,36 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.UUID;
 
-/**
- * Stateless: every instance validates the JWT signature/expiry itself,
- * no DB or Redis lookup on the hot path.
- */
 @Component
 public class JwtAuthFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
     private final EmployeeService employeeService;
+    private final EmployeeAuthorizationService authorizationService;
 
-    public JwtAuthFilter(JwtService jwtService, EmployeeService employeeService) {
+    public JwtAuthFilter(
+            JwtService jwtService,
+            EmployeeService employeeService,
+            EmployeeAuthorizationService authorizationService
+    ) {
         this.jwtService = jwtService;
         this.employeeService = employeeService;
+        this.authorizationService = authorizationService;
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
-                                    FilterChain chain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
+                                    throws ServletException, IOException {
 
         String header = request.getHeader("Authorization");
-        //boolean isLoginUrl = request.getRequestURI().contains("login");
+
         if (header == null || !header.startsWith("Bearer ")) {
             chain.doFilter(request, response);
             return;
@@ -47,43 +47,45 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         try {
 
-
             String token = header.substring(7);
+
+            // 1. Validate JWT
             Claims claims = jwtService.parseAndValidate(token);
-            String role = claims.get("role", String.class);
 
-            /*var auth = new UsernamePasswordAuthenticationToken(
-                    claims.getSubject(),
-                    null,
-                    List.of(new SimpleGrantedAuthority("ROLE_" + role))
-            );*/
-
+            // 2. Subject contains employee UUID
             UUID userId = UUID.fromString(claims.getSubject());
 
+            // 3. Load employee
             Employee user = employeeService.getEmployeeById(userId);
-            var auth = new UsernamePasswordAuthenticationToken(
-                    user,
-                    null,
-                    List.of(new SimpleGrantedAuthority("ROLE_" + role))
-            );
 
-            SecurityContextHolder.getContext().setAuthentication(auth);
+            // 4. Make sure employee is active
+            if (!Boolean.TRUE.equals(user.getIsActive())) {
+                SecurityContextHolder.clearContext();
+                chain.doFilter(request, response);
+                return;
+            }
 
-        } catch (JwtException e) {
-            // invalid/expired token -> leave context unauthenticated,
-            // downstream endpoints protected by SecurityConfig will 401
+            // 5. Load current roles + permissions from DB
+            var authorities = authorizationService.getAuthorities(userId);
+
+            // 6. Create Spring Security authentication
+            var authentication = new UsernamePasswordAuthenticationToken(user, null, authorities);
+
+            // 7. Store authentication
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+
+            System.out.println(
+                    "Authenticated: " +
+                            SecurityContextHolder
+                                    .getContext()
+                                    .getAuthentication()
+                                    .isAuthenticated());
+
+        } catch (JwtException | IllegalArgumentException  e) {
+
             SecurityContextHolder.clearContext();
         }
 
         chain.doFilter(request, response);
-    }
-
-    private void authenticateAllApiExceptLogin() {
-        var auth = new UsernamePasswordAuthenticationToken(
-                "userId",
-                null,
-                List.of(new SimpleGrantedAuthority("ROLE_ADMIN"))
-        );
-        SecurityContextHolder.getContext().setAuthentication(auth);
     }
 }

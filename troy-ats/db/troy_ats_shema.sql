@@ -120,7 +120,6 @@ CREATE TABLE employees (
     whatsapp        VARCHAR(30)     NOT NULL,
     country_id    UUID            NOT NULL REFERENCES countries(id) ON DELETE RESTRICT,
     photo_url       TEXT,
-    role            user_role       NOT NULL DEFAULT 'recruiter',
     password_hash   TEXT,           -- store bcrypt / argon2 hash ONLY, never plain-text
     is_active       BOOLEAN         NOT NULL DEFAULT TRUE,
     last_login_at   TIMESTAMPTZ,
@@ -133,7 +132,6 @@ CREATE TABLE employees (
 CREATE INDEX idx_employees_full_name ON employees (full_name);
 CREATE INDEX idx_employees_designation ON employees (designation);
 CREATE INDEX idx_employees_official_email ON employees (official_email);
-CREATE INDEX idx_employees_role           ON employees (role);
 CREATE INDEX idx_employees_is_active      ON employees (is_active);
 
 -- Back-fill FK on clients now that employees exists
@@ -600,6 +598,66 @@ INSERT INTO countries (code, name) VALUES
                                        ('MY', 'Malaysia'),
                                        ('SA', 'Saudi Arabia'),
                                        ('QA', 'Qatar');
+
+-- ================================================================
+-- Role Schema start
+-- ===================================================================
+
+CREATE TABLE roles (
+                       id UUID PRIMARY KEY,
+                       name VARCHAR(100) NOT NULL,
+                       description VARCHAR(255),
+                       created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+                       updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+
+                       CONSTRAINT uk_role_name UNIQUE (name)
+);
+
+CREATE TABLE permissions (
+                             id UUID PRIMARY KEY,
+                             module VARCHAR(50) NOT NULL,
+                             action VARCHAR(50) NOT NULL,
+                             description VARCHAR(255),
+
+                             CONSTRAINT uk_permission_module_action UNIQUE (module, action)
+);
+CREATE INDEX idx_permission_module ON permissions(module);
+CREATE INDEX idx_permission_action ON permissions(action);
+
+CREATE TABLE role_permissions (
+                                  id UUID PRIMARY KEY,
+                                  role_id UUID NOT NULL,
+                                  permission_id UUID NOT NULL,
+                                  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+
+                                  CONSTRAINT fk_role_permissions_role FOREIGN KEY (role_id) REFERENCES roles(id),
+                                  CONSTRAINT fk_role_permissions_permission FOREIGN KEY (permission_id) REFERENCES permissions(id),
+                                  CONSTRAINT uk_role_permission UNIQUE (role_id, permission_id)
+);
+CREATE INDEX idx_role_permissions_role ON role_permissions(role_id);
+CREATE INDEX idx_role_permissions_permission ON role_permissions(permission_id);
+
+CREATE TABLE user_roles (
+                            id UUID PRIMARY KEY,
+                            user_id UUID NOT NULL,
+                            role_id UUID NOT NULL,
+                            assigned_by UUID,
+                            assigned_at TIMESTAMP WITH TIME ZONE NOT NULL,
+                            expires_at TIMESTAMP WITH TIME ZONE,
+                            active BOOLEAN NOT NULL DEFAULT TRUE,
+
+                            CONSTRAINT fk_user_roles_user FOREIGN KEY (user_id) REFERENCES employees(id),
+                            CONSTRAINT fk_user_roles_role FOREIGN KEY (role_id) REFERENCES roles(id),
+                            CONSTRAINT fk_user_roles_assigned_by FOREIGN KEY (assigned_by) REFERENCES employees(id),
+                            CONSTRAINT uk_user_role UNIQUE (user_id, role_id)
+);
+CREATE INDEX idx_user_roles_user ON user_roles(user_id);
+CREATE INDEX idx_user_roles_role ON user_roles(role_id);
+CREATE INDEX idx_user_roles_active ON user_roles(active);
+
+-- ========================================================================
+-- Role Schema End
+-- ==================================================================================
 
 -- ============================================================
 -- 18. updated_at TRIGGER  (applied to all mutable tables)

@@ -110,7 +110,7 @@ public class CandidateController {
         return candidateService.updateCandidate(id, candidate);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/delete/{id}")
     public void deleteCandidate(@PathVariable UUID id) {
         candidateService.deleteCandidate(id);
     }

@@ -65,13 +65,19 @@ public class AuthController {
             throw new ServiceException(HttpStatus.UNAUTHORIZED, INVALID_CREDENTIALS);
         }
 
-        if (user.getIsActive()) {
-            if (user.getLockedUntil() != null && user.getLockedUntil().isAfter(Instant.now())) {
+        if (!Boolean.TRUE.equals(user.getIsActive())) {
+            log.warn("User is inactive for email={}", req.getEmailId());
+            throw new ServiceException(HttpStatus.FORBIDDEN, "Account is inactive");
+        }
+        if (user.getLockedUntil() != null) {
+
+            if (user.getLockedUntil().isAfter(Instant.now())) {
                 log.warn("Login blocked - account {} locked until {}", user.getId(), user.getLockedUntil());
                 throw new ServiceException(HttpStatus.LOCKED, "Account locked. Try again later.");
             }
-            // lockout window passed -> reset
-            user.setIsActive(false);
+
+            // Lockout window has passed
+            user.setLockedUntil(null);
             user.setFailedLoginAttempts(0);
         }
 
@@ -94,10 +100,10 @@ public class AuthController {
         user.setFailedLoginAttempts(0);
         employeeService.updateEmployee(user.getId(), user);
 
-        String accessToken = jwtService.generateAccessToken(user.getId().toString(), user.getOfficialEmail(), user.getRole().name());
+        String accessToken = jwtService.generateAccessToken(user.getId().toString(), user.getOfficialEmail());
         String refreshToken = refreshTokenService.issue(user.getId().toString());
 
-        log.info("Login success for account {} role={}", user.getId(), user.getRole());
+        log.info("Login success for account {}", user.getId());
         return ResponseEntity.ok(new TokenResponse(accessToken, refreshToken, ACCESS_TOKEN_TTL_SECONDS));
     }
 
@@ -117,7 +123,7 @@ public class AuthController {
             throw new ServiceException(HttpStatus.UNAUTHORIZED, "Account unavailable");
         }
 
-        String accessToken = jwtService.generateAccessToken(user.getId().toString(), user.getOfficialEmail(), user.getRole().name());
+        String accessToken = jwtService.generateAccessToken(user.getId().toString(), user.getOfficialEmail());
         String newRefreshToken = refreshTokenService.issue(user.getId().toString()); // rotation
 
         log.info("Refresh success for account {}", user.getId());

@@ -32,9 +32,10 @@ public class EmployeePopulator {
         target.setFullName(source.getFullName());
         target.setDesignation(source.getDesignation());
         target.setOfficialEmail(source.getOfficialEmail());
+        target.setPersonalEmail(source.getPersonalEmail());
         target.setPhone(source.getPhone());
         target.setWhatsapp(source.getWhatsapp());
-        target.setRole(source.getRole());
+        //target.setRole(source.getRole());
         target.setPhotoUrl(source.getPhotoUrl());
         target.setLastLoginAt(convertInstantToLocalDate(source.getLastLoginAt(), sessionService));
         target.setActive(source.getIsActive());

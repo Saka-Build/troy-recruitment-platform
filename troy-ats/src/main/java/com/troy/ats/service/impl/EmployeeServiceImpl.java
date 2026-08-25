@@ -262,6 +262,17 @@ public class EmployeeServiceImpl implements EmployeeService {
         return Collections.emptyList();
     }
 
+    /**
+     *
+     * @param id
+     * @return
+     */
+    @Override
+    public boolean employeeExistsById(UUID id) {
+
+        return  employeeRepository.existsById(id);
+    }
+
     private byte[] createExcel(List<Employee> employees) throws IOException {
 
         try (Workbook workbook = new HSSFWorkbook();
@@ -288,7 +299,7 @@ public class EmployeeServiceImpl implements EmployeeService {
                     "Personal Email",
                     "Phone",
                     "WhatsApp",
-                    "Role",
+                    //"Role",
                     "Active",
                     "Country Code",
                     "Created At",
@@ -319,7 +330,7 @@ public class EmployeeServiceImpl implements EmployeeService {
                 row.createCell(col++).setCellValue(value(employee.getPersonalEmail()));
                 row.createCell(col++).setCellValue(value(employee.getPhone()));
                 row.createCell(col++).setCellValue(value(employee.getWhatsapp()));
-                row.createCell(col++).setCellValue(employee.getRole() != null ? employee.getRole().name() : "");
+                //row.createCell(col++).setCellValue(employee.getRole() != null ? employee.getRole().name() : "");
                 row.createCell(col++).setCellValue(employee.getIsActive() != null ? employee.getIsActive() : false);
                 row.createCell(col++).setCellValue(value(employee.getCountry().getCode()));
                 row.createCell(col++).setCellValue(employee.getCreatedAt() != null ? employee.getCreatedAt().toString() : "");
