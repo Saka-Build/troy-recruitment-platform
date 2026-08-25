@@ -2,7 +2,7 @@ package com.troy.ats.enums;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 
-public enum UserRole {
+public enum RoleName {
     super_admin,
     admin,
     recruiter,
@@ -10,12 +10,12 @@ public enum UserRole {
     coordinator;
 
     @JsonCreator
-    public static UserRole fromValue(String value) {
+    public static RoleName fromValue(String value) {
         if (value == null) {
             return null;
         }
 
-        return UserRole.valueOf(
+        return RoleName.valueOf(
                 value.trim().toLowerCase()
         );
     }

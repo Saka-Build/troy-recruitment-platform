@@ -2,7 +2,7 @@ package com.troy.ats.populator;
 
 import com.troy.ats.dto.EmployeeCreateRequest;
 import com.troy.ats.entity.Employee;
-import com.troy.ats.enums.UserRole;
+import com.troy.ats.enums.RoleName;
 import com.troy.ats.service.CountryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -41,9 +41,9 @@ public class ReverseEmployeePopulator {
         if(Objects.nonNull(source.getWhatsapp())){
             target.setWhatsapp(source.getWhatsapp());
         }
-        if(Objects.nonNull(source.getRole())){
-            target.setRole(UserRole.fromValue(source.getRole()));
-        }
+        /*if(Objects.nonNull(source.getRole())){
+            target.setRole(RoleName.fromValue(source.getRole()));
+        }*/
         if(Objects.nonNull(source.getPassword())){
             target.setPasswordHash(passwordEncoder.encode(source.getPassword()));
         }

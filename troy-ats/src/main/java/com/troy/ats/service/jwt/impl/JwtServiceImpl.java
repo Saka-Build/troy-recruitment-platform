@@ -26,14 +26,12 @@ public class JwtServiceImpl implements JwtService {
     }
 
     @Override
-    public String generateAccessToken(String userId, String username, String role) {
+    public String generateAccessToken(String userId, String username) {
         Date now = new Date();
         Date expiry = new Date(now.getTime() + accessTokenTtlMillis);
 
         return Jwts.builder()
                 .subject(userId)
-                .claim("username", username)
-                .claim("role", role)
                 .issuedAt(now)
                 .expiration(expiry)
                 .signWith(signingKey)

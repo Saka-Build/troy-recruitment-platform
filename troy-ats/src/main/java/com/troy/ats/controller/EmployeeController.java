@@ -100,7 +100,7 @@ public class EmployeeController {
     ) {
         return employeeService.updateEmployee(id, employee);
     }
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/delete/{id}")
     public void deleteEmployee(@PathVariable UUID id) {
         employeeService.deleteEmployee(id);
     }

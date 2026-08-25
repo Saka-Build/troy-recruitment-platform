@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 public interface JwtService {
 
     /** Issues a signed, short-lived access token for the given user. */
-    String generateAccessToken(String userId, String username, String role);
+    String generateAccessToken(String userId, String username);
 
     /** Throws JwtException (expired, malformed, bad signature) if invalid. */
     Claims parseAndValidate(String token);

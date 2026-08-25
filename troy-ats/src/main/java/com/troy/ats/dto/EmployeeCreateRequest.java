@@ -1,6 +1,5 @@
 package com.troy.ats.dto;
 
-import com.troy.ats.enums.UserRole;
 import jakarta.validation.constraints.*;
 import lombok.Data;
 
