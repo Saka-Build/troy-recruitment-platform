@@ -482,8 +482,8 @@ CREATE TABLE activity_log (
                               )),
     entity_id     UUID        NOT NULL,
     action        VARCHAR(100) NOT NULL,   -- e.g. 'status_changed', 'cv_uploaded'
-    old_value     JSONB,
-    new_value     JSONB,
+    old_value     TEXT,
+    new_value     TEXT,
     description   TEXT,
     performed_by  UUID        REFERENCES employees (id) ON DELETE SET NULL,
     performed_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
