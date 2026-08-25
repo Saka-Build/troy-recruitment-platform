@@ -28,7 +28,7 @@ public class RolePopulator {
         }
 
         target.setId(source.getId());
-        target.setName(source.getName());
+        target.setName(enumToStringFormat(source.getName().name()));
         populateModulePermissions(source, target);
 
     }

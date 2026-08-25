@@ -8,6 +8,7 @@ import com.troy.ats.entity.Role;
 import com.troy.ats.entity.UserRole;
 import com.troy.ats.enums.PermissionAction;
 import com.troy.ats.enums.PermissionModule;
+import com.troy.ats.enums.RoleName;
 import com.troy.ats.populator.ReverseRolePopulator;
 import com.troy.ats.populator.RolePopulator;
 import com.troy.ats.repository.PermissionRepository;
@@ -47,7 +48,7 @@ public class RoleServiceImpl implements RoleService{
 
         String roleName = request.getRoleName().trim().toUpperCase(Locale.ROOT);
 
-        if (roleRepository.existsByNameIgnoreCase(roleName)) {
+        if (roleRepository.existsByName(RoleName.valueOf(roleName))) {
             throw new IllegalArgumentException("Role already exists: " + roleName);
         }
         Set<Permission> permissions = resolvePermissions(request);

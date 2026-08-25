@@ -4,6 +4,7 @@ import com.troy.ats.dto.RoleCreateRequest;
 import com.troy.ats.entity.Permission;
 import com.troy.ats.entity.Role;
 import com.troy.ats.entity.RolePermission;
+import com.troy.ats.enums.RoleName;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -19,7 +20,7 @@ public class ReverseRolePopulator {
     public void populate(RoleCreateRequest source, Role target, Set<Permission> permissions) {
 
        if(Objects.nonNull(source.getRoleName())){
-           target.setName(source.getRoleName());
+           target.setName(RoleName.fromValue(source.getRoleName()));
        }
        if(Objects.nonNull(source.getPermissions())){
             populatePermissions(source, target,permissions);

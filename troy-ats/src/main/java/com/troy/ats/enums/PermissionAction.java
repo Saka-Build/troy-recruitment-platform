@@ -6,7 +6,8 @@ import java.util.Locale;
 
 public enum PermissionAction {
     READ,
-    WRITE;
+    WRITE,
+    DELETE;
 
     @JsonCreator
     public static PermissionAction fromValue(String value) {
