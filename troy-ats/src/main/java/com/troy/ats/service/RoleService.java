@@ -2,6 +2,7 @@ package com.troy.ats.service;
 
 import com.troy.ats.dto.RoleCreateRequest;
 import com.troy.ats.dto.RoleResponseDto;
+import com.troy.ats.dto.RolesModulesListDto;
 import com.troy.ats.entity.Permission;
 import com.troy.ats.entity.Role;
 import com.troy.ats.enums.PermissionAction;
@@ -79,4 +80,10 @@ public interface RoleService {
      * @param roleId
      */
     void removeRoleForEmployee(UUID employeeId, UUID roleId);
+
+    /**
+     *
+     * @return
+     */
+    RolesModulesListDto getRolesModules();
 }

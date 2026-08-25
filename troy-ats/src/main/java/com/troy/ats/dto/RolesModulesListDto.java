@@ -10,11 +10,10 @@ import java.util.UUID;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class RoleResponseDto {
+public class RolesModulesListDto {
 
-    private UUID id;
-    private String name;
-    private String description;
-    private List<RoleModuleResponseDto> modules;
+    private List<String> roles;
+    private List<String> modules;
+    private List<String> permissions;
 
 }
