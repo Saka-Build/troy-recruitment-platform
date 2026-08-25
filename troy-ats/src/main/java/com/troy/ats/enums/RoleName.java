@@ -2,12 +2,13 @@ package com.troy.ats.enums;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 
+import java.util.Locale;
+
 public enum RoleName {
-    super_admin,
-    admin,
-    recruiter,
-    resourcer,
-    coordinator;
+    SUPER_ADMIN,
+    ADMIN,
+    LEAD_RECRUITER,
+    RECRUITER;
 
     @JsonCreator
     public static RoleName fromValue(String value) {
@@ -16,7 +17,7 @@ public enum RoleName {
         }
 
         return RoleName.valueOf(
-                value.trim().toLowerCase()
+                value.trim().toUpperCase(Locale.ROOT)
         );
     }
 

@@ -1,5 +1,6 @@
 package com.troy.ats.entity;
 
+import com.troy.ats.enums.RoleName;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -30,8 +31,9 @@ public class Role {
     @Column(name = "id", nullable = false, updatable = false)
     private UUID id;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "name", nullable = false, length = 100)
-    private String name;
+    private RoleName name;
 
     @Column(name = "description", length = 255)
     private String description;
