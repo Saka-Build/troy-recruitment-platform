@@ -8,6 +8,7 @@ public enum PermissionModule {
     USER,
     ROLE,
     PERMISSION,
+    CLIENT,
     JOB,
     CANDIDATE,
     SUBMISSION,

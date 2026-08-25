@@ -2,6 +2,7 @@ package com.troy.ats.service.impl;
 
 import com.troy.ats.dto.RoleCreateRequest;
 import com.troy.ats.dto.RoleResponseDto;
+import com.troy.ats.dto.RolesModulesListDto;
 import com.troy.ats.entity.Employee;
 import com.troy.ats.entity.Permission;
 import com.troy.ats.entity.Role;
@@ -22,6 +23,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+
+import static com.troy.ats.util.CommonUtil.enumToStringFormat;
 
 @Service("roleService")
 @RequiredArgsConstructor
@@ -239,6 +242,42 @@ public class RoleServiceImpl implements RoleService{
                 .orElseThrow(() -> new EntityNotFoundException("Role is not assigned to employee"));
 
         userRoleRepository.delete(userRole);
+    }
+
+    /**
+     *
+     * @return
+     */
+    @Override
+    public RolesModulesListDto getRolesModules() {
+
+        List<String> roles = List.of(enumToStringFormat(RoleName.SUPER_ADMIN.name()),
+                                        enumToStringFormat(RoleName.ADMIN.name()),
+                                        enumToStringFormat(RoleName.LEAD_RECRUITER.name()),
+                                        enumToStringFormat(RoleName.RECRUITER.name())
+                                    );
+
+        List<String> modules = List.of(enumToStringFormat(PermissionModule.ROLE.name()),
+                enumToStringFormat(PermissionModule.USER.name()),
+                enumToStringFormat(PermissionModule.JOB.name()),
+                enumToStringFormat(PermissionModule.CLIENT.name()),
+                enumToStringFormat(PermissionModule.CANDIDATE.name()),
+                enumToStringFormat(PermissionModule.SUBMISSION.name()),
+                enumToStringFormat(PermissionModule.PERMISSION.name()),
+                enumToStringFormat(PermissionModule.INTERVIEW.name())
+        );
+
+        List<String> permissions = List.of(enumToStringFormat(PermissionAction.WRITE.name()),
+                enumToStringFormat(PermissionAction.READ.name()),
+                enumToStringFormat(PermissionAction.DELETE.name())
+        );
+
+        RolesModulesListDto rolesModulesListDto = new RolesModulesListDto();
+        rolesModulesListDto.setRoles(roles);
+        rolesModulesListDto.setModules(modules);
+        rolesModulesListDto.setPermissions(permissions);
+
+        return rolesModulesListDto;
     }
 
     private Set<Permission> resolvePermissions(RoleCreateRequest request) {

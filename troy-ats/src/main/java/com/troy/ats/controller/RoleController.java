@@ -4,6 +4,7 @@ package com.troy.ats.controller;
 import com.troy.ats.dto.AssignRoleRequest;
 import com.troy.ats.dto.RoleCreateRequest;
 import com.troy.ats.dto.RoleResponseDto;
+import com.troy.ats.dto.RolesModulesListDto;
 import com.troy.ats.service.RoleService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -88,6 +89,13 @@ public class RoleController {
         roleService.removeRoleForEmployee(employeeId, roleId);
 
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/allRolesAndModules")
+    //@PreAuthorize("hasAuthority('ROLE_READ')")
+    public ResponseEntity<RolesModulesListDto> getRolesModules() {
+
+        return ResponseEntity.ok(roleService.getRolesModules());
     }
 
 }
