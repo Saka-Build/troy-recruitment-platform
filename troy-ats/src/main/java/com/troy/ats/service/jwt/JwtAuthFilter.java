@@ -53,20 +53,28 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             Claims claims = jwtService.parseAndValidate(token);
 
             // 2. Subject contains employee UUID
-            UUID userId = UUID.fromString(claims.getSubject());
+            UUID userId = jwtService.getUserId(claims);
+            // Selected role
+            UUID roleId = jwtService.getRoleId(claims);
+
+            if (roleId == null) {
+                SecurityContextHolder.clearContext();
+                chain.doFilter(request, response);
+                return;
+            }
 
             // 3. Load employee
             Employee user = employeeService.getEmployeeById(userId);
 
             // 4. Make sure employee is active
-            if (!Boolean.TRUE.equals(user.getIsActive())) {
+            if (user == null || !Boolean.TRUE.equals(user.getIsActive())) {
                 SecurityContextHolder.clearContext();
                 chain.doFilter(request, response);
                 return;
             }
 
             // 5. Load current roles + permissions from DB
-            var authorities = authorizationService.getAuthorities(userId);
+            var authorities = authorizationService.getAuthorities(userId,roleId);
 
             // 6. Create Spring Security authentication
             var authentication = new UsernamePasswordAuthenticationToken(user, null, authorities);

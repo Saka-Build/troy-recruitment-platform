@@ -12,7 +12,7 @@ public interface EmployeeAuthorizationService {
      * @param employeeId
      * @return
      */
-    Set<GrantedAuthority> getAuthorities(UUID employeeId);
+    Set<GrantedAuthority> getAuthorities(UUID employeeId, UUID roleId);
 
 }
 

@@ -2,11 +2,9 @@ package com.troy.ats.service.impl;
 
 import com.troy.ats.dto.RoleCreateRequest;
 import com.troy.ats.dto.RoleResponseDto;
+import com.troy.ats.dto.RolesForTokenDto;
 import com.troy.ats.dto.RolesModulesListDto;
-import com.troy.ats.entity.Employee;
-import com.troy.ats.entity.Permission;
-import com.troy.ats.entity.Role;
-import com.troy.ats.entity.UserRole;
+import com.troy.ats.entity.*;
 import com.troy.ats.enums.PermissionAction;
 import com.troy.ats.enums.PermissionModule;
 import com.troy.ats.enums.RoleName;
@@ -19,6 +17,7 @@ import com.troy.ats.repository.UserRoleRepository;
 import com.troy.ats.service.RoleService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -238,8 +237,7 @@ public class RoleServiceImpl implements RoleService{
             throw new EntityNotFoundException("Role not found: " + roleId);
         }
 
-        UserRole userRole = userRoleRepository.findByUserIdAndRoleId(employeeId, roleId)
-                .orElseThrow(() -> new EntityNotFoundException("Role is not assigned to employee"));
+        UserRole userRole = findByUserIdAndRoleId(employeeId, roleId);
 
         userRoleRepository.delete(userRole);
     }
@@ -278,6 +276,71 @@ public class RoleServiceImpl implements RoleService{
         rolesModulesListDto.setPermissions(permissions);
 
         return rolesModulesListDto;
+    }
+
+    /**
+     *
+     * @param employeeId
+     * @param roleId
+     * @return
+     */
+    @Override
+    public UserRole validateEmployeeRole(UUID employeeId, UUID roleId) {
+
+        UserRole userRole = findByUserIdAndRoleId(employeeId, roleId);
+
+        return userRole;
+    }
+
+    @Override
+    public UserRole findByUserIdAndRoleId(UUID employeeId, UUID roleId) {
+
+        return userRoleRepository
+                .findByUserIdAndRoleId(employeeId, roleId)
+                .orElseThrow(() -> new EntityNotFoundException("Role is not assigned to employee"));
+    }
+
+    /**
+     *
+     * @param employeeId
+     * @return
+     */
+    @Override
+    public List<UserRole> findActiveRolesWithPermissions(UUID employeeId) {
+
+        return userRoleRepository.findActiveRolesWithPermissions(employeeId);
+    }
+
+    /**
+     *
+     * @param roleId
+     * @return
+     */
+    @Override
+    @Transactional
+    public TokenResponse getActiveRolesForToken(TokenResponse tokenResponse, UUID employeeId,UUID roleId) {
+
+        RoleResponseDto roleResponseDto = new RoleResponseDto();
+        List<RolesForTokenDto> rolesForTokenDtos = new ArrayList<>();
+        List<UserRole> userRoles = userRoleRepository.findByUserIdAndActiveTrue(employeeId);
+
+        for(UserRole userRole : CollectionUtils.emptyIfNull(userRoles)){
+
+            Role role = userRole.getRole();
+            if(roleId.equals(role.getId())){
+                rolePopulator.populate(role, roleResponseDto);
+                continue;
+            }
+            RolesForTokenDto rolesForTokenDto = new RolesForTokenDto();
+            rolesForTokenDto.setId(role.getId());
+            rolesForTokenDto.setName(role.getName().name());
+            rolesForTokenDtos.add(rolesForTokenDto);
+        }
+
+        tokenResponse.setActiveRole(roleResponseDto);
+        tokenResponse.setRoles(rolesForTokenDtos);
+
+        return  tokenResponse;
     }
 
     private Set<Permission> resolvePermissions(RoleCreateRequest request) {

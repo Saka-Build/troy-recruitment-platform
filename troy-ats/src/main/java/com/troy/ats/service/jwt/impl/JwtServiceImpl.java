@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
 import java.util.Date;
+import java.util.UUID;
 
 @Service
 public class JwtServiceImpl implements JwtService {
@@ -26,12 +27,15 @@ public class JwtServiceImpl implements JwtService {
     }
 
     @Override
-    public String generateAccessToken(String userId, String username) {
+    public String generateAccessToken(String userId, String username, UUID roleId, String roleName) {
         Date now = new Date();
         Date expiry = new Date(now.getTime() + accessTokenTtlMillis);
 
         return Jwts.builder()
                 .subject(userId)
+                .claim("username", username)
+                .claim("roleId", roleId)
+                .claim("role", roleName)
                 .issuedAt(now)
                 .expiration(expiry)
                 .signWith(signingKey)
@@ -45,5 +49,31 @@ public class JwtServiceImpl implements JwtService {
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
+    }
+
+    @Override
+    public UUID getUserId(Claims claims) {
+
+        return UUID.fromString(
+                claims.getSubject()
+        );
+    }
+
+    @Override
+    public UUID getRoleId(Claims claims) {
+
+        String roleId = claims.get("roleId", String.class);
+
+        if (roleId == null) {
+            return null;
+        }
+
+        return UUID.fromString(roleId);
+    }
+
+    @Override
+    public String getRoleName(Claims claims) {
+
+        return claims.get("role", String.class);
     }
 }

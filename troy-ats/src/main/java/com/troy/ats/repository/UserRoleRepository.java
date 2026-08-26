@@ -1,6 +1,7 @@
 package com.troy.ats.repository;
 
 import com.troy.ats.entity.UserRole;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -32,6 +33,7 @@ public interface UserRoleRepository
 
     List<UserRole> findByUserIdAndActiveTrue(UUID userId);
 
+    @EntityGraph(attributePaths = {"role"})
     Optional<UserRole> findByUserIdAndRoleId(
             UUID userId,
             UUID roleId
