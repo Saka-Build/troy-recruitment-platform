@@ -1,42 +1,23 @@
 package com.troy.ats.entity;
 
+import com.troy.ats.dto.RoleResponseDto;
+import com.troy.ats.dto.RolesForTokenDto;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+
+import java.util.List;
+
+@Getter
+@Setter
+@RequiredArgsConstructor
 public class TokenResponse {
 
     private String accessToken;
     private String refreshToken;
     private long expiresInSeconds;
 
-    public TokenResponse() {
-        // required by Jackson for JSON serialization
-    }
+    private RoleResponseDto activeRole;
 
-    public TokenResponse(String accessToken, String refreshToken, long expiresInSeconds) {
-        this.accessToken = accessToken;
-        this.refreshToken = refreshToken;
-        this.expiresInSeconds = expiresInSeconds;
-    }
-
-    public String getAccessToken() {
-        return accessToken;
-    }
-
-    public void setAccessToken(String accessToken) {
-        this.accessToken = accessToken;
-    }
-
-    public String getRefreshToken() {
-        return refreshToken;
-    }
-
-    public void setRefreshToken(String refreshToken) {
-        this.refreshToken = refreshToken;
-    }
-
-    public long getExpiresInSeconds() {
-        return expiresInSeconds;
-    }
-
-    public void setExpiresInSeconds(long expiresInSeconds) {
-        this.expiresInSeconds = expiresInSeconds;
-    }
+    private List<RolesForTokenDto> roles;
 }

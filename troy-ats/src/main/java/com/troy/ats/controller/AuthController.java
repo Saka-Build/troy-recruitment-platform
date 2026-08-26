@@ -1,13 +1,12 @@
 package com.troy.ats.controller;
 
 import com.troy.ats.dto.EmployeeDto;
-import com.troy.ats.entity.Employee;
-import com.troy.ats.entity.LoginRequest;
-import com.troy.ats.entity.RefreshTokenRequest;
-import com.troy.ats.entity.TokenResponse;
+import com.troy.ats.dto.SwitchRoleRequest;
+import com.troy.ats.entity.*;
 import com.troy.ats.exception.ServiceException;
 import com.troy.ats.service.EmployeeService;
 import com.troy.ats.service.SessionService;
+import com.troy.ats.service.impl.RoleServiceImpl;
 import com.troy.ats.service.jwt.JwtService;
 import com.troy.ats.service.jwt.RefreshTokenService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -24,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
  
@@ -45,14 +45,16 @@ public class AuthController {
     private final JwtService jwtService;
     private final RefreshTokenService refreshTokenService;
     private final SessionService sessionService;
+    private final RoleServiceImpl roleService;
 
     public AuthController(EmployeeService employeeService, PasswordEncoder passwordEncoder,
-                          JwtService jwtService, RefreshTokenService refreshTokenService, SessionService sessionService) {
+                          JwtService jwtService, RefreshTokenService refreshTokenService, SessionService sessionService, RoleServiceImpl roleService) {
         this.employeeService = employeeService;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
         this.refreshTokenService = refreshTokenService;
         this.sessionService = sessionService;
+        this.roleService = roleService;
     }
 
     @PostMapping("/token")
@@ -100,11 +102,25 @@ public class AuthController {
         user.setFailedLoginAttempts(0);
         employeeService.updateEmployee(user.getId(), user);
 
-        String accessToken = jwtService.generateAccessToken(user.getId().toString(), user.getOfficialEmail());
+        List<UserRole> roles = roleService.findActiveRolesWithPermissions(user.getId());
+
+        if (roles.isEmpty()) {
+            throw new ServiceException(HttpStatus.FORBIDDEN, "No role assigned to account");
+        }
+        UserRole selectedRole = roles.get(0);
+        String accessToken = jwtService.generateAccessToken(user.getId().toString(), user.getOfficialEmail(), selectedRole.getRole().getId(), selectedRole.getRole().getName().name());
         String refreshToken = refreshTokenService.issue(user.getId().toString());
 
         log.info("Login success for account {}", user.getId());
-        return ResponseEntity.ok(new TokenResponse(accessToken, refreshToken, ACCESS_TOKEN_TTL_SECONDS));
+
+        TokenResponse tokenResponse = new TokenResponse();
+        tokenResponse.setAccessToken(accessToken);
+        tokenResponse.setRefreshToken(refreshToken);
+        tokenResponse.setExpiresInSeconds(ACCESS_TOKEN_TTL_SECONDS);
+
+        tokenResponse = roleService.getActiveRolesForToken(tokenResponse, user.getId(), selectedRole.getRole().getId());
+
+        return ResponseEntity.ok(tokenResponse);
     }
 
     @PostMapping("/refresh")
@@ -123,11 +139,24 @@ public class AuthController {
             throw new ServiceException(HttpStatus.UNAUTHORIZED, "Account unavailable");
         }
 
-        String accessToken = jwtService.generateAccessToken(user.getId().toString(), user.getOfficialEmail());
+        List<UserRole> roles = roleService.findActiveRolesWithPermissions(user.getId());
+
+        if (roles.isEmpty()) {
+            throw new ServiceException(HttpStatus.FORBIDDEN, "No role assigned to account");
+        }
+        UserRole selectedRole = roles.get(0);
+        String accessToken = jwtService.generateAccessToken(user.getId().toString(), user.getOfficialEmail(), selectedRole.getRole().getId(), selectedRole.getRole().getName().name());
         String newRefreshToken = refreshTokenService.issue(user.getId().toString()); // rotation
 
         log.info("Refresh success for account {}", user.getId());
-        return ResponseEntity.ok(new TokenResponse(accessToken, newRefreshToken, ACCESS_TOKEN_TTL_SECONDS));
+        TokenResponse tokenResponse = new TokenResponse();
+        tokenResponse.setAccessToken(accessToken);
+        tokenResponse.setRefreshToken(newRefreshToken);
+        tokenResponse.setExpiresInSeconds(ACCESS_TOKEN_TTL_SECONDS);
+
+        tokenResponse = roleService.getActiveRolesForToken(tokenResponse, user.getId(), selectedRole.getRole().getId());
+
+        return ResponseEntity.ok(tokenResponse);
     }
 
     @PostMapping("/login")
@@ -149,5 +178,45 @@ public class AuthController {
         }
         // 204 either way: a stale token being "logged out" is not an error.
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/switchRole")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<TokenResponse> switchRole(
+            @Valid @RequestBody SwitchRoleRequest request) {
+
+        // Get currently authenticated employee
+        Employee user = sessionService.getCurrentUser();
+
+        if (user == null) {
+            throw new ServiceException(HttpStatus.UNAUTHORIZED, "User not authenticated");
+        }
+
+        // Verify that this role belongs to the logged-in employee
+        // and that the assignment is active.
+        UserRole selectedRole = roleService.validateEmployeeRole(user.getId(), request.getRoleId());
+
+        Role role = selectedRole.getRole();
+
+        // Generate a NEW access token containing the selected role
+        String accessToken = jwtService.generateAccessToken(
+                user.getId().toString(),
+                user.getOfficialEmail(),
+                role.getId(),
+                role.getName().name()
+        );
+
+
+        TokenResponse tokenResponse = new TokenResponse();
+        tokenResponse.setAccessToken(accessToken);
+        tokenResponse.setExpiresInSeconds(ACCESS_TOKEN_TTL_SECONDS);
+
+        tokenResponse = roleService.getActiveRolesForToken(tokenResponse, user.getId(), selectedRole.getRole().getId());
+
+
+        log.info(
+                "Role switched successfully. userId={}, roleId={}, role={}", user.getId(), role.getId(), role.getName());
+
+        return ResponseEntity.ok(tokenResponse);
     }
 }
