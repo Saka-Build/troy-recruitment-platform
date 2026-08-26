@@ -36,7 +36,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
     show-sql: true
     properties:
       hibernate:
@@ -53,10 +53,13 @@ spring:
 server:
   port: 8080
 
-file:
-  upload-original-cv-dir: C:/work/Docs-Troy-ats/upload/originalcv
-  upload-troy-cv-dir: C:/work/Docs-Troy-ats/upload/troycv
-  upload-photo-dir: C:/work/Docs-Troy-ats/upload/employee/photo
+aws:
+  region: ap-south  -1
+  s3:
+    bucket-name: troy-ats-uploads-prod
+    upload-original-cv-dir: upload/originalcv
+    upload-troy-cv-dir: upload/troycv
+    upload-photo-dir: upload/employee/photo
 
 logging:
   level:
