@@ -484,11 +484,6 @@ CREATE INDEX idx_ai_reviews_score        ON ai_reviews (match_score DESC);
 -- ============================================================
 CREATE TABLE activity_log (
     id            UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
-    parent_entity_id    UUID,
-    parent_entity_type   VARCHAR(50) CHECK (parent_entity_type IN (
-                                                           'candidate', 'job', 'submission', 'interview',
-                                                           'offer', 'onboarding', 'client', 'employee'
-                                                             )),
     entity_type   VARCHAR(50) NOT NULL
                               CHECK (entity_type IN (
                                   'candidate', 'job', 'submission', 'interview',
@@ -506,7 +501,6 @@ CREATE TABLE activity_log (
 CREATE INDEX idx_activity_entity       ON activity_log (entity_type, entity_id);
 CREATE INDEX idx_activity_performed_at ON activity_log (performed_at DESC);
 CREATE INDEX idx_activity_performed_by ON activity_log (performed_by);
-CREATE INDEX idx_activity_parent_entity ON activity_log (parent_entity_type, parent_entity_id);
 
 
 -- ============================================================
