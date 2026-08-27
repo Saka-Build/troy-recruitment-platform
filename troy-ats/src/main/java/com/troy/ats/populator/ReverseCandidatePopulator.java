@@ -77,7 +77,7 @@ public class ReverseCandidatePopulator {
         if (source.getWhatsapp() != null) {
             String oldValue = Objects.nonNull(target.getWhatsapp()) ? target.getWhatsapp() : null;
             String field = getFieldName(Candidate.class, "setWhatsapp", String.class);
-            populateActivityLog(entityType, entityId, field, oldValue,source.getWhatsapp(),activityLogs);
+            populateActivityLog( entityType, entityId, field, oldValue,source.getWhatsapp(),activityLogs);
             target.setWhatsapp(source.getWhatsapp());
         }
 

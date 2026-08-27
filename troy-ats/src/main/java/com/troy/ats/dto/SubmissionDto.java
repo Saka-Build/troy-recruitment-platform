@@ -3,6 +3,7 @@ package com.troy.ats.dto;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 @Getter
@@ -22,6 +23,15 @@ public class SubmissionDto {
     private String statusName;
     private UUID subStatusId;
     private String subStatusName;
+    BigDecimal candidateExpectedAmount;
+    String candidateExpectedCurrency;
+    String candidateExpectedPeriod;
+    BigDecimal submissionAmount;
+    String submissionCurrency;
+    String submissionPeriod;
+    BigDecimal offerAmount;
+    String offerCurrency;
+    String offerPeriod;
     private String notes;
     private long historyCounts;
 

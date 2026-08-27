@@ -34,7 +34,7 @@ public class AuthController {
 
     private static final int MAX_FAILED_ATTEMPTS = 5;
     private static final long LOCKOUT_MINUTES = 15;
-    private static final long ACCESS_TOKEN_TTL_SECONDS = 10 * 60;
+    private static final long ACCESS_TOKEN_TTL_SECONDS = 60 * 60;
 
     // One shared constant so "no such user" and "wrong password" are byte-identical
     // to the caller - anything else lets an attacker enumerate valid emails.

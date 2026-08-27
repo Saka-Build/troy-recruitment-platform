@@ -17,7 +17,9 @@ public class CountSubmissionsByPipelineStageDto {
     long totalReadyToSubmit;
     long totalSubmitted;
     long totalInterview;
-    long totalOffer;
-    long totalJoined;
+    long totalSelected;
+    long totalRejected;
+    long totalOnBoarding;
+    long totalOnBoarded;
 
 }

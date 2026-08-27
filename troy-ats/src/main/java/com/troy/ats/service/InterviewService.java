@@ -1,15 +1,14 @@
 package com.troy.ats.service;
 
+import com.troy.ats.dto.InterviewDto;
+import com.troy.ats.dto.InterviewScheduleRequest;
 import com.troy.ats.entity.Interview;
-import com.troy.ats.enums.InterviewOutcome;
-import com.troy.ats.repository.InterviewRepository;
-import org.springframework.stereotype.Service;
 
-import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 public interface InterviewService {
 
@@ -24,7 +23,21 @@ public interface InterviewService {
      * @param id
      * @return
      */
-    public Optional<Interview> getInterviewById(Long id);
+    public Interview getInterviewById(UUID id);
+
+    /**
+     *
+     * @param id
+     * @return
+     */
+    public InterviewDto getInterviewDtoById(UUID id);
+
+    /**
+     *
+     * @param id
+     * @return
+     */
+    public List<InterviewDto> getInterviewsBySubmissionId(UUID id);
 
     /**
      *
@@ -38,13 +51,20 @@ public interface InterviewService {
      * @param interview
      * @return
      */
-    public Interview createInterview(Interview interview);
+    public InterviewDto createInterview(InterviewScheduleRequest request);
+
+    /**
+     *
+     * @param request
+     * @return
+     */
+    public InterviewDto updateInterview(UUID interviewId, InterviewScheduleRequest request);
 
     /**
      *
      * @param id
      */
-    public void deleteInterview(Long id);
+    public void deleteInterview(UUID id);
 
     /**
      *

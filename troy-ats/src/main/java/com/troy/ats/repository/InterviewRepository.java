@@ -11,7 +11,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
-public interface InterviewRepository extends JpaRepository<Interview, Long> {
+public interface InterviewRepository extends JpaRepository<Interview, UUID> {
     List<Interview> findByCandidateId(UUID candidateId);
     List<Interview> findByJobId(UUID jobId);
     List<Interview> findByInterviewDate(LocalDate date);
@@ -22,5 +22,7 @@ public interface InterviewRepository extends JpaRepository<Interview, Long> {
         SELECT COUNT(i) FROM Interview i WHERE i.outcome = :outcome AND (i.feedback IS NULL OR TRIM(i.feedback) = '')
         """)
     long countByOutcomeAndFeedbackEmpty(@Param("outcome") InterviewOutcome outcome);
+
+    List<Interview> findBySubmissionId(UUID submissionId);
 
 }
