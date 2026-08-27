@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.Locale;
+import java.util.Objects;
 
 import static com.troy.ats.util.CommonUtil.enumToStringFormat;
 
@@ -32,11 +33,38 @@ public class SubmissionPopulator {
 
         target.setPipelineStage(enumToStringFormat(source.getPipelineStage().name()));
 
-        target.setStatusId(source.getStatus().getId());
-        target.setStatusName(source.getStatus().getName());
+        if(Objects.nonNull(source.getStatus())){
+            target.setStatusId(source.getStatus().getId());
+            target.setStatusName(source.getStatus().getName());
+        }
 
-        target.setSubStatusId(source.getSubStatus().getId());
-        target.setSubStatusName(source.getSubStatus().getName());
+        if(Objects.nonNull(source.getSubStatus())){
+            target.setSubStatusId(source.getSubStatus().getId());
+            target.setSubStatusName(source.getSubStatus().getName());
+        }
+        target.setCandidateExpectedAmount(source.getCandidateExpectedAmount());
+        if(source.getCandidateExpectedCurrency() != null){
+            target.setCandidateExpectedCurrency(source.getCandidateExpectedCurrency().name());
+        }
+        if(source.getCandidateExpectedPeriod() != null){
+            target.setCandidateExpectedPeriod(source.getCandidateExpectedPeriod().name().toLowerCase(Locale.ROOT));
+        }
+
+        target.setSubmissionAmount(source.getSubmissionAmount());
+        if(source.getSubmissionCurrency() != null){
+            target.setSubmissionCurrency(source.getSubmissionCurrency().name());
+        }
+        if(source.getSubmissionPeriod() != null){
+            target.setSubmissionPeriod(source.getSubmissionPeriod().name().toLowerCase(Locale.ROOT));
+        }
+
+        target.setOfferAmount(source.getOfferAmount());
+        if(source.getOfferCurrency() != null){
+            target.setOfferCurrency(source.getOfferCurrency().name());
+        }
+        if(source.getOfferPeriod() != null){
+            target.setOfferPeriod(source.getOfferPeriod().name().toLowerCase(Locale.ROOT));
+        }
 
         target.setNotes(source.getNotes());
 

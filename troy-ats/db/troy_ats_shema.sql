@@ -158,18 +158,18 @@ CREATE UNIQUE INDEX idx_statuses_name_active ON statuses (name) WHERE is_active 
 
 -- Seed common statuses
 INSERT INTO statuses (name, colour_hex, sort_order, show_in_pipeline) VALUES
-    ('Applied',          '#6B7280', 1, TRUE),
-    ('Screening', '#3B82F6', 2, TRUE),
-    ('Ready to Submit',   '#8B5CF6', 3, TRUE),
-    ('Submitted',         '#F59E0B', 4, TRUE),
-    ('Interview',         '#EF4444', 5, TRUE),
-    ('Selected',          '#10B981', 6, TRUE),
-    ('Offer Released',    '#059669', 7, FALSE),
-    ('Onboarding',        '#0EA5E9', 8, FALSE),
-    ('Onboarded',         '#16A34A', 9, TRUE),
-    ('Hold',              '#D97706', 10, FALSE),
-    ('Rejected',          '#DC2626', 11, FALSE),
-    ('Offboarded',            '#374151', 12, FALSE);
+      ('Applied',          '#6B7280', 1, TRUE),
+      ('Screening',         '#3B82F6', 2, TRUE),
+      ('Ready_to_Submit',   '#8B5CF6', 3, TRUE),
+      ('Submitted',         '#F59E0B', 4, TRUE),
+      ('Interview',         '#EF4444', 5, TRUE),
+      ('Selected',          '#10B981', 6, TRUE),
+      ('Offer Released',    '#059669', 7, FALSE),
+      ('Onboarding',        '#0EA5E9', 8, FALSE),
+      ('Onboarded',         '#16A34A', 9, TRUE),
+      ('Hold',              '#D97706', 10, FALSE),
+      ('Rejected',          '#DC2626', 11, FALSE),
+      ('Offboarded',        '#374151', 12, FALSE);
 
 
 -- ============================================================
@@ -336,6 +336,15 @@ CREATE TABLE submissions (
     sub_status_id   UUID            REFERENCES sub_statuses (id) ON DELETE RESTRICT,
     submitted_by    UUID            REFERENCES employees (id) ON DELETE SET NULL,
     submitted_at    TIMESTAMPTZ,
+    candidate_expected_amount NUMERIC(12,2),
+    candidate_expected_currency VARCHAR(3),
+    candidate_expected_period VARCHAR(20),
+    submission_amount NUMERIC(12,2),
+    submission_currency VARCHAR(3),
+    submission_period VARCHAR(20),
+    offer_amount NUMERIC(12,2),
+    offer_currency VARCHAR(3),
+    offer_period VARCHAR(20),
     notes           TEXT,
     is_active       BOOLEAN         NOT NULL DEFAULT TRUE,
     created_at      TIMESTAMPTZ     NOT NULL DEFAULT NOW(),
@@ -475,6 +484,11 @@ CREATE INDEX idx_ai_reviews_score        ON ai_reviews (match_score DESC);
 -- ============================================================
 CREATE TABLE activity_log (
     id            UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+    parent_entity_id    UUID,
+    parent_entity_type   VARCHAR(50) CHECK (parent_entity_type IN (
+                                                           'candidate', 'job', 'submission', 'interview',
+                                                           'offer', 'onboarding', 'client', 'employee'
+                                                             )),
     entity_type   VARCHAR(50) NOT NULL
                               CHECK (entity_type IN (
                                   'candidate', 'job', 'submission', 'interview',
@@ -492,6 +506,7 @@ CREATE TABLE activity_log (
 CREATE INDEX idx_activity_entity       ON activity_log (entity_type, entity_id);
 CREATE INDEX idx_activity_performed_at ON activity_log (performed_at DESC);
 CREATE INDEX idx_activity_performed_by ON activity_log (performed_by);
+CREATE INDEX idx_activity_parent_entity ON activity_log (parent_entity_type, parent_entity_id);
 
 
 -- ============================================================

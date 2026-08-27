@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
 @Service("activityLogService")
@@ -39,7 +40,7 @@ public class ActivityLogServiceImpl implements ActivityLogService {
     public ActivityLog save(String entityType, UUID entityId, String action, String oldValue, String newValue, String description, Employee performedBy) {
 
         ActivityLog activityLog = ActivityLog.builder()
-                .entityType(entityType)
+                .entityType(entityType.toLowerCase(Locale.ROOT))
                 .entityId(entityId)
                 .action(action)
                 .oldValue(oldValue)
@@ -56,7 +57,7 @@ public class ActivityLogServiceImpl implements ActivityLogService {
     @Transactional(readOnly = true)
     public List<ActivityLogDto> findByEntityTypeAndEntityId(String entityType, UUID entityId) {
 
-        return activityLogRepository.findByEntityTypeAndEntityIdOrderByPerformedAtDesc(entityType, entityId).stream()
+        return activityLogRepository.findByEntityTypeAndEntityIdOrderByPerformedAtDesc(entityType.toLowerCase(Locale.ROOT), entityId).stream()
                                     .map(activityLog -> {
                                         ActivityLogDto activityLogDto = new ActivityLogDto();
                                         activityLogPopulator.populate(activityLog, activityLogDto);
@@ -73,7 +74,7 @@ public class ActivityLogServiceImpl implements ActivityLogService {
      */
     @Override
     public long countByEntityTypeAndEntityId(String entityType, UUID entityId) {
-        return activityLogRepository.countByEntityTypeAndEntityId(entityType, entityId);
+        return activityLogRepository.countByEntityTypeAndEntityId(entityType.toLowerCase(Locale.ROOT), entityId);
     }
 
     /**

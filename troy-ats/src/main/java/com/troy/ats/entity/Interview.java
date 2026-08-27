@@ -2,9 +2,12 @@ package com.troy.ats.entity;
 
 import com.troy.ats.enums.InterviewOutcome;
 import com.troy.ats.enums.InterviewRound;
+import com.troy.ats.enums.InterviewStatus;
 import com.troy.ats.enums.InterviewType;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -71,10 +74,12 @@ public class Interview {
     private Instant interviewDateTimeWithZone;
 
     @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Column(name = "interview_type")
     private InterviewType interviewType;
 
     @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Column(name = "round")
     private InterviewRound round;
 

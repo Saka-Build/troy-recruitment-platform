@@ -25,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.nio.channels.Pipe;
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -71,13 +72,13 @@ public class SubmissionServiceImpl implements SubmissionService {
     public SubmissionDto createSubmission(SubmissionCreateRequest request) {
         Submission submission = new Submission();
         reverseSubmissionPopulator.populate(request, submission);
-        submission.setPipelineStage(PipelineStage.APPLIED);
+        if(Objects.isNull(submission.getStatus())){
 
-        Status status = submissionStatusService.getStatusByName(STATUS_APPLIED);
-        SubStatus subStatus = submissionStatusService.getSUbStatusByName(SUBSTATUS_READY_FOR_SUBMISSION);
+            submission.setPipelineStage(PipelineStage.APPLIED);
+            Status status = submissionStatusService.getStatusByName(STATUS_APPLIED);
+            submission.setStatus(status);
+        }
 
-        submission.setStatus(status);
-        submission.setSubStatus(subStatus);
         submission.setSubmittedBy(sessionService.getCurrentUser());
         submission.setSubmittedAt(Instant.now());
 
@@ -139,7 +140,10 @@ public class SubmissionServiceImpl implements SubmissionService {
                 PipelineStage.READY_TO_SUBMIT,
                 PipelineStage.SUBMITTED,
                 PipelineStage.INTERVIEW,
-                PipelineStage.OFFER
+                PipelineStage.SELECTED,
+                PipelineStage.REJECTED,
+                PipelineStage.ONBOARDING,
+                PipelineStage.ONBOARDED
         );
 
         List<Submission> submissions = submissionRepository.findByPipelineStageIn(stages);
@@ -210,8 +214,10 @@ public class SubmissionServiceImpl implements SubmissionService {
         dto.setTotalReadyToSubmit(getTotalCVSubmissionsByPipelineStage(PipelineStage.READY_TO_SUBMIT));
         dto.setTotalSubmitted(getTotalCVSubmissionsByPipelineStage(PipelineStage.SUBMITTED));
         dto.setTotalInterview(getTotalCVSubmissionsByPipelineStage(PipelineStage.INTERVIEW));
-        dto.setTotalOffer(getTotalCVSubmissionsByPipelineStage(PipelineStage.OFFER));
-        dto.setTotalJoined(getTotalCVSubmissionsByPipelineStage(PipelineStage.JOINED));
+        dto.setTotalSelected(getTotalCVSubmissionsByPipelineStage(PipelineStage.SELECTED));
+        dto.setTotalRejected(getTotalCVSubmissionsByPipelineStage(PipelineStage.REJECTED));
+        dto.setTotalOnBoarding(getTotalCVSubmissionsByPipelineStage(PipelineStage.ONBOARDING));
+        dto.setTotalOnBoarded(getTotalCVSubmissionsByPipelineStage(PipelineStage.ONBOARDED));
 
         return dto;
 
