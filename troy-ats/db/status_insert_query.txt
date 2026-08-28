@@ -1,0 +1,476 @@
+BEGIN;
+
+WITH new_status AS (
+    INSERT INTO statuses (
+        name,
+        colour_hex,
+        sort_order
+    )
+    VALUES (
+        'Applied',
+        '#6B7280',
+        1
+    )
+    RETURNING id
+)
+INSERT INTO sub_statuses (
+    status_id,
+    name,
+    colour_hex,
+    sort_order
+)
+SELECT
+    new_status.id,
+    sub.name,
+    sub.colour_hex,
+    sub.sort_order
+FROM (
+    VALUES
+        ('In Progress', '#FBBF24', 1)
+) AS sub(name, colour_hex, sort_order)		
+CROSS JOIN new_status;
+
+COMMIT;
+END;
+
+================================================================================================
+
+BEGIN;
+
+WITH new_status AS (
+    INSERT INTO statuses (
+        name,
+        colour_hex,
+        sort_order
+    )
+    VALUES (
+        'Screening',
+        '#3B82F6',
+        2
+    )
+    RETURNING id
+)
+INSERT INTO sub_statuses (
+    status_id,
+    name,
+    colour_hex,
+    sort_order
+)
+SELECT
+    new_status.id,
+    sub.name,
+    sub.colour_hex,
+    sub.sort_order
+FROM (
+    VALUES
+        ('Speaking', '#F59E0B', 1),
+        ('Outreach Mail', '#EF4444', 2), 
+		('Candidate Did not Pick Up', '#EF4444', 3),
+		('Candidate Availability for Call', '#EF4444', 4),
+		('Ask Alternate Number', '#EF4444', 5)
+) AS sub(name, colour_hex, sort_order)
+CROSS JOIN new_status;
+
+COMMIT;
+END;
+
+======================================================================================================
+
+BEGIN;
+
+WITH new_status AS (
+    INSERT INTO statuses (
+        name,
+        colour_hex,
+        sort_order
+    )
+    VALUES (
+        'Ready_to_Submit',
+        '#8B5CF6',
+        3
+    )
+    RETURNING id
+)
+INSERT INTO sub_statuses (
+    status_id,
+    name,
+    colour_hex,
+    sort_order
+)
+SELECT
+    new_status.id,
+    sub.name,
+    sub.colour_hex,
+    sub.sort_order
+FROM (
+    VALUES
+        ('Candidate Confirmation Awaited', '#F59E0B', 1),
+        ('Final Review', '#EF4444', 2)
+) AS sub(name, colour_hex, sort_order)
+CROSS JOIN new_status;
+
+COMMIT;
+END;
+
+========================================================================================
+
+BEGIN;
+
+WITH new_status AS (
+    INSERT INTO statuses (
+        name,
+        colour_hex,
+        sort_order
+    )
+    VALUES (
+        'Submitted',
+        '#F59E0B',
+        4
+    )
+    RETURNING id
+)
+INSERT INTO sub_statuses (
+    status_id,
+    name,
+    colour_hex,
+    sort_order
+)
+SELECT
+    new_status.id,
+    sub.name,
+    sub.colour_hex,
+    sub.sort_order
+FROM (
+    VALUES
+        ('Awaiting Client Feedback', '#F59E0B', 1)
+) AS sub(name, colour_hex, sort_order)
+CROSS JOIN new_status;
+
+COMMIT;
+END;
+==================================================================================
+
+BEGIN;
+
+WITH new_status AS (
+    INSERT INTO statuses (
+        name,
+        colour_hex,
+        sort_order
+    )
+    VALUES (
+        'Interview',
+        '#EF4444',
+        5
+    )
+    RETURNING id
+)
+INSERT INTO sub_statuses (
+    status_id,
+    name,
+    colour_hex,
+    sort_order
+)
+SELECT
+    new_status.id,
+    sub.name,
+    sub.colour_hex,
+    sub.sort_order
+FROM (
+    VALUES
+        ('L1 Scheduled', '#F59E0B', 1),
+        ('L1 In Progress', '#EF4444', 2), 
+		('L1 Feedback Awaited', '#EF4444', 3),
+		('L1 Interview Cleared', '#EF4444', 4),
+		('L2 Scheduled', '#EF4444', 5),
+		('L2 In Progress', '#EF4444', 6),
+		('L2 Feedback Awaited', '#EF4444', 7),
+		('L2 Coordinating', '#EF4444', 8),
+		('Candidate Availability', '#EF4444', 9)
+) AS sub(name, colour_hex, sort_order)
+CROSS JOIN new_status;
+
+COMMIT;
+END;
+=========================================================================
+
+BEGIN;
+
+WITH new_status AS (
+    INSERT INTO statuses (
+        name,
+        colour_hex,
+        sort_order
+    )
+    VALUES (
+        'Selected',
+        '#10B981',
+        6
+    )
+    RETURNING id
+)
+INSERT INTO sub_statuses (
+    status_id,
+    name,
+    colour_hex,
+    sort_order
+)
+SELECT
+    new_status.id,
+    sub.name,
+    sub.colour_hex,
+    sub.sort_order
+FROM (
+    VALUES
+        ('Offer Release in Progress', '#F59E0B', 1)
+) AS sub(name, colour_hex, sort_order)
+CROSS JOIN new_status;
+
+COMMIT;
+END;
+====================================================================
+BEGIN;
+
+WITH new_status AS (
+    INSERT INTO statuses (
+        name,
+        colour_hex,
+        sort_order
+    )
+    VALUES (
+        'Offer Released',
+        '#059669',
+        7
+    )
+    RETURNING id
+)
+INSERT INTO sub_statuses (
+    status_id,
+    name,
+    colour_hex,
+    sort_order
+)
+SELECT
+    new_status.id,
+    sub.name,
+    sub.colour_hex,
+    sub.sort_order
+FROM (
+    VALUES
+        ('Candidate Consent Awaited', '#F59E0B', 1),
+        ('Onboarding In Progress', '#EF4444', 2)
+) AS sub(name, colour_hex, sort_order)
+CROSS JOIN new_status;
+
+COMMIT;
+END;
+
+=======================================================================
+
+
+BEGIN;
+
+WITH new_status AS (
+    INSERT INTO statuses (
+        name,
+        colour_hex,
+        sort_order
+    )
+    VALUES (
+        'Onboarding',
+        '#0EA5E9',
+        8
+    )
+    RETURNING id
+)
+INSERT INTO sub_statuses (
+    status_id,
+    name,
+    colour_hex,
+    sort_order
+)
+SELECT
+    new_status.id,
+    sub.name,
+    sub.colour_hex,
+    sub.sort_order
+FROM (
+    VALUES
+        ('Onboarding Preparedness', '#F59E0B', 1),
+        ('Visa Details Awaited', '#EF4444', 2), 
+		('Contract Confirmation Awaited', '#EF4444', 3),
+		('Documentation Completed', '#EF4444', 4),
+		('Security Clearance', '#EF4444', 5)
+) AS sub(name, colour_hex, sort_order)
+CROSS JOIN new_status;
+
+COMMIT;
+END;
+
+=======================================================================
+
+
+BEGIN;
+
+WITH new_status AS (
+    INSERT INTO statuses (
+        name,
+        colour_hex,
+        sort_order
+    )
+    VALUES (
+        'Onboarded',
+        '#16A34A',
+        9
+    )
+    RETURNING id
+)
+INSERT INTO sub_statuses (
+    status_id,
+    name,
+    colour_hex,
+    sort_order
+)
+SELECT
+    new_status.id,
+    sub.name,
+    sub.colour_hex,
+    sub.sort_order
+FROM (
+    VALUES
+        ('Onboarded Successfully', '#F59E0B', 1),
+        ('Contract Extended', '#EF4444', 2)
+) AS sub(name, colour_hex, sort_order)
+CROSS JOIN new_status;
+
+COMMIT;
+END;
+
+=========================================================================
+
+BEGIN;
+
+WITH new_status AS (
+    INSERT INTO statuses (
+        name,
+        colour_hex,
+        sort_order
+    )
+    VALUES (
+        'Hold',
+        '#D97706',
+        10
+    )
+    RETURNING id
+)
+INSERT INTO sub_statuses (
+    status_id,
+    name,
+    colour_hex,
+    sort_order
+)
+SELECT
+    new_status.id,
+    sub.name,
+    sub.colour_hex,
+    sub.sort_order
+FROM (
+    VALUES
+        ('Candidate Hold', '#F59E0B', 1),
+        ('Hold by Client', '#EF4444', 2)
+) AS sub(name, colour_hex, sort_order)
+CROSS JOIN new_status;
+
+COMMIT;
+END;
+==================================================================
+
+
+BEGIN;
+
+WITH new_status AS (
+    INSERT INTO statuses (
+        name,
+        colour_hex,
+        sort_order
+    )
+    VALUES (
+        'Rejected',
+        '#DC2626',
+        11
+    )
+    RETURNING id
+)
+INSERT INTO sub_statuses (
+    status_id,
+    name,
+    colour_hex,
+    sort_order
+)
+SELECT
+    new_status.id,
+    sub.name,
+    sub.colour_hex,
+    sub.sort_order
+FROM (
+    VALUES
+        ('Skill', '#F59E0B', 1),
+        ('Rate / High Rate', '#EF4444', 2), 
+		('Location', '#EF4444', 3),
+		('Visa', '#EF4444', 4),
+		('Notice Period', '#EF4444', 5),
+		('Not Promising', '#EF4444', 6),
+		('Mostly Reject', '#EF4444', 7),
+		('Already Applied to Client', '#EF4444', 8),
+		('Client Rejected', '#EF4444', 9)
+) AS sub(name, colour_hex, sort_order)
+CROSS JOIN new_status;
+
+COMMIT;
+END;
+
+===================================================================
+
+
+BEGIN;
+
+WITH new_status AS (
+    INSERT INTO statuses (
+        name,
+        colour_hex,
+        sort_order
+    )
+    VALUES (
+        'Offboarded',
+        '#374151',
+        12
+    )
+    RETURNING id
+)
+INSERT INTO sub_statuses (
+    status_id,
+    name,
+    colour_hex,
+    sort_order
+)
+SELECT
+    new_status.id,
+    sub.name,
+    sub.colour_hex,
+    sub.sort_order
+FROM (
+    VALUES
+        ('Contract Ended', '#F59E0B', 1),
+        ('Contract Terminated', '#EF4444', 2), 
+		('Location', '#EF4444', 3),
+		('Candidate Withdrawn', '#EF4444', 4),
+		('Client Replacement', '#EF4444', 5),
+		('Candidate Left', '#EF4444', 6),
+		('Other', '#EF4444', 7)
+) AS sub(name, colour_hex, sort_order)
+CROSS JOIN new_status;
+
+COMMIT;
+END;
+
+=====================================================================

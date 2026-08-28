@@ -33,9 +33,9 @@ public class SubmissionController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Submission> getSubmissionById(@PathVariable UUID id) {
+    public ResponseEntity<SubmissionDto> getSubmissionById(@PathVariable UUID id) {
 
-        return ResponseEntity.ok(submissionService.getSubmissionById(id));
+        return ResponseEntity.ok(submissionService.getSubmissionDtoById(id));
 
     }
 

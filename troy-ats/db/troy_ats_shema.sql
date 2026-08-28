@@ -50,7 +50,7 @@ CREATE TYPE cv_format AS ENUM (
 );
 
 CREATE TYPE pipeline_stage AS ENUM (
-    'APPLIED', 'SCREENING', 'READY_TO_SUBMIT', 'SUBMITTED', 'INTERVIEW', 'OFFER', 'JOINED'
+    'APPLIED', 'SCREENING', 'READY_TO_SUBMIT', 'SUBMITTED', 'INTERVIEW', 'SELECTED', 'REJECTED', 'ONBOARDING', 'ONBOARDED'
 );
 
 CREATE TYPE offer_status AS ENUM (
@@ -517,11 +517,14 @@ CREATE TABLE notes (
     is_pinned   BOOLEAN     NOT NULL DEFAULT FALSE,
     created_by  UUID        REFERENCES employees (id) ON DELETE SET NULL,
     created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+
+    CONSTRAINT fk_notes_created_by FOREIGN KEY (created_by) REFERENCES employees(id) ON DELETE SET NULL
 );
 
 CREATE INDEX idx_notes_entity    ON notes (entity_type, entity_id);
 CREATE INDEX idx_notes_is_pinned ON notes (is_pinned) WHERE is_pinned = TRUE;
+CREATE INDEX idx_notes_created_by ON notes (created_by);
 
 
 -- ============================================================

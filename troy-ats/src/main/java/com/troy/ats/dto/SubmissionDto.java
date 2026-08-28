@@ -15,10 +15,17 @@ public class SubmissionDto {
     private String candidateName;
     private String candidateDesignation;
     private String candidateCVId;
+    private String candidateOriginalCV;
+    private String candidateEmail;
+    private String candidatePhone;
     private UUID jobId;
+    private String troyJobId;
     private String jobName;
+    private String jobPriority;
     private String clientName;
+    private String endClientName;
     private String pipelineStage;
+    private String BDM;
     private UUID statusId;
     private String statusName;
     private UUID subStatusId;

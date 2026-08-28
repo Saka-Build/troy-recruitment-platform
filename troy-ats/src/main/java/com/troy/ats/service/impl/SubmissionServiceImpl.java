@@ -57,14 +57,31 @@ public class SubmissionServiceImpl implements SubmissionService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Submission> getAllSubmissions() {
         return submissionRepository.findAll();
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Submission getSubmissionById(UUID id) {
         return submissionRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Submission not found: " + id));
+    }
+
+    /**
+     *
+     * @param id
+     * @return
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public SubmissionDto getSubmissionDtoById(UUID id) {
+
+        Submission submission = getSubmissionById(id);
+        SubmissionDto dto = new SubmissionDto();
+        submissionPopulator.populate(submission, dto);
+        return dto;
     }
 
     @Override
@@ -221,6 +238,38 @@ public class SubmissionServiceImpl implements SubmissionService {
 
         return dto;
 
+    }
+
+    /**
+     *
+     * @param statusName
+     * @param subStatusName
+     * @return
+     */
+    @Override
+    public long countSubmissionsByStatusAndSubStatus(String statusName, String subStatusName) {
+        return submissionRepository.countSubmissionsByStatusAndSubStatus(statusName, statusName);
+    }
+
+    /**
+     *
+     * @param statusName
+     * @return
+     */
+    @Override
+    public long countSubmissionsByStatus(String statusName) {
+        return submissionRepository.countSubmissionsByStatus(statusName);
+    }
+
+    /**
+     *
+     * @param statusName
+     * @param subStatusName
+     * @return
+     */
+    @Override
+    public List<Submission> findByStatus_NameIgnoreCaseAndSubStatus_NameIgnoreCase(String statusName, String subStatusName) {
+        return submissionRepository.findByStatus_NameIgnoreCaseAndSubStatus_NameIgnoreCase(statusName,subStatusName);
     }
 
 }
