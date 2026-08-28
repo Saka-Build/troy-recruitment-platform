@@ -50,7 +50,7 @@ public class ReverseSubmissionPopulator {
         if(Objects.nonNull(source.getPipelineStage()) || Objects.nonNull(source.getStatusId())){
             Status status = null;
             if(Objects.nonNull(source.getStatusId())){
-                target.setPipelineStage(PipelineStage.fromValue(status.getName()));
+                status = submissionStatusService.getStatusById(source.getStatusId());
             } else {
                 status = submissionStatusService.getStatusByName(source.getPipelineStage());
             }
