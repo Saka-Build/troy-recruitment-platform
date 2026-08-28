@@ -41,4 +41,29 @@ public interface SubmissionRepository extends JpaRepository<Submission, UUID>, J
             @Param("pipelineStage") PipelineStage pipelineStage
     );
 
+    @Query("""
+        SELECT COUNT(s)
+        FROM Submission s
+        WHERE LOWER(s.status.name) = LOWER(:statusName)
+          AND LOWER(s.subStatus.name) = LOWER(:subStatusName)
+    """)
+    long countSubmissionsByStatusAndSubStatus(
+            @Param("statusName") String statusName,
+            @Param("subStatusName") String subStatusName
+    );
+
+    @Query("""
+        SELECT COUNT(s)
+        FROM Submission s
+        WHERE LOWER(s.status.name) = LOWER(:statusName)
+    """)
+    long countSubmissionsByStatus(
+            @Param("statusName") String statusName
+    );
+
+    List<Submission> findByStatus_NameIgnoreCaseAndSubStatus_NameIgnoreCase(
+            String statusName,
+            String subStatusName
+    );
+
 }

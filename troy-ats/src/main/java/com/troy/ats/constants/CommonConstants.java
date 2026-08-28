@@ -1,10 +1,20 @@
 package com.troy.ats.constants;
 
+import com.troy.ats.entity.Interview;
+
 public final class CommonConstants {
 
-    public static final String CANDIDATE_STATUS_ONBOARDED = "Onboarded";
-    public static final String CANDIDATE_STATUS_READY_TO_SUBMIT = "Ready to Submit";
-    public static final String CANDIDATE_SUBSTATUS_CANDIDATE_CONFIRMATION_AWAITED = "Candidate confirmation awaited";
+    public static final String CANDIDATE_STATUS_ACTIVE = "Active";
+    public static final String CANDIDATE_STATUS_INACTIVE= "InActive";
+    public static final String CANDIDATE_SUBSTATUS_BLACKLISTED = "Blacklisted";
+    public static final String SUBMISSION_STATUS_INTERVIEW = "Interview";
+    public static final String SUBMISSION_SUBSTATUS_L1FEEDBACK = "L1 Feedback Awaited";
+    public static final String SUBMISSION_SUBSTATUS_L2FEEDBACK = "L2 Feedback Awaited";
+    public static final String SUBMISSION_STATUS_SELECTED = "Selected";
+    public static final String SUBMISSION_STATUS_OFFER_RELEASED = "Offer Released";
+    public static final String SUBMISSION_SUBSTATUS_CANDIDATE_CONSENT_AWAITING = "Candidate Consent Awaited";
+    public static final String SUBMISSION_STATUS_READY_TO_SUBMIT = "Ready_to_Submit";
+    public static final String SUBMISSION_SUBSTATUS_CANDIDATE_CONF_AWAITING = "Candidate Confirmation Awaited";
     public static final String JOB_PRIORITY_URGENT = "urgent";
     public static final String STATUS_DROPDOWN = "statuses";
     public static final String SUB_STATUS_DROPDOWN = "substatuses";

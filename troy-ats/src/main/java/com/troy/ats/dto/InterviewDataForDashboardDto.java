@@ -1,5 +1,6 @@
 package com.troy.ats.dto;
 
+import com.troy.ats.enums.InterviewOutcome;
 import com.troy.ats.enums.InterviewType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -17,7 +18,8 @@ public class InterviewDataForDashboardDto {
     private String candidateName;
     private String skillName;
     private String jobName;
-    private InterviewType interviewType;
+    private String interviewType;
+    private String interviewStatus;
     private LocalTime interviewTime;
     private LocalDate interviewDate;
     private String interviewLink;

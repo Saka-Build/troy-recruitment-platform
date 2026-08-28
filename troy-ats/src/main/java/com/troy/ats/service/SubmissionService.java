@@ -7,6 +7,7 @@ import com.troy.ats.searchfilter.dto.ClientFilter;
 import com.troy.ats.searchfilter.dto.SubmissionFilter;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.UUID;
@@ -87,5 +88,28 @@ public interface SubmissionService {
      * @return
      */
     CountSubmissionsByPipelineStageDto submissionCountsByPipelines();
+
+    /**
+     *
+     * @param statusName
+     * @param subStatusName
+     * @return
+     */
+    long countSubmissionsByStatusAndSubStatus(String statusName, String subStatusName);
+
+    /**
+     *
+     * @param statusName
+     * @return
+     */
+    long countSubmissionsByStatus(String statusName);
+
+    /**
+     *
+     * @param statusName
+     * @param subStatusName
+     * @return
+     */
+    List<Submission> findByStatus_NameIgnoreCaseAndSubStatus_NameIgnoreCase(String statusName, String subStatusName);
 
 }
