@@ -60,6 +60,10 @@ public final class CommonUtil {
     }
 
     public static MediaType getMediaType(CvFormat format) {
+        if (format == null) {
+            return MediaType.APPLICATION_OCTET_STREAM;
+        }
+
         return switch (format) {
             case PDF -> MediaType.APPLICATION_PDF;
             case DOC -> MediaType.parseMediaType("application/msword");
@@ -81,25 +85,21 @@ public final class CommonUtil {
         };
     }
 
+
     public static CvFormat determineCvFormat(MultipartFile file) {
 
-        String contentType = file.getContentType();
-
-        if ("application/pdf".equalsIgnoreCase(contentType)) {
-            return CvFormat.PDF;
+        if (file == null || file.isEmpty()) {
+            return null;
         }
 
-        if ("application/msword".equalsIgnoreCase(contentType)) {
-            return CvFormat.DOC;
-        }
+        String extension = getExtension(file.getOriginalFilename());
 
-        if ("application/vnd.openxmlformats-officedocument.wordprocessingml.document".equalsIgnoreCase(contentType)) {
-            return CvFormat.DOCX;
-        }
-
-        throw new IllegalArgumentException(
-                "Only PDF, DOC and DOCX files are supported"
-        );
+        return switch (extension) {
+            case ".pdf" -> CvFormat.PDF;
+            case ".doc" -> CvFormat.DOC;
+            case ".docx" -> CvFormat.DOCX;
+            default -> null;
+        };
     }
 
     public static String getExtension(String fileName) {
@@ -116,15 +116,36 @@ public final class CommonUtil {
         return fileName.substring(index).toLowerCase();
     }
 
+
+    public static String getFileName(String fileRef) {
+
+        if (fileRef == null || fileRef.isBlank()) {
+            throw new IllegalArgumentException("Invalid file reference");
+        }
+
+        int index = Math.max(fileRef.lastIndexOf('/'), fileRef.lastIndexOf('\\'));
+
+        return fileRef.substring(index + 1);
+    }
+
+
+    private static final Set<String> BLOCKED_EXTENSIONS =
+            Set.of(
+                    ".exe", ".msi", ".bat", ".cmd", ".com", ".scr", ".cpl", ".dll",
+                    ".sh", ".bash", ".ps1", ".psm1", ".vbs", ".vbe", ".js", ".jse",
+                    ".jar", ".apk", ".app", ".deb", ".rpm", ".pkg", ".dmg"
+            );
+
     public static void validateExtension(String extension) {
 
-        List<String> extensions = List.of(
-                ".pdf",".doc", ".docx", ".jpeg", ".png", ".webp", ".jpg"
-        );
+        if (extension == null || extension.isBlank()) {
+            throw new IllegalArgumentException("File must have an extension");
+        }
 
-        if (!extensions.contains(extension)) {
+        if (BLOCKED_EXTENSIONS.contains(extension.toLowerCase(Locale.ROOT))) {
 
-            throw new IllegalArgumentException("Only PDF, DOC and DOCX files are supported");
+            throw new IllegalArgumentException(
+                    "Executable and script files are not allowed: " + extension);
         }
     }
 

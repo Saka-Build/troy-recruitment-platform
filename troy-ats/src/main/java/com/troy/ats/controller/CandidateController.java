@@ -5,9 +5,8 @@ import com.troy.ats.entity.Candidate;
 import com.troy.ats.exception.ApiResponse;
 import com.troy.ats.searchfilter.dto.CandidateFilter;
 import com.troy.ats.service.CandidateService;
+import com.troy.ats.service.FileStorageService;
 import com.troy.ats.util.CommonUtil;
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -21,9 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.net.URL;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Locale;
@@ -38,8 +35,11 @@ public class CandidateController {
 
     private final CandidateService candidateService;
 
-    public CandidateController(CandidateService candidateService) {
+    private final FileStorageService fileStorageService;
+
+    public CandidateController(CandidateService candidateService, FileStorageService fileStorageService) {
         this.candidateService = candidateService;
+        this.fileStorageService = fileStorageService;
     }
 
     @GetMapping
@@ -115,32 +115,29 @@ public class CandidateController {
         candidateService.deleteCandidate(id);
     }
 
+    /**
+     * Returns a short-lived S3 URL rather than the bytes, so the download does
+     * not stream through the application. The client opens the returned url.
+     */
     @GetMapping("/{candidateId}/download/cv/{cvType}")
-    public ResponseEntity<Resource> downloadCv(
+    public ResponseEntity<FileDownloadDto> downloadCv(
             @PathVariable UUID candidateId, @PathVariable String cvType) {
 
         Candidate candidate = candidateService.getCandidateById(candidateId);
         if(Objects.isNull(candidate)){
             return ResponseEntity.notFound().build();
         }
-        String cvUrl = cvType.toLowerCase(Locale.ROOT).contains(CANDIDATE_CV_TYPE_TROY) ? candidate.getTroyCvUrl() : candidate.getOriginalCvUrl();
+        String cvKey = cvType.toLowerCase(Locale.ROOT).contains(CANDIDATE_CV_TYPE_TROY) ? candidate.getTroyCvUrl() : candidate.getOriginalCvUrl();
 
-        Path path = Paths.get(cvUrl);
-        if (!Files.exists(path) || !Files.isReadable(path)) {
+        if (Objects.isNull(cvKey) || cvKey.isBlank()) {
             return ResponseEntity.notFound().build();
         }
 
-        Resource resource = new FileSystemResource(path);
-        String fileName = path.getFileName().toString();
-        MediaType mediaType = CommonUtil.getMediaType(candidate.getOriginalCvFormat());
+        String fileName = CommonUtil.getFileName(cvKey);
+        URL url = fileStorageService.presignedUrl(cvKey, fileName);
 
-        return ResponseEntity.ok()
-                .contentType(mediaType)
-                .header(
-                        HttpHeaders.CONTENT_DISPOSITION,
-                        "attachment; filename=\"" + fileName + "\""
-                )
-                .body(resource);
+        return ResponseEntity.ok(new FileDownloadDto(
+                url.toString(), fileName, fileStorageService.getPresignTtlMinutes()));
     }
 
     @PostMapping("/{id}/send/email/{emailType}")

@@ -25,7 +25,13 @@ spring:
       port: 6379
 
   profiles:
+    # Selects the RefreshTokenService impl: database | redis | test.
+    # Has no matching application-*.yaml - it is a bean-selection profile only.
     active: database
+    # Activating prod replaces `active`, so pull the token store back in
+    # explicitly - AuthController has no RefreshTokenService bean without it.
+    group:
+      prod: database
 
 
   datasource:
@@ -53,13 +59,13 @@ spring:
 server:
   port: 8080
 
-aws:
-  region: ap-south  -1
-  s3:
-    bucket-name: troy-ats-uploads-prod
-    upload-original-cv-dir: upload/originalcv
-    upload-troy-cv-dir: upload/troycv
-    upload-photo-dir: upload/employee/photo
+# Defaults are the Windows paths used when running from the IDE. In Docker the
+# UPLOAD_* env vars in docker-compose.yml point these at the mounted volume -
+# a C:/... path inside the Linux container would resolve relative to /app.
+file:
+  upload-original-cv-dir: ${UPLOAD_ORIGINAL_CV_DIR:C:/work/Docs-Troy-ats/upload/originalcv}
+  upload-troy-cv-dir: ${UPLOAD_TROY_CV_DIR:C:/work/Docs-Troy-ats/upload/troycv}
+  upload-photo-dir: ${UPLOAD_PHOTO_DIR:C:/work/Docs-Troy-ats/upload/employee/photo}
 
 logging:
   level:
@@ -70,9 +76,8 @@ logging:
 
 app:
   logging:
-    dir: ${LOG_DIR}
+    dir: ${LOG_DIR:logs}
   jwt:
     secret: ${JWT_SECRET}
     access-ttl-minutes: 30
     refresh-ttl-days: 2
-
