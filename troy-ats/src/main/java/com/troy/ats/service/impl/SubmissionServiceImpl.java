@@ -240,4 +240,36 @@ public class SubmissionServiceImpl implements SubmissionService {
 
     }
 
+    /**
+     *
+     * @param statusName
+     * @param subStatusName
+     * @return
+     */
+    @Override
+    public long countSubmissionsByStatusAndSubStatus(String statusName, String subStatusName) {
+        return submissionRepository.countSubmissionsByStatusAndSubStatus(statusName, statusName);
+    }
+
+    /**
+     *
+     * @param statusName
+     * @return
+     */
+    @Override
+    public long countSubmissionsByStatus(String statusName) {
+        return submissionRepository.countSubmissionsByStatus(statusName);
+    }
+
+    /**
+     *
+     * @param statusName
+     * @param subStatusName
+     * @return
+     */
+    @Override
+    public List<Submission> findByStatus_NameIgnoreCaseAndSubStatus_NameIgnoreCase(String statusName, String subStatusName) {
+        return submissionRepository.findByStatus_NameIgnoreCaseAndSubStatus_NameIgnoreCase(statusName,subStatusName);
+    }
+
 }

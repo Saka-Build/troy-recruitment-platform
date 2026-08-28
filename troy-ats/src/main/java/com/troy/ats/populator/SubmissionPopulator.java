@@ -26,10 +26,16 @@ public class SubmissionPopulator {
         target.setCandidateCVId(source.getCandidate().getCvId());
         target.setCandidateName(source.getCandidate().getFullName());
         target.setCandidateDesignation(source.getCandidate().getCurrentDesignation());
+        target.setCandidateEmail(source.getCandidate().getEmail());
+        target.setCandidatePhone(source.getCandidate().getPhone());
+        target.setCandidateOriginalCV(source.getCandidate().getOriginalCvUrl());
 
         target.setJobId(source.getJob().getId());
+        target.setTroyJobId(source.getJob().getJobId());
         target.setJobName(source.getJob().getTitle());
+        target.setJobPriority(enumToStringFormat(source.getJob().getPriority()));
         target.setClientName(source.getJob().getClient().getName());
+        target.setEndClientName(source.getJob().getEndClient().getName());
 
         target.setPipelineStage(enumToStringFormat(source.getPipelineStage().name()));
 

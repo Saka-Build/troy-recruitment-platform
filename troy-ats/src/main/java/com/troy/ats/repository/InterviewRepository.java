@@ -2,6 +2,7 @@ package com.troy.ats.repository;
 
 import com.troy.ats.entity.Interview;
 import com.troy.ats.enums.InterviewOutcome;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -15,6 +16,12 @@ public interface InterviewRepository extends JpaRepository<Interview, UUID> {
     List<Interview> findByCandidateId(UUID candidateId);
     List<Interview> findByJobId(UUID jobId);
     List<Interview> findByInterviewDate(LocalDate date);
+
+    @EntityGraph(attributePaths = {
+            "candidate",
+            "job",
+            "job.client"
+    })
     List<Interview> findByInterviewDateTimeWithZoneGreaterThanEqualAndInterviewDateTimeWithZoneLessThanOrderByInterviewDateTimeWithZoneDesc(Instant start, Instant end);
 
     // Count interviews with a particular outcome and no feedback
