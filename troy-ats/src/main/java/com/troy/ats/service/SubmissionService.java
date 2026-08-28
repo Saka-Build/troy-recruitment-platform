@@ -28,6 +28,13 @@ public interface SubmissionService {
 
     /**
      *
+     * @param id
+     * @return
+     */
+    SubmissionDto getSubmissionDtoById(UUID id);
+
+    /**
+     *
      * @param request
      * @return
      */
