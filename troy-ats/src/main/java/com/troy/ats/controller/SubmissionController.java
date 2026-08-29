@@ -42,13 +42,15 @@ public class SubmissionController {
     @GetMapping
     public ResponseEntity<Page<SubmissionDto>> getSubmissions(@RequestParam(required = false) String search,
                                                       @RequestParam(required = false) String pipelineStage,
+                                                      @RequestParam(required = false) String statusName,
+                                                      @RequestParam(required = false) String subStatusName,
                                                       @RequestParam(required = false) UUID candidateId,
                                                       @RequestParam(required = false) UUID jobId,
                                                       @RequestParam(required = false) OffsetDateTime createdFrom,
                                                       @RequestParam(required = false) OffsetDateTime createdTo,
                                                       @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
 
-        SubmissionFilter filter = new SubmissionFilter(search, pipelineStage, candidateId, jobId, createdFrom, createdTo);
+        SubmissionFilter filter = new SubmissionFilter(search, pipelineStage, statusName, subStatusName, candidateId, jobId, createdFrom, createdTo);
 
         return ResponseEntity.ok(submissionService.getSubmissions(filter, pageable));
     }
