@@ -1,13 +1,14 @@
 package com.troy.ats.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.util.UUID;
 
-@Getter
-@Setter
+@Data
 public class SubmissionDto {
 
     private UUID submissionId;
@@ -24,8 +25,9 @@ public class SubmissionDto {
     private String jobPriority;
     private String clientName;
     private String endClientName;
+    @JsonProperty("BDM")
+    private String bdm;
     private String pipelineStage;
-    private String BDM;
     private UUID statusId;
     private String statusName;
     private UUID subStatusId;
