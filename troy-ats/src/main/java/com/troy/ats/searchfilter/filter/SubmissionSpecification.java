@@ -28,16 +28,26 @@ public class SubmissionSpecification {
                 Predicate namePredicate = cb.like(cb.lower(root.get("candidate").get("fullName")), search);
                 Predicate designationPredicate = cb.like(cb.lower(root.get("candidate").get("currentDesignation")), search);
                 Predicate cvIdPredicate = cb.like(cb.lower(root.get("candidate").get("cvId")), search);
+                Predicate statusNamePredicate = cb.like(cb.lower(root.get("status").get("name")), search);
+                Predicate subStatusnamePredicate = cb.like(cb.lower(root.get("subStatus").get("name")), search);
                 Predicate jobNamePredicate = cb.like(cb.lower(root.get("job").get("title")), search);
                 Expression<String> skills = cb.function("array_to_string", String.class, root.get("job").get("skillsRequired"), cb.literal(","));
                 Predicate skillsPredicate = cb.like(cb.lower(skills), "%" + search.toLowerCase() + "%");
 
-                predicates.add(cb.or(namePredicate, designationPredicate, cvIdPredicate,jobNamePredicate,skillsPredicate));
+                predicates.add(cb.or(namePredicate, designationPredicate, cvIdPredicate, statusNamePredicate, subStatusnamePredicate, jobNamePredicate,skillsPredicate));
             }
 
             //pipelineStage
             if (filter.pipelineStage() != null) {
                 predicates.add(cb.equal(root.get("pipelineStage"), PipelineStage.fromValue(filter.pipelineStage())));
+            }
+            //status name
+            if (filter.statusName() != null) {
+                predicates.add(cb.like(root.get("status").get("name"), filter.statusName()));
+            }
+            //sub status name
+            if (filter.subStatusName() != null) {
+                predicates.add(cb.like(root.get("subStatus").get("name"), filter.subStatusName()));
             }
             // candidate
             if (filter.candidateId() != null) {
