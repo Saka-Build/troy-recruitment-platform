@@ -35,6 +35,7 @@ public class SubmissionPopulator {
         target.setJobName(source.getJob().getTitle());
         target.setJobPriority(enumToStringFormat(source.getJob().getPriority()));
         target.setClientName(source.getJob().getClient().getName());
+        target.setBdm(source.getJob().getClient().getSource());
         target.setEndClientName(source.getJob().getEndClient().getName());
 
         target.setPipelineStage(enumToStringFormat(source.getPipelineStage().name()));
