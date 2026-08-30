@@ -12,8 +12,12 @@ public enum PipelineStage {
         if (value == null) {
             return null;
         }
+        String normalizedValue = value.trim().toUpperCase(Locale.ROOT);
 
-        return PipelineStage.valueOf(
-                value.trim().toUpperCase(Locale.ROOT));
+        try {
+            return PipelineStage.valueOf(normalizedValue);
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
     }
 }
