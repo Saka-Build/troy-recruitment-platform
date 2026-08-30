@@ -53,13 +53,13 @@ public class ReverseSubmissionPopulator {
                 status = submissionStatusService.getStatusById(source.getStatusId());
             } else {
                 status = submissionStatusService.getStatusByName(source.getPipelineStage());
+                target.setPipelineStage(PipelineStage.fromValue(status.getName()));
             }
             String field = getFieldName(Submission.class, "setStatus", Status.class);
             String oldValue = Objects.nonNull(target.getStatus()) ? target.getStatus().getName() : null;
             populateActivityLog(entityType, entityId, field, oldValue, status.getName(),activityLogs);
 
             target.setStatus(status);
-            target.setPipelineStage(PipelineStage.fromValue(status.getName()));
             target.setSubStatus(null);
         }
 
