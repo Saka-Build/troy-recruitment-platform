@@ -60,6 +60,7 @@ public class ReverseSubmissionPopulator {
 
             target.setStatus(status);
             target.setPipelineStage(PipelineStage.fromValue(status.getName()));
+            target.setSubStatus(null);
         }
 
         if(Objects.nonNull(source.getSubStatusId())) {

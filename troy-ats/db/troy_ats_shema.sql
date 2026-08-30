@@ -156,21 +156,6 @@ CREATE TABLE statuses (
 
 CREATE UNIQUE INDEX idx_statuses_name_active ON statuses (name) WHERE is_active = TRUE;
 
--- Seed common statuses
-INSERT INTO statuses (name, colour_hex, sort_order, show_in_pipeline) VALUES
-      ('Applied',          '#6B7280', 1, TRUE),
-      ('Screening',         '#3B82F6', 2, TRUE),
-      ('Ready_to_Submit',   '#8B5CF6', 3, TRUE),
-      ('Submitted',         '#F59E0B', 4, TRUE),
-      ('Interview',         '#EF4444', 5, TRUE),
-      ('Selected',          '#10B981', 6, TRUE),
-      ('Offer Released',    '#059669', 7, FALSE),
-      ('Onboarding',        '#0EA5E9', 8, FALSE),
-      ('Onboarded',         '#16A34A', 9, TRUE),
-      ('Hold',              '#D97706', 10, FALSE),
-      ('Rejected',          '#DC2626', 11, FALSE),
-      ('Offboarded',        '#374151', 12, FALSE);
-
 
 -- ============================================================
 -- 4. SUB-STATUS MASTER  (mapped to a parent status)
@@ -612,7 +597,7 @@ INSERT INTO countries (code, name) VALUES
                                        ('QA', 'Qatar');
 
 -- ================================================================
--- Role Schema start
+-- Start User Role Schema
 -- ===================================================================
 
 CREATE TABLE roles (
@@ -667,130 +652,8 @@ CREATE INDEX idx_user_roles_user ON user_roles(user_id);
 CREATE INDEX idx_user_roles_role ON user_roles(role_id);
 CREATE INDEX idx_user_roles_active ON user_roles(active);
 
--- ======================================================================
--- Initial Admin role setup to Admin user
---===================================================================================
-
--- =========================================================
--- 1. Create ADMIN role
--- =========================================================
-
-INSERT INTO roles (
-    id,
-    name,
-    description,
-    created_at,
-    updated_at
-)
-VALUES (
-           gen_random_uuid(),
-           'ADMIN',
-           'Administrator role',
-           NOW(),
-           NOW()
-       )
-    ON CONFLICT (name) DO NOTHING;
-
-
--- =========================================================
--- 2. Create all permissions
--- =========================================================
-
-INSERT INTO permissions (
-    id,
-    module,
-    action,
-    description
-)
-VALUES
-    (gen_random_uuid(), 'USER',       'READ',   'USER READ'),
-    (gen_random_uuid(), 'USER',       'WRITE',  'USER WRITE'),
-    (gen_random_uuid(), 'USER',       'DELETE', 'USER DELETE'),
-
-    (gen_random_uuid(), 'ROLE',       'READ',   'ROLE READ'),
-    (gen_random_uuid(), 'ROLE',       'WRITE',  'ROLE WRITE'),
-    (gen_random_uuid(), 'ROLE',       'DELETE', 'ROLE DELETE'),
-
-    (gen_random_uuid(), 'PERMISSION', 'READ',   'PERMISSION READ'),
-    (gen_random_uuid(), 'PERMISSION', 'WRITE',  'PERMISSION WRITE'),
-    (gen_random_uuid(), 'PERMISSION', 'DELETE', 'PERMISSION DELETE'),
-
-    (gen_random_uuid(), 'CLIENT',     'READ',   'CLIENT READ'),
-    (gen_random_uuid(), 'CLIENT',     'WRITE',  'CLIENT WRITE'),
-    (gen_random_uuid(), 'CLIENT',     'DELETE', 'CLIENT DELETE'),
-
-    (gen_random_uuid(), 'JOB',        'READ',   'JOB READ'),
-    (gen_random_uuid(), 'JOB',        'WRITE',  'JOB WRITE'),
-    (gen_random_uuid(), 'JOB',        'DELETE', 'JOB DELETE'),
-
-    (gen_random_uuid(), 'CANDIDATE',  'READ',   'CANDIDATE READ'),
-    (gen_random_uuid(), 'CANDIDATE',  'WRITE',  'CANDIDATE WRITE'),
-    (gen_random_uuid(), 'CANDIDATE',  'DELETE', 'CANDIDATE DELETE'),
-
-    (gen_random_uuid(), 'SUBMISSION', 'READ',   'SUBMISSION READ'),
-    (gen_random_uuid(), 'SUBMISSION', 'WRITE',  'SUBMISSION WRITE'),
-    (gen_random_uuid(), 'SUBMISSION', 'DELETE', 'SUBMISSION DELETE'),
-
-    (gen_random_uuid(), 'INTERVIEW',  'READ',   'INTERVIEW READ'),
-    (gen_random_uuid(), 'INTERVIEW',  'WRITE',  'INTERVIEW WRITE'),
-    (gen_random_uuid(), 'INTERVIEW',  'DELETE', 'INTERVIEW DELETE')
-
-    ON CONFLICT DO NOTHING;
-
-
--- =========================================================
--- 3. Give ADMIN all permissions
--- =========================================================
-
-INSERT INTO role_permissions (
-    id,
-    role_id,
-    permission_id,
-    created_at
-)
-SELECT
-    gen_random_uuid(),
-    r.id,
-    p.id,
-    NOW()
-FROM roles r
-         CROSS JOIN permissions p
-WHERE r.name = 'ADMIN'
-    ON CONFLICT (role_id, permission_id) DO NOTHING;
-
-
--- =========================================================
--- 4. Assign ADMIN to employee
--- =========================================================
-
-INSERT INTO user_roles (
-    id,
-    user_id,
-    role_id,
-    assigned_by,
-    assigned_at,
-    expires_at,
-    active
-)
-SELECT
-    gen_random_uuid(),
-    e.id,
-    r.id,
-    NULL,
-    NOW(),
-    NULL,
-    TRUE
-FROM employees e
-         JOIN roles r
-              ON r.name = 'ADMIN'
-WHERE e.official_email = 'biswa.sahu@troy.com'
-    ON CONFLICT (user_id, role_id)
-DO UPDATE SET
-    active = TRUE,
-           expires_at = NULL;
-
 -- ========================================================================
--- Role Schema End
+-- End User Role Schema
 -- ==================================================================================
 
 -- ============================================================
