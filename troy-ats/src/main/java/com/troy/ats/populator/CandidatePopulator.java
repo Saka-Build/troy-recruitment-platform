@@ -45,14 +45,29 @@ public class CandidatePopulator {
         target.setVisaStatus(source.getVisaStatus());
         target.setSource(source.getSource());
         target.setLinkedinUrl(source.getLinkedinUrl());
-        target.setStatus(enumToStringFormat(source.getStatus().name()));
+        if(source.getStatus() != null){
+            target.setStatus(enumToStringFormat(source.getStatus().name()));
+        }
+
         target.setEducation(source.getEducation());
-        target.setCurrentSalaryAmount(source.getCurrentSalaryAmount());
-        target.setCurrentSalaryCurrency(source.getCurrentSalaryCurrency().name());
-        target.setCurrentSalaryPeriod(source.getCurrentSalaryPeriod().name().toLowerCase(Locale.ROOT));
+        if(source.getCurrentSalaryAmount() != null){
+            target.setCurrentSalaryAmount(source.getCurrentSalaryAmount());
+        }
+        if(source.getCurrentSalaryCurrency() != null){
+            target.setCurrentSalaryCurrency(source.getCurrentSalaryCurrency().name());
+        }
+        if(source.getCurrentSalaryPeriod() != null){
+            target.setCurrentSalaryPeriod(source.getCurrentSalaryPeriod().name().toLowerCase(Locale.ROOT));
+        }
+
         target.setExpectedSalaryAmount(source.getExpectedSalaryAmount());
-        target.setExpectedSalaryCurrency(source.getExpectedSalaryCurrency().name());
-        target.setExpectedSalaryPeriod(source.getExpectedSalaryPeriod().name().toLowerCase(Locale.ROOT));
+        if(source.getExpectedSalaryCurrency() != null){
+            target.setExpectedSalaryCurrency(source.getExpectedSalaryCurrency().name());
+        }
+        if(source.getExpectedSalaryPeriod() != null){
+            target.setExpectedSalaryPeriod(source.getExpectedSalaryPeriod().name().toLowerCase(Locale.ROOT));
+        }
+
         target.setOriginalCvUrl(source.getOriginalCvUrl());
         target.setOriginalCvFormat(source.getOriginalCvFormat());
         target.setTroyCvUrl(source.getTroyCvUrl());
