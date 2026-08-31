@@ -62,9 +62,11 @@ public class JobPopulator {
             target.setCountryCode(source.getCountry().getCode());
             target.setCountryName(source.getCountry().getName());
         }
+        if(source.getWorkMode() != null){
+            target.setWorkMode(enumToStringFormat(source.getWorkMode().name()));
+            target.setJobType(enumToStringFormat(source.getJobType().name()));
+        }
 
-        target.setWorkMode(enumToStringFormat(source.getWorkMode().name()));
-        target.setJobType(enumToStringFormat(source.getJobType().name()));
         target.setIndustry(source.getIndustry());
 
         target.setExperienceMin(source.getExperienceMin());
@@ -72,7 +74,10 @@ public class JobPopulator {
 
         target.setSkillsRequired(source.getSkillsRequired());
 
-        target.setStatus(enumToStringFormat(source.getStatus().name()));
+        if(source.getWorkMode() != null){
+            target.setStatus(enumToStringFormat(source.getStatus().name()));
+        }
+
         target.setPriority(enumToStringFormat(source.getPriority()));
 
         target.setLeadNote(source.getLeadNote());
@@ -83,11 +88,21 @@ public class JobPopulator {
         target.setTemplateName(source.getTemplateName());
 
         target.setClientRateAmount(source.getClientRateAmount());
-        target.setClientRateCurrency(source.getClientRateCurrency().name());
-        target.setClientRatePeriod(source.getClientRatePeriod().name().toLowerCase(Locale.ROOT));
+        if(source.getClientRateCurrency() != null){
+            target.setClientRateCurrency(source.getClientRateCurrency().name());
+        }
+        if(source.getClientRatePeriod() != null){
+            target.setClientRatePeriod(source.getClientRatePeriod().name().toLowerCase(Locale.ROOT));
+        }
+
         target.setCandidateRateAmount(source.getCandidateRateAmount());
-        target.setCandidateRateCurrency(source.getCandidateRateCurrency().name());
-        target.setCandidateRatePeriod(source.getCandidateRatePeriod().name().toLowerCase(Locale.ROOT));
+        if(source.getCandidateRateCurrency() != null){
+            target.setCandidateRateCurrency(source.getCandidateRateCurrency().name());
+        }
+        if(source.getCandidateRatePeriod() != null){
+            target.setCandidateRatePeriod(source.getCandidateRatePeriod().name().toLowerCase(Locale.ROOT));
+        }
+
 
         // Owner
         if (source.getOwner() != null) {
