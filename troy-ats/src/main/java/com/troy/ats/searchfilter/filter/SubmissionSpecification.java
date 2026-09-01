@@ -41,6 +41,10 @@ public class SubmissionSpecification {
             if (filter.pipelineStage() != null) {
                 predicates.add(cb.equal(root.get("pipelineStage"), PipelineStage.fromValue(filter.pipelineStage())));
             }
+            //status id
+            if (filter.statusId() != null) {
+                predicates.add(cb.equal(root.get("status").get("id"), filter.statusId()));
+            }
             //status name
             if (filter.statusName() != null) {
                 predicates.add(cb.like(root.get("status").get("name"), filter.statusName()));

@@ -6,6 +6,7 @@ import java.util.UUID;
 public record SubmissionFilter(
         String search,
         String pipelineStage,
+        UUID statusId,
         String statusName,
         String subStatusName,
         UUID candidateId,
