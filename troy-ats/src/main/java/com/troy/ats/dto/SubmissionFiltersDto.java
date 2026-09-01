@@ -17,5 +17,6 @@ public class SubmissionFiltersDto {
 
     List<JobsForSubmissionFiltersDto> jobs;
     List<ClientsForSubmissionFiltersDto> clients;
+    List<SubmissionStatus> applicationStatusList;
 
 }

@@ -298,6 +298,8 @@ public class SubmissionServiceImpl implements SubmissionService {
                                             return jobsDto;
                                         }).toList();
 
+        List<SubmissionStatus> submissionStatuses = submissionStatusService.getAllActiveStatus();
+
         SubmissionFiltersDto submissionFiltersDto = new SubmissionFiltersDto();
 
         submissionFiltersDto.setTotalSubmittedApplications(getTotalCVSubmissionsByPipelineStage(PipelineStage.SUBMITTED));
@@ -305,6 +307,7 @@ public class SubmissionServiceImpl implements SubmissionService {
         submissionFiltersDto.setTotalOnboardedApplications(getTotalCVSubmissionsByPipelineStage(PipelineStage.ONBOARDED));
         submissionFiltersDto.setJobs(jobs);
         submissionFiltersDto.setClients(clients);
+        submissionFiltersDto.setApplicationStatusList(submissionStatuses);
 
         return submissionFiltersDto;
     }
