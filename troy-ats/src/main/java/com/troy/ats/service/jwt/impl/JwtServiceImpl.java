@@ -19,7 +19,7 @@ public class JwtServiceImpl implements JwtService {
 
     public JwtServiceImpl(
             @Value("${app.jwt.secret}") String secret,
-            @Value("${app.jwt.access-ttl-minutes:10}") long accessTtlMinutes
+            @Value("${app.jwt.access-ttl-minutes:60}") long accessTtlMinutes
     ) {
         // secret must be >= 256 bits for HS256. Load from env/secret manager, never hardcode.
         this.signingKey = Keys.hmacShaKeyFor(secret.getBytes());

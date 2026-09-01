@@ -13,6 +13,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -32,9 +33,11 @@ import java.util.UUID;
 @RequestMapping("/api/v1/auth")
 public class AuthController {
 
+    @Value("${app.jwt.access-ttl-minutes:60}")
+    private long accessTokenTtlMinutes;
+
     private static final int MAX_FAILED_ATTEMPTS = 5;
     private static final long LOCKOUT_MINUTES = 15;
-    private static final long ACCESS_TOKEN_TTL_SECONDS = 60 * 60;
 
     // One shared constant so "no such user" and "wrong password" are byte-identical
     // to the caller - anything else lets an attacker enumerate valid emails.
@@ -116,7 +119,7 @@ public class AuthController {
         TokenResponse tokenResponse = new TokenResponse();
         tokenResponse.setAccessToken(accessToken);
         tokenResponse.setRefreshToken(refreshToken);
-        tokenResponse.setExpiresInSeconds(ACCESS_TOKEN_TTL_SECONDS);
+        tokenResponse.setExpiresInSeconds(accessTokenTtlMinutes * 60);
 
         tokenResponse = roleService.getActiveRolesForToken(tokenResponse, user.getId(), selectedRole.getRole().getId());
 
@@ -152,7 +155,7 @@ public class AuthController {
         TokenResponse tokenResponse = new TokenResponse();
         tokenResponse.setAccessToken(accessToken);
         tokenResponse.setRefreshToken(newRefreshToken);
-        tokenResponse.setExpiresInSeconds(ACCESS_TOKEN_TTL_SECONDS);
+        tokenResponse.setExpiresInSeconds(accessTokenTtlMinutes * 60);
 
         tokenResponse = roleService.getActiveRolesForToken(tokenResponse, user.getId(), selectedRole.getRole().getId());
 
@@ -209,7 +212,7 @@ public class AuthController {
 
         TokenResponse tokenResponse = new TokenResponse();
         tokenResponse.setAccessToken(accessToken);
-        tokenResponse.setExpiresInSeconds(ACCESS_TOKEN_TTL_SECONDS);
+        tokenResponse.setExpiresInSeconds(accessTokenTtlMinutes * 60);
 
         tokenResponse = roleService.getActiveRolesForToken(tokenResponse, user.getId(), selectedRole.getRole().getId());
 
