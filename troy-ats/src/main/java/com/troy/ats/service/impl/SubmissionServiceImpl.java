@@ -1,29 +1,34 @@
 package com.troy.ats.service.impl;
 
 import com.troy.ats.dto.*;
-import com.troy.ats.entity.ActivityLog;
-import com.troy.ats.entity.Status;
-import com.troy.ats.entity.SubStatus;
-import com.troy.ats.entity.Submission;
+import com.troy.ats.entity.*;
 import com.troy.ats.enums.JobStatus;
 import com.troy.ats.enums.PipelineStage;
 import com.troy.ats.populator.CandidatePipelinePopulator;
 import com.troy.ats.populator.ReverseSubmissionPopulator;
 import com.troy.ats.populator.SubmissionPopulator;
 import com.troy.ats.repository.SubmissionRepository;
+import com.troy.ats.searchfilter.dto.SubmissionExportFilter;
 import com.troy.ats.searchfilter.dto.SubmissionFilter;
+import com.troy.ats.searchfilter.filter.JobSpecification;
 import com.troy.ats.searchfilter.filter.SubmissionSpecification;
 import com.troy.ats.service.SubmissionService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.formula.functions.T;
+import org.apache.poi.ss.usermodel.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.channels.Pipe;
@@ -33,6 +38,7 @@ import java.util.stream.Collectors;
 
 import static com.troy.ats.constants.CommonConstants.STATUS_APPLIED;
 import static com.troy.ats.constants.CommonConstants.SUBSTATUS_READY_FOR_SUBMISSION;
+import static com.troy.ats.util.CommonUtil.enumToStringFormat;
 import static com.troy.ats.util.CommonUtil.logActivity;
 
 @Slf4j
@@ -310,6 +316,103 @@ public class SubmissionServiceImpl implements SubmissionService {
         submissionFiltersDto.setApplicationStatusList(submissionStatuses);
 
         return submissionFiltersDto;
+    }
+
+    /**
+     *
+     * @param filter
+     * @return
+     * @throws IOException
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public byte[] exportSubmissions(SubmissionExportFilter filter) throws IOException {
+
+        Specification<Submission> specification = SubmissionSpecification.exportFilter(filter);
+
+        List<Submission> submissions = submissionRepository.findAll(specification, Sort.by(Sort.Direction.DESC, "createdAt"));
+
+        return createExcel(submissions);
+    }
+
+    private byte[] createExcel(List<Submission> submissions) throws IOException {
+
+        try (Workbook workbook = new HSSFWorkbook();
+             ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+
+            Sheet sheet = workbook.createSheet("Submissions");
+
+            // Header style
+            CellStyle headerStyle = workbook.createCellStyle();
+
+            Font headerFont = workbook.createFont();
+            headerFont.setBold(true);
+
+            headerStyle.setFont(headerFont);
+
+            // Header
+            Row header = sheet.createRow(0);
+
+            String[] columns = {
+                    "Client",
+                    "End Client",
+                    "Job Name",
+                    "BDM",
+                    "Priority",
+                    "CV Id",
+                    "Candidate",
+                    "Status",
+                    "Sub Status",
+                    "Created At",
+                    "Updated At"
+            };
+
+            for (int i = 0; i < columns.length; i++) {
+
+                Cell cell = header.createCell(i);
+                cell.setCellValue(columns[i]);
+                cell.setCellStyle(headerStyle);
+            }
+
+            // Data
+            int rowNum = 1;
+
+            for (Submission submission : submissions) {
+
+                Row row = sheet.createRow(rowNum++);
+                int col = 0;
+
+                row.createCell(col++).setCellValue(submission.getJob() != null ? submission.getJob().getClient() !=null ?safe(submission.getJob().getClient().getName()) : "" : "");
+                row.createCell(col++).setCellValue(submission.getJob() != null ? submission.getJob().getEndClient() !=null ?safe(submission.getJob().getEndClient().getName()) : "" : "");
+                row.createCell(col++).setCellValue(submission.getJob()!= null ? safe(submission.getJob().getTitle()) : "");
+                row.createCell(col++).setCellValue(submission.getJob() != null ? submission.getJob().getClient() !=null ?safe(submission.getJob().getClient().getSource()) : "" : "");
+                row.createCell(col++).setCellValue(submission.getJob()!= null ? safe(enumToStringFormat(submission.getJob().getPriority())) : "");
+                row.createCell(col++).setCellValue(submission.getCandidate()!= null ? safe(submission.getCandidate().getCvId()) : "");
+                row.createCell(col++).setCellValue(submission.getCandidate()!= null ? safe(submission.getCandidate().getFullName()) : "");
+                row.createCell(col++).setCellValue(submission.getStatus()!= null ? safe(submission.getStatus().getName()) : "");
+                row.createCell(col++).setCellValue(submission.getSubStatus()!= null ? safe(submission.getSubStatus().getName()) : "");
+                row.createCell(col++).setCellValue(submission.getCreatedAt() != null ? submission.getCreatedAt().toString() : "");
+                row.createCell(col++).setCellValue(submission.getUpdatedAt() != null ? submission.getUpdatedAt().toString() : "");
+
+            }
+
+            // Auto-size columns
+            for (int i = 0; i < columns.length; i++) {
+                sheet.autoSizeColumn(i);
+            }
+
+            workbook.write(outputStream);
+
+            return outputStream.toByteArray();
+        }
+    }
+
+    private String safe(String value) {
+        return value != null ? value : "";
+    }
+
+    private String value(String value) {
+        return value != null ? value : "";
     }
 
 }

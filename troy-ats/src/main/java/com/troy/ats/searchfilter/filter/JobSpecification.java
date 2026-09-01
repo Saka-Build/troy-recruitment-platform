@@ -91,6 +91,10 @@ public class JobSpecification {
             if (filter.getStatus() != null) {
                 predicates.add(cb.equal(root.get("status"), JobStatus.fromValue(filter.getStatus())));
             }
+            // priority
+            if (filter.getPriority() != null) {
+                predicates.add(cb.equal(cb.lower(root.get("priority")), filter.getPriority().toLowerCase(Locale.ROOT)));
+            }
 
             query.orderBy(cb.desc(root.get("createdAt")));
 

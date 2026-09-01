@@ -3,16 +3,20 @@ package com.troy.ats.controller;
 import com.troy.ats.dto.*;
 import com.troy.ats.entity.Submission;
 import com.troy.ats.exception.ApiResponse;
+import com.troy.ats.searchfilter.dto.SubmissionExportFilter;
 import com.troy.ats.searchfilter.dto.SubmissionFilter;
 import com.troy.ats.service.SubmissionService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -97,6 +101,16 @@ public class SubmissionController {
 
         submissionService.deleteSubmission(id);
         return ResponseEntity.ok(ApiResponse.success("Deleted successfully"));
+    }
+
+    @PostMapping("/export")
+    public ResponseEntity<byte[]> exportSubmissions(@RequestBody(required = false) SubmissionExportFilter filter) throws IOException {
+
+        byte[] excelFile = submissionService.exportSubmissions(filter);
+
+        return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=applications.xls")
+                .contentType(MediaType.parseMediaType("application/vnd.ms-excel"))
+                .body(excelFile);
     }
 
     @GetMapping("/pipeline")

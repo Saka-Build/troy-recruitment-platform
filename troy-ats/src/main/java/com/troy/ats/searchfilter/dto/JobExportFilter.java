@@ -11,6 +11,7 @@ public class JobExportFilter {
 
     private String countryCode;
     private String status;
+    private String priority;
     private LocalDateTime fromDate;
     private LocalDateTime toDate;
 }

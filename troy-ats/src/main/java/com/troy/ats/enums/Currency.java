@@ -11,6 +11,7 @@ public enum Currency {
     INR,
     PLN,
     EUR,
+    AED,
     CAD;
 
     @JsonCreator
