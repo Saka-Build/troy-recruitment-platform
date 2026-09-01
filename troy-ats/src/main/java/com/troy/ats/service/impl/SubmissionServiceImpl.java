@@ -5,6 +5,7 @@ import com.troy.ats.entity.ActivityLog;
 import com.troy.ats.entity.Status;
 import com.troy.ats.entity.SubStatus;
 import com.troy.ats.entity.Submission;
+import com.troy.ats.enums.JobStatus;
 import com.troy.ats.enums.PipelineStage;
 import com.troy.ats.populator.CandidatePipelinePopulator;
 import com.troy.ats.populator.ReverseSubmissionPopulator;
@@ -45,8 +46,10 @@ public class SubmissionServiceImpl implements SubmissionService {
     private final SessionServiceImpl sessionService;
     private final SubmissionPopulator submissionPopulator;
     private final ActivityLogServiceImpl activityLogService;
+    private final ClientServiceImpl clientService;
+    private final JobServiceImpl jobService;
 
-    public SubmissionServiceImpl(SubmissionRepository submissionRepository, CandidatePipelinePopulator candidatePipelinePopulator, ReverseSubmissionPopulator reverseSubmissionPopulator, SubmissionStatusServiceImpl submissionStatusService, SessionServiceImpl sessionService, SubmissionPopulator submissionPopulator, ActivityLogServiceImpl activityLogService) {
+    public SubmissionServiceImpl(SubmissionRepository submissionRepository, CandidatePipelinePopulator candidatePipelinePopulator, ReverseSubmissionPopulator reverseSubmissionPopulator, SubmissionStatusServiceImpl submissionStatusService, SessionServiceImpl sessionService, SubmissionPopulator submissionPopulator, ActivityLogServiceImpl activityLogService, ClientServiceImpl clientService, JobServiceImpl jobService) {
         this.submissionRepository = submissionRepository;
         this.candidatePipelinePopulator = candidatePipelinePopulator;
         this.reverseSubmissionPopulator = reverseSubmissionPopulator;
@@ -54,6 +57,8 @@ public class SubmissionServiceImpl implements SubmissionService {
         this.sessionService = sessionService;
         this.submissionPopulator = submissionPopulator;
         this.activityLogService = activityLogService;
+        this.clientService = clientService;
+        this.jobService = jobService;
     }
 
     @Override
@@ -270,6 +275,38 @@ public class SubmissionServiceImpl implements SubmissionService {
     @Override
     public List<Submission> findByStatus_NameIgnoreCaseAndSubStatus_NameIgnoreCase(String statusName, String subStatusName) {
         return submissionRepository.findByStatus_NameIgnoreCaseAndSubStatus_NameIgnoreCase(statusName,subStatusName);
+    }
+
+    /**
+     *
+     * @return
+     */
+    @Override
+    public SubmissionFiltersDto getSubmissionFilters() {
+
+        List<ClientsForSubmissionFiltersDto> clients = clientService.findByIsActive(Boolean.TRUE).stream().map(client -> {
+                                                ClientsForSubmissionFiltersDto clientDto = new ClientsForSubmissionFiltersDto();
+                                                clientDto.setId(client.getId());
+                                                clientDto.setName(client.getName());
+                                                return clientDto;
+                                            }).toList();
+
+        List<JobsForSubmissionFiltersDto> jobs = jobService.findByStatusIn(List.of(JobStatus.OPEN)).stream().map(job -> {
+                                            JobsForSubmissionFiltersDto jobsDto = new JobsForSubmissionFiltersDto();
+                                            jobsDto.setId(job.getId());
+                                            jobsDto.setName(job.getTitle());
+                                            return jobsDto;
+                                        }).toList();
+
+        SubmissionFiltersDto submissionFiltersDto = new SubmissionFiltersDto();
+
+        submissionFiltersDto.setTotalSubmittedApplications(getTotalCVSubmissionsByPipelineStage(PipelineStage.SUBMITTED));
+        submissionFiltersDto.setTotalSubmittedApplications(getTotalCVSubmissionsByPipelineStage(PipelineStage.INTERVIEW));
+        submissionFiltersDto.setTotalOnboardedApplications(getTotalCVSubmissionsByPipelineStage(PipelineStage.ONBOARDED));
+        submissionFiltersDto.setJobs(jobs);
+        submissionFiltersDto.setClients(clients);
+
+        return submissionFiltersDto;
     }
 
 }

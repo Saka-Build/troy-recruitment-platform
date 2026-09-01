@@ -228,10 +228,12 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         long totalEmployees = employeeRepository.count();
         long totalActiveEmployees = employeeRepository.countByIsActive(Boolean.TRUE);
+        long totalInActiveEmployees = employeeRepository.countByIsActive(Boolean.FALSE);
 
         EmployeesFiltersDto employeesFiltersDto = new EmployeesFiltersDto();
         employeesFiltersDto.setTotalEmployees(totalEmployees);
         employeesFiltersDto.setTotalActiveEmployees(totalActiveEmployees);
+        employeesFiltersDto.setTotalInActiveEmployees(totalInActiveEmployees);
 
         return employeesFiltersDto;
 

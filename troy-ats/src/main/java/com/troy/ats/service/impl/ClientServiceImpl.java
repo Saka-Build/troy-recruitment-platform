@@ -169,15 +169,28 @@ public class ClientServiceImpl implements ClientService {
     @Override
     public ClientsFiltersDto getClientFilters() {
 
+        long totalClients = clientRepository.count();
         long totalActiveClients = clientRepository.countByIsActive(Boolean.TRUE);
         long totalInActiveClients = clientRepository.countByIsActive(Boolean.FALSE);
 
         ClientsFiltersDto clientsFiltersDto = new ClientsFiltersDto();
+        clientsFiltersDto.setTotalClients(totalClients);
         clientsFiltersDto.setTotalActiveClients(totalActiveClients);
         clientsFiltersDto.setTotalInActiveClients(totalInActiveClients);
 
         return clientsFiltersDto;
 
+    }
+
+    /**
+     *
+     * @param active
+     * @return
+     */
+    @Override
+    public List<Client> findByIsActive(boolean active) {
+
+        return clientRepository.findByIsActive(active);
     }
 
     private byte[] createExcel(List<Client> clients) throws IOException {

@@ -10,6 +10,7 @@ public record SubmissionFilter(
         String subStatusName,
         UUID candidateId,
         UUID jobId,
+        UUID clientId,
         OffsetDateTime createdFrom,
         OffsetDateTime createdTo
 ) {

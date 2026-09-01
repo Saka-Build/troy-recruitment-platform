@@ -57,6 +57,10 @@ public class SubmissionSpecification {
             if (filter.jobId() != null) {
                 predicates.add(cb.equal(root.get("job").get("id"), filter.jobId()));
             }
+            // client
+            if (filter.clientId() != null) {
+                predicates.add(cb.equal(root.get("job").get("client").get("id"), filter.clientId()));
+            }
 
             // Created from
             if (filter.createdFrom() != null) {

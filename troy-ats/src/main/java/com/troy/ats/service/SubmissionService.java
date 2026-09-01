@@ -112,4 +112,10 @@ public interface SubmissionService {
      */
     List<Submission> findByStatus_NameIgnoreCaseAndSubStatus_NameIgnoreCase(String statusName, String subStatusName);
 
+    /**
+     *
+     * @return
+     */
+    SubmissionFiltersDto getSubmissionFilters();
+
 }
