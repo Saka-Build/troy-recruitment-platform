@@ -121,4 +121,11 @@ public interface JobService {
      * @return
      */
     JobsFiltersDto getJobFilters();
+
+    /**
+     *
+     * @param statuses
+     * @return
+     */
+    List<Job> findByStatusIn(List<JobStatus> statuses);
 }

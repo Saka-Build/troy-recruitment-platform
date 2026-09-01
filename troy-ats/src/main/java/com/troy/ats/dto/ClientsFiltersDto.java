@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ClientsFiltersDto {
 
+    long totalClients;
     long totalActiveClients;
     long totalInActiveClients;
 

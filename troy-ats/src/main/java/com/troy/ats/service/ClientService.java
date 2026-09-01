@@ -91,4 +91,11 @@ public interface ClientService {
      * @return
      */
     ClientsFiltersDto getClientFilters();
+
+    /**
+     *
+     * @param active
+     * @return
+     */
+    List<Client> findByIsActive(boolean active);
 }

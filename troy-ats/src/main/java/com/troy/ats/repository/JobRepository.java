@@ -1,6 +1,5 @@
 package com.troy.ats.repository;
 
-import com.troy.ats.entity.Candidate;
 import com.troy.ats.entity.Job;
 import com.troy.ats.enums.JobStatus;
 import org.springframework.data.domain.Page;
@@ -11,6 +10,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -18,6 +18,8 @@ public interface JobRepository extends JpaRepository<Job, UUID>, JpaSpecificatio
 
     long countByStatus(JobStatus status);
     long countByPriority(String priority);
+
+    List<Job> findByStatusIn(List<JobStatus> statuses);
 
     @Override
     @EntityGraph(attributePaths = {

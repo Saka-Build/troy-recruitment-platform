@@ -5,17 +5,14 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import java.util.UUID;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class JobsFiltersDto {
+public class JobsForSubmissionFiltersDto {
 
-    long totalJobs;
-    long totalOpenJobs;
-    long totalClosedJobs;
-    long totalOnHoldJobs;
-    List<String> statuses;
-    List<String> priorities;
+    UUID id;
+    String name;
 
 }

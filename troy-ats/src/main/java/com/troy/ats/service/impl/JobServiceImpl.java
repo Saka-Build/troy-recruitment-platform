@@ -6,6 +6,7 @@ import com.troy.ats.dto.JobDto;
 import com.troy.ats.dto.JobsFiltersDto;
 import com.troy.ats.entity.ActivityLog;
 import com.troy.ats.entity.Job;
+import com.troy.ats.enums.CandidateStatus;
 import com.troy.ats.enums.JobStatus;
 import com.troy.ats.populator.JobPopulator;
 import com.troy.ats.populator.ReverseJobPopulator;
@@ -34,8 +35,8 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.UUID;
 
-import static com.troy.ats.util.CommonUtil.getCode;
-import static com.troy.ats.util.CommonUtil.logActivity;
+import static com.troy.ats.util.CommonUtil.*;
+import static com.troy.ats.util.CommonUtil.enumToStringFormat;
 
 @Service("jobService")
 @RequiredArgsConstructor
@@ -219,16 +220,42 @@ public class JobServiceImpl implements JobService {
     @Override
     public JobsFiltersDto getJobFilters() {
 
+        long totalJobs = jobRepository.count();
        long totalOpenJobs = getTotalJobsByStatus(JobStatus.OPEN);
         long totalClosedJobs = getTotalJobsByStatus(JobStatus.CLOSED);
         long totalOnHoldJobs = getTotalJobsByStatus(JobStatus.ON_HOLD);
 
+        List<String> statuses = List.of(
+                enumToStringFormat(JobStatus.OPEN.name()),
+                enumToStringFormat(JobStatus.CLOSED.name()),
+                enumToStringFormat(JobStatus.ON_HOLD.name()),
+                enumToStringFormat(JobStatus.FILLED.name()),
+                enumToStringFormat(JobStatus.CANCELLED.name())
+        );
+
+        List<String> priorities = List.of("Low", "Medium", "High", "Urgent");
+
         JobsFiltersDto jobsFiltersDto = new JobsFiltersDto();
+        jobsFiltersDto.setTotalJobs(totalJobs);
         jobsFiltersDto.setTotalOpenJobs(totalOpenJobs);
         jobsFiltersDto.setTotalClosedJobs(totalClosedJobs);
         jobsFiltersDto.setTotalOnHoldJobs(totalOnHoldJobs);
+        jobsFiltersDto.setStatuses(statuses);
+        jobsFiltersDto.setPriorities(priorities);
 
         return jobsFiltersDto;
+    }
+
+    /**
+     *
+     * @param statuses
+     * @return
+     */
+    @Override
+    public List<Job> findByStatusIn(List<JobStatus> statuses) {
+
+        return jobRepository.findByStatusIn(statuses);
+
     }
 
     private byte[] createExcel(List<Job> jobs) throws IOException {

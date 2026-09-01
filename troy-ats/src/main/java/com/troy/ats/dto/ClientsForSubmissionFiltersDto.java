@@ -4,17 +4,14 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class EmployeesFiltersDto {
+public class ClientsForSubmissionFiltersDto {
 
-    long totalEmployees;
-    long totalActiveEmployees;
-    long totalInActiveEmployees;
+    UUID id;
+    String name;
 
 }
