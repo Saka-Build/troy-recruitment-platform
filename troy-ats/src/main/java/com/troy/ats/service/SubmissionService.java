@@ -3,12 +3,12 @@ package com.troy.ats.service;
 import com.troy.ats.dto.*;
 import com.troy.ats.entity.Submission;
 import com.troy.ats.enums.PipelineStage;
-import com.troy.ats.searchfilter.dto.ClientFilter;
+import com.troy.ats.searchfilter.dto.SubmissionExportFilter;
 import com.troy.ats.searchfilter.dto.SubmissionFilter;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.repository.query.Param;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
@@ -117,5 +117,13 @@ public interface SubmissionService {
      * @return
      */
     SubmissionFiltersDto getSubmissionFilters();
+
+    /**
+     *
+     * @param filter
+     * @return
+     * @throws IOException
+     */
+    byte[] exportSubmissions(SubmissionExportFilter filter) throws IOException;
 
 }

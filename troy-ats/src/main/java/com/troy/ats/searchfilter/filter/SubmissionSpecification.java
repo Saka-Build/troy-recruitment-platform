@@ -2,6 +2,7 @@ package com.troy.ats.searchfilter.filter;
 
 import com.troy.ats.entity.Submission;
 import com.troy.ats.enums.PipelineStage;
+import com.troy.ats.searchfilter.dto.SubmissionExportFilter;
 import com.troy.ats.searchfilter.dto.SubmissionFilter;
 import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Predicate;
@@ -76,6 +77,39 @@ public class SubmissionSpecification {
             if (filter.createdTo() != null) {
 
                 predicates.add(cb.lessThanOrEqualTo(root.get("createdAt"), filter.createdTo()));
+            }
+
+            return cb.and(predicates.toArray(new Predicate[0]));
+        };
+    }
+
+    public static Specification<Submission> exportFilter(SubmissionExportFilter filter) {
+
+        return (root, query, cb) -> {
+
+            List<Predicate> predicates = new ArrayList<>();
+
+            // status id
+            if (filter.getStatusId() != null) {
+                predicates.add(cb.equal(root.get("status").get("id"), filter.getStatusId()));
+            }
+
+            // job
+            if (filter.getJobId() != null) {
+                predicates.add(cb.equal(root.get("job").get("id"), filter.getJobId()));
+            }
+            // client
+            if (filter.getClientId() != null) {
+                predicates.add(cb.equal(root.get("job").get("client").get("id"), filter.getClientId()));
+            }
+
+            // From date
+            if (filter.getCreatedFrom() != null) {
+                predicates.add(cb.greaterThanOrEqualTo(root.get("createdAt"), filter.getCreatedFrom()));
+            }
+            // To date
+            if (filter.getCreatedTo() != null) {
+                predicates.add(cb.lessThanOrEqualTo(root.get("createdAt"), filter.getCreatedTo()));
             }
 
             return cb.and(predicates.toArray(new Predicate[0]));

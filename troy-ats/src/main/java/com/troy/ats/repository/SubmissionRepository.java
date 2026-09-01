@@ -4,6 +4,7 @@ import com.troy.ats.entity.Submission;
 import com.troy.ats.enums.PipelineStage;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -31,6 +32,10 @@ public interface SubmissionRepository extends JpaRepository<Submission, UUID>, J
     @Override
     @EntityGraph(attributePaths = {"status", "subStatus"})
     Page<Submission> findAll(Specification<Submission> specification, Pageable pageable);
+
+    @Override
+    @EntityGraph(attributePaths = {"status", "subStatus"})
+    List<Submission> findAll(Specification<Submission> specification, Sort sort);
 
     @Query("""
     SELECT s.job.title
