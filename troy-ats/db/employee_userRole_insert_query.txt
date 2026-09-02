@@ -146,3 +146,64 @@ WHERE e.official_email = 'admin@troy.com'
 DO UPDATE SET
     active = TRUE,
            expires_at = NULL;
+
+======================================================================
+
+
+INSERT INTO role_permissions (
+    id,
+    role_id,
+    permission_id,
+    created_at
+)
+SELECT
+    gen_random_uuid(),
+    r.id,
+    p.id,
+    NOW()
+FROM roles r
+CROSS JOIN permissions p
+WHERE r.name = 'RECRUITER'
+  AND (
+      p.action = 'READ' AND p.module IN (
+              'JOB',
+			  'CLIENT'
+          )
+      OR (
+          p.action IN ('READ', 'WRITE', 'DELETE')
+          AND p.module IN (
+              'CANDIDATE',
+              'SUBMISSION',
+              'INTERVIEW'
+          )
+      )
+  )
+ON CONFLICT (role_id, permission_id) DO NOTHING;
+
+
+
+INSERT INTO role_permissions (
+    id,
+    role_id,
+    permission_id,
+    created_at
+)
+SELECT
+    gen_random_uuid(),
+    r.id,
+    p.id,
+    NOW()
+FROM roles r
+CROSS JOIN permissions p
+WHERE r.name = 'LEAD_RECRUITER'
+  AND (
+         p.action IN ('READ', 'WRITE', 'DELETE')
+          AND p.module IN (
+		  	  'JOB',
+			  'CLIENT',
+              'CANDIDATE',
+              'SUBMISSION',
+              'INTERVIEW'
+          )
+      )
+ON CONFLICT (role_id, permission_id) DO NOTHING;

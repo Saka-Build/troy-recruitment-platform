@@ -16,6 +16,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -35,11 +36,13 @@ public class EmployeeController {
     }
 
     @GetMapping(("/allEmployees"))
+    @PreAuthorize("hasAuthority('USER_READ')")
     public List<Employee> getAllEmployees() {
         return employeeService.getAllEmployees();
     }
 
     @GetMapping
+    @PreAuthorize("hasAuthority('USER_READ')")
     public ResponseEntity<Page<EmployeeDto>> getEmployees(@RequestParam(required = false) String search,
                                                            @RequestParam(required = false) Boolean active,
                                                            @RequestParam(required = false) String designation,
@@ -53,18 +56,21 @@ public class EmployeeController {
     }
 
     @GetMapping("/employeefilters")
+    @PreAuthorize("hasAuthority('USER_READ')")
     public ResponseEntity<EmployeesFiltersDto> getCandidateFilters() {
 
         return ResponseEntity.ok(employeeService.getEmployeeFilters());
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('USER_READ')")
     public ResponseEntity<EmployeeDto> getEmployeeById(@PathVariable UUID id) {
 
         return ResponseEntity.ok(employeeService.getEmployeeDtoById(id));
     }
 
     @GetMapping("email/{email}")
+    @PreAuthorize("hasAuthority('USER_READ')")
     public ResponseEntity<Employee> getEmployeeByEmail(@PathVariable String email) {
         return employeeService.getEmployeeByEmail(email)
                 .map(ResponseEntity::ok)
@@ -72,6 +78,7 @@ public class EmployeeController {
     }
 
     @PostMapping(value = "/create")
+    @PreAuthorize("hasAuthority('USER_WRITE')")
     public ResponseEntity<EmployeeDto> createEmployee(
             @RequestPart("employee") @Valid EmployeeCreateRequest request,
             @RequestPart(value = "photo", required = false) MultipartFile photo) {
@@ -83,6 +90,7 @@ public class EmployeeController {
     }
 
     @PutMapping(value = "/update/{employeeId}")
+    @PreAuthorize("hasAuthority('USER_WRITE')")
     public ResponseEntity<EmployeeDto> updateEmployee(
             @PathVariable UUID employeeId,
             @RequestPart("employee") @Valid EmployeeCreateRequest request,
@@ -94,6 +102,7 @@ public class EmployeeController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('USER_WRITE')")
     public Employee updateEmployee(
             @PathVariable UUID id,
             @RequestBody Employee employee
@@ -101,11 +110,13 @@ public class EmployeeController {
         return employeeService.updateEmployee(id, employee);
     }
     @DeleteMapping("/delete/{id}")
+    @PreAuthorize("hasAuthority('USER_DELETE')")
     public void deleteEmployee(@PathVariable UUID id) {
         employeeService.deleteEmployee(id);
     }
 
     @PostMapping("/export")
+    @PreAuthorize("hasAuthority('USER_READ')")
     public ResponseEntity<byte[]> exportEmployees(@RequestBody(required = false) EmployeeExportFilter filter) throws IOException {
 
         byte[] excelFile = employeeService.exportEmployees(filter);

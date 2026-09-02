@@ -17,6 +17,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -35,11 +36,13 @@ public class ClientController {
     }
 
     @GetMapping("/allClients")
+    @PreAuthorize("hasAuthority('CLIENT_READ')")
     public List<Client> getAllClients() {
         return clientService.getAllClients();
     }
 
     @GetMapping
+    @PreAuthorize("hasAuthority('CLIENT_READ')")
     public ResponseEntity<Page<ClientDto>> getClients(@RequestParam(required = false) String search,
                                                           @RequestParam(required = false) Boolean active,
                                                           @RequestParam(required = false) String status,
@@ -54,18 +57,21 @@ public class ClientController {
     }
 
     @GetMapping("/clientheader/clientfilters")
+    @PreAuthorize("hasAuthority('CLIENT_READ')")
     public ResponseEntity<ClientsFiltersDto> getClientFilters() {
 
         return ResponseEntity.ok(clientService.getClientFilters());
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('CLIENT_READ')")
     public ResponseEntity<ClientDto> getClientById(@PathVariable UUID id) {
 
         return ResponseEntity.ok(clientService.getClientDtoById(id));
     }
 
     @PostMapping("/create")
+    @PreAuthorize("hasAuthority('CLIENT_WRITE')")
     public ResponseEntity<ClientDto> createClient(
             @Valid @RequestBody ClientCreateRequest request) {
 
@@ -75,6 +81,7 @@ public class ClientController {
     }
 
     @PutMapping("/update/{clientId}")
+    @PreAuthorize("hasAuthority('CLIENT_WRITE')")
     public ResponseEntity<ClientDto> updateClient(
             @PathVariable UUID clientId,
             @RequestBody ClientCreateRequest request) {
@@ -86,12 +93,14 @@ public class ClientController {
 
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('CLIENT_WRITE')")
     public Client updateClient(@PathVariable UUID id, @RequestBody Client client) {
        // client.setId(id);
         return clientService.updateClient(id, client);
     }
 
     @DeleteMapping("delete/{id}")
+    @PreAuthorize("hasAuthority('CLIENT_DELETE')")
     public ResponseEntity<ApiResponse> deleteClient(@PathVariable UUID id) {
 
         clientService.deleteClient(id);
@@ -99,6 +108,7 @@ public class ClientController {
     }
 
     @PostMapping("/export")
+    @PreAuthorize("hasAuthority('CLIENT_READ')")
     public ResponseEntity<byte[]> exportClients(@RequestBody(required = false) ClientExportFilter filter) throws IOException {
 
         byte[] excelFile = clientService.exportClients(filter);

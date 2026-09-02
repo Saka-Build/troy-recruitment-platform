@@ -10,6 +10,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,7 +24,7 @@ public class RoleController {
     private final RoleService roleService;
 
     @PostMapping("/create")
-    //@PreAuthorize("hasAuthority('ROLE_WRITE')")
+    @PreAuthorize("hasAuthority('ROLE_WRITE')")
     public ResponseEntity<RoleResponseDto> createRole(
                                             @Valid @RequestBody RoleCreateRequest request) {
 
@@ -33,6 +34,7 @@ public class RoleController {
     }
 
     @PostMapping("/update/{id}")
+    @PreAuthorize("hasAuthority('ROLE_WRITE')")
     public ResponseEntity<RoleResponseDto> updateRole(@PathVariable UUID id,
                                                     @RequestBody RoleCreateRequest request) {
 
@@ -42,6 +44,7 @@ public class RoleController {
     }
 
     @DeleteMapping("/delete/{roleId}")
+    @PreAuthorize("hasAuthority('ROLE_DELETE')")
     public ResponseEntity<Void> deleteRole(
             @PathVariable UUID roleId) {
 
@@ -51,20 +54,21 @@ public class RoleController {
     }
 
     @GetMapping("/{id}")
-    //@PreAuthorize("hasAuthority('ROLE_READ')")
+    @PreAuthorize("hasAuthority('ROLE_READ')")
     public ResponseEntity<RoleResponseDto> getRoleById(@PathVariable UUID id) {
 
         return ResponseEntity.ok(roleService.getRoleDtoById(id));
     }
 
     @GetMapping
-    //@PreAuthorize("hasAuthority('ROLE_READ')")
+    @PreAuthorize("hasAuthority('ROLE_READ')")
     public ResponseEntity<List<RoleResponseDto>> getRoles() {
 
         return ResponseEntity.ok(roleService.getAllRoles());
     }
 
     @PostMapping("/employee/{employeeId}")
+    @PreAuthorize("hasAuthority('ROLE_WRITE')")
     public ResponseEntity<Void> assignRole(
                                         @PathVariable UUID employeeId,
                                         @RequestBody @Valid AssignRoleRequest request) {
@@ -75,6 +79,7 @@ public class RoleController {
     }
 
     @GetMapping("/employee/{employeeId}")
+    @PreAuthorize("hasAuthority('ROLE_READ')")
     public ResponseEntity<List<RoleResponseDto>> getRoles(
                                                 @PathVariable UUID employeeId) {
 
@@ -82,6 +87,7 @@ public class RoleController {
     }
 
     @DeleteMapping("/{roleId}/employee/{employeeId}")
+    @PreAuthorize("hasAuthority('ROLE_DELETE')")
     public ResponseEntity<Void> removeRole(
             @PathVariable UUID employeeId,
             @PathVariable UUID roleId) {
@@ -92,7 +98,7 @@ public class RoleController {
     }
 
     @GetMapping("/allRolesAndModules")
-    //@PreAuthorize("hasAuthority('ROLE_READ')")
+    @PreAuthorize("hasAuthority('ROLE_READ')")
     public ResponseEntity<RolesModulesListDto> getRolesModules() {
 
         return ResponseEntity.ok(roleService.getRolesModules());

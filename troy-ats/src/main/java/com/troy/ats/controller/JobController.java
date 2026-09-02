@@ -15,6 +15,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -33,11 +34,13 @@ public class JobController {
     }
 
     @GetMapping("/alljobs")
+
     public List<Job> getAllJobs() {
         return jobService.getAllJobs();
     }
 
     @GetMapping
+    @PreAuthorize("hasAuthority('JOB_READ')")
     public ResponseEntity<Page<JobDto>> getJobs(@RequestParam(required = false) String search,
                                                 @RequestParam(required = false) String countryCode,
                                                 @RequestParam(required = false) String status,
@@ -52,18 +55,21 @@ public class JobController {
     }
 
     @GetMapping("/jobheader/jobfilters")
+    @PreAuthorize("hasAuthority('JOB_READ')")
     public ResponseEntity<JobsFiltersDto> getJobFilters() {
 
         return ResponseEntity.ok(jobService.getJobFilters());
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('JOB_READ')")
     public ResponseEntity<JobDto> getJobById(@PathVariable UUID id) {
 
         return ResponseEntity.ok(jobService.getJobDtoById(id));
     }
 
     @PostMapping("/create")
+    @PreAuthorize("hasAuthority('JOB_WRITE')")
     public ResponseEntity<JobDto> createJob(@RequestBody JobCreateRequest request) {
 
         JobDto response = jobService.createJob(request);
@@ -74,6 +80,7 @@ public class JobController {
     }
 
     @PutMapping("/update/{jobId}")
+    @PreAuthorize("hasAuthority('JOB_WRITE')")
     public ResponseEntity<JobDto> updateJob(
             @PathVariable UUID jobId,
             @RequestBody JobCreateRequest request) {
@@ -84,12 +91,14 @@ public class JobController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('JOB_WRITE')")
     public Job updateJob(@PathVariable Long id, @RequestBody Job job) {
        // job.setId(id);
         return jobService.updateJob(id, job);
     }
 
     @DeleteMapping("delete/{id}")
+    @PreAuthorize("hasAuthority('JOB_DELETE')")
     public ResponseEntity<ApiResponse> deleteJob(@PathVariable UUID id) {
 
         jobService.deleteJob(id);
@@ -97,6 +106,7 @@ public class JobController {
     }
 
     @PostMapping("/export")
+    @PreAuthorize("hasAuthority('JOB_READ')")
     public ResponseEntity<byte[]> exportJobs(@RequestBody(required = false) JobExportFilter filter) throws IOException {
 
         byte[] excelFile = jobService.exportJobs(filter);

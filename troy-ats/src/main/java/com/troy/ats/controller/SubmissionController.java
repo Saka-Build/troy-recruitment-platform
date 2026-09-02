@@ -14,6 +14,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -32,11 +33,13 @@ public class SubmissionController {
     }
 
     @GetMapping("/allSubmissions")
+    @PreAuthorize("hasAuthority('SUBMISSION_READ')")
     public List<Submission> getAllSubmissions() {
         return submissionService.getAllSubmissions();
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('SUBMISSION_READ')")
     public ResponseEntity<SubmissionDto> getSubmissionById(@PathVariable UUID id) {
 
         return ResponseEntity.ok(submissionService.getSubmissionDtoById(id));
@@ -44,6 +47,7 @@ public class SubmissionController {
     }
 
     @GetMapping
+    @PreAuthorize("hasAuthority('SUBMISSION_READ')")
     public ResponseEntity<Page<SubmissionDto>> getSubmissions(@RequestParam(required = false) String search,
                                                       @RequestParam(required = false) String pipelineStage,
                                                       @RequestParam(required = false) UUID statusId,
@@ -62,24 +66,28 @@ public class SubmissionController {
     }
 
     @GetMapping("/header/submissionfilters")
+    @PreAuthorize("hasAuthority('SUBMISSION_READ')")
     public ResponseEntity<SubmissionFiltersDto> getSubmissionFilters() {
 
         return ResponseEntity.ok(submissionService.getSubmissionFilters());
     }
 
     @GetMapping("/allJobsName")
+    @PreAuthorize("hasAuthority('SUBMISSION_READ')")
     public List<String> getJobsNameByPipelineStage( @RequestParam(required = true) String pipelineStage) {
 
         return submissionService.findJobNamesByPipelineStage(pipelineStage);
     }
 
     @GetMapping("/submissionCounts")
+    @PreAuthorize("hasAuthority('SUBMISSION_READ')")
     public  ResponseEntity<CountSubmissionsByPipelineStageDto> submissionCountsByPipelines() {
 
         return ResponseEntity.ok(submissionService.submissionCountsByPipelines());
     }
 
     @PostMapping("/create")
+    @PreAuthorize("hasAuthority('SUBMISSION_WRITE')")
     public ResponseEntity<SubmissionDto> createSubmission(@RequestBody SubmissionCreateRequest request) {
 
         SubmissionDto response =  submissionService.createSubmission(request);
@@ -87,6 +95,7 @@ public class SubmissionController {
     }
 
     @PutMapping("/update/{submissionId}")
+    @PreAuthorize("hasAuthority('SUBMISSION_WRITE')")
     public ResponseEntity<SubmissionDto> updateSubmission(
             @PathVariable UUID submissionId,
             @RequestBody SubmissionCreateRequest request) {
@@ -97,6 +106,7 @@ public class SubmissionController {
     }
 
     @DeleteMapping("delete/{id}")
+    @PreAuthorize("hasAuthority('SUBMISSION_DELETE')")
     public ResponseEntity<ApiResponse> deleteSubmission(@PathVariable UUID id) {
 
         submissionService.deleteSubmission(id);
@@ -104,6 +114,7 @@ public class SubmissionController {
     }
 
     @PostMapping("/export")
+    @PreAuthorize("hasAuthority('SUBMISSION_READ')")
     public ResponseEntity<byte[]> exportSubmissions(@RequestBody(required = false) SubmissionExportFilter filter) throws IOException {
 
         byte[] excelFile = submissionService.exportSubmissions(filter);
@@ -114,6 +125,7 @@ public class SubmissionController {
     }
 
     @GetMapping("/pipeline")
+    @PreAuthorize("hasAuthority('SUBMISSION_READ')")
     public ResponseEntity<List<PipelineDto>> getCandidatePipelines() {
         List<PipelineDto> pipelines = submissionService.getCandidatePipelines();
         return ResponseEntity.ok(pipelines);

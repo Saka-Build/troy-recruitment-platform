@@ -43,6 +43,7 @@ public class CandidateController {
     }
 
     @GetMapping
+    @PreAuthorize("hasAuthority('CANDIDATE_READ')")
     public ResponseEntity<Page<CandidateDto>> getCandidates(@RequestParam(required = false) String search,
                                                              @RequestParam(required = false) String status,
                                                              @RequestParam(required = false) OffsetDateTime createdFrom,
@@ -55,30 +56,34 @@ public class CandidateController {
     }
 
     @GetMapping("/candidatefilters")
+    @PreAuthorize("hasAuthority('CANDIDATE_READ')")
     public ResponseEntity<CandidatesFiltersDto> getCandidateFilters() {
 
         return ResponseEntity.ok(candidateService.getCandidateFilters());
     }
 
     @GetMapping("/allcandidates")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasAuthority('CANDIDATE_READ')")
     public List<Candidate> getAllCandidates() {
 
         return candidateService.getAllCandidates();
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('CANDIDATE_READ')")
     public ResponseEntity<CandidateDto> getCandidateById(@PathVariable UUID id) {
 
         return ResponseEntity.ok(candidateService.getCandidateDtoById(id));
     }
 
     @PostMapping
+    @PreAuthorize("hasAuthority('CANDIDATE_WRITE')")
     public Candidate createCandidate(@RequestBody Candidate candidate) {
         return candidateService.createCandidate(candidate);
     }
 
     @PostMapping(value = "/create")
+    @PreAuthorize("hasAuthority('CANDIDATE_WRITE')")
     public ResponseEntity<CandidateDto> createCandidateWithCV(
             @RequestPart("candidate") CandidateCreateRequest candidate,
             @RequestPart(value = "original_cv_file", required = false) MultipartFile originalCVFile,
@@ -90,6 +95,7 @@ public class CandidateController {
     }
 
     @PutMapping("update/{candidateId}")
+    @PreAuthorize("hasAuthority('CANDIDATE_WRITE')")
     public ResponseEntity<CandidateDto> updateCandidate(
             @PathVariable UUID candidateId,
             @RequestPart("candidate") CandidateCreateRequest candidate,
@@ -103,6 +109,7 @@ public class CandidateController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('CANDIDATE_WRITE')")
     public Candidate updateCandidate(
             @PathVariable UUID id,
             @RequestBody Candidate candidate
@@ -111,11 +118,13 @@ public class CandidateController {
     }
 
     @DeleteMapping("/delete/{id}")
+    @PreAuthorize("hasAuthority('CANDIDATE_DELETE')")
     public void deleteCandidate(@PathVariable UUID id) {
         candidateService.deleteCandidate(id);
     }
 
     @GetMapping("/{candidateId}/download/cv/{cvType}")
+    @PreAuthorize("hasAuthority('CANDIDATE_READ')")
     public ResponseEntity<Resource> downloadCv(
             @PathVariable UUID candidateId, @PathVariable String cvType) {
 
@@ -144,6 +153,7 @@ public class CandidateController {
     }
 
     @PostMapping("/{id}/send/email/{emailType}")
+    @PreAuthorize("hasAuthority('CANDIDATE_READ')")
     public ResponseEntity<ApiResponse> sendCandidateEmail(
             @PathVariable UUID id,
             @PathVariable String emailType,
@@ -155,6 +165,7 @@ public class CandidateController {
     }
 
     @PostMapping("/export")
+    @PreAuthorize("hasAuthority('CANDIDATE_READ')")
     public ResponseEntity<byte[]> exportCandidates(
             @RequestBody CandidateExportRequest request)
             throws IOException {
