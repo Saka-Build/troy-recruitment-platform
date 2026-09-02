@@ -129,7 +129,6 @@ public class CandidateController {
      */
     @GetMapping("/{candidateId}/download/cv/{cvType}")
     @PreAuthorize("hasAuthority('CANDIDATE_READ')")
-    public ResponseEntity<Resource> downloadCv(
     public ResponseEntity<FileDownloadDto> downloadCv(
             @PathVariable UUID candidateId, @PathVariable String cvType) {
 
