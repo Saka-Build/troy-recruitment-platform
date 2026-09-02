@@ -34,7 +34,7 @@ public class JobController {
     }
 
     @GetMapping("/alljobs")
-
+    @PreAuthorize("hasAuthority('JOB_READ')")
     public List<Job> getAllJobs() {
         return jobService.getAllJobs();
     }
