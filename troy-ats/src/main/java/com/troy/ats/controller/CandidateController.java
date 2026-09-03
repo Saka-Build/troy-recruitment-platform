@@ -98,7 +98,7 @@ public class CandidateController {
     @PreAuthorize("hasAuthority('CANDIDATE_WRITE')")
     public ResponseEntity<CandidateDto> updateCandidate(
             @PathVariable UUID candidateId,
-            @RequestPart("candidate") CandidateCreateRequest candidate,
+            @RequestPart(value = "candidate", required = false) CandidateCreateRequest candidate,
             @RequestPart(value = "original_cv_file", required = false) MultipartFile originalCVFile,
             @RequestPart(value = "troy_cv_file", required = false) MultipartFile troyCVFile) {
 

@@ -28,6 +28,9 @@ public class ReverseCandidatePopulator {
 
     public void populate(CandidateCreateRequest source, Candidate target) {
 
+        if(Objects.isNull(source)){
+            return;
+        }
         List<ActivityLogRequest> activityLogs = new ArrayList<>();
         String entityType = target.getClass().getSimpleName().toLowerCase(Locale.ROOT);
         UUID entityId = target.getId();
