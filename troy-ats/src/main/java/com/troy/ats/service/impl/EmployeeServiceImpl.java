@@ -32,10 +32,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.time.format.DateTimeFormatter;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service("employeeService")
 @RequiredArgsConstructor
@@ -138,7 +135,10 @@ public class EmployeeServiceImpl implements EmployeeService {
         Employee employee = employeeRepository.findById(employeeId)
                 .orElseThrow(() -> new EntityNotFoundException("Employee not found: " + employeeId));
 
-        reverseEmployeePopulator.populate(request, employee);
+        if(Objects.nonNull(request)){
+            reverseEmployeePopulator.populate(request, employee);
+        }
+
         // Save employee first
         employee = employeeRepository.save(employee);
 

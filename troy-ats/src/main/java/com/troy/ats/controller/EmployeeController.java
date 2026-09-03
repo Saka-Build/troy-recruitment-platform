@@ -93,7 +93,7 @@ public class EmployeeController {
     @PreAuthorize("hasAuthority('USER_WRITE')")
     public ResponseEntity<EmployeeDto> updateEmployee(
             @PathVariable UUID employeeId,
-            @RequestPart("employee") @Valid EmployeeCreateRequest request,
+            @RequestPart(value = "employee", required = false) @Valid EmployeeCreateRequest request,
             @RequestPart(value = "photo", required = false) MultipartFile photo) {
 
         EmployeeDto employeeDto = employeeService.updateEmployee(employeeId,request, photo);

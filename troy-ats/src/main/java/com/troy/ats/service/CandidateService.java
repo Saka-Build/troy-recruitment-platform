@@ -183,8 +183,10 @@ public class CandidateService {
 
         Candidate candidate = candidateRepository.findById(candidateId)
                 .orElseThrow(() -> new EntityNotFoundException("Candidate not found: " + candidateId));
+        if(Objects.nonNull(request)){
+            reverseCandidatePopulator.populate(request, candidate);
+        }
 
-        reverseCandidatePopulator.populate(request, candidate);
         // Save candidate first
         candidate = candidateRepository.save(candidate);
 

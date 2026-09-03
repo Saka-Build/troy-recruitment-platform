@@ -20,6 +20,10 @@ public class ReverseEmployeePopulator {
 
     public void populate(EmployeeCreateRequest source, Employee target) {
 
+        if(Objects.isNull(source)){
+            return;
+        }
+
         if(Objects.nonNull(source.getEmployeeCode())){
             target.setEmployeeCode(source.getEmployeeCode());
         }
