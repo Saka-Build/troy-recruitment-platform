@@ -309,7 +309,7 @@ public class SubmissionServiceImpl implements SubmissionService {
         SubmissionFiltersDto submissionFiltersDto = new SubmissionFiltersDto();
 
         submissionFiltersDto.setTotalSubmittedApplications(getTotalCVSubmissionsByPipelineStage(PipelineStage.SUBMITTED));
-        submissionFiltersDto.setTotalSubmittedApplications(getTotalCVSubmissionsByPipelineStage(PipelineStage.INTERVIEW));
+        submissionFiltersDto.setTotalInterviewApplications(getTotalCVSubmissionsByPipelineStage(PipelineStage.INTERVIEW));
         submissionFiltersDto.setTotalOnboardedApplications(getTotalCVSubmissionsByPipelineStage(PipelineStage.ONBOARDED));
         submissionFiltersDto.setJobs(jobs);
         submissionFiltersDto.setClients(clients);
