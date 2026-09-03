@@ -6,6 +6,7 @@ import com.troy.ats.searchfilter.dto.SubmissionExportFilter;
 import com.troy.ats.searchfilter.dto.SubmissionFilter;
 import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Predicate;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.util.ArrayList;
@@ -44,8 +45,13 @@ public class SubmissionSpecification {
             }
             //status id
             if (filter.statusId() != null) {
-                predicates.add(cb.equal(root.get("status").get("id"), filter.statusId()));
+                predicates.add(cb.equal(root.get("status").get("id"), filter.statusIds()));
             }
+            //Multi status ids
+            if (CollectionUtils.isNotEmpty(filter.statusIds())) {
+                predicates.add(root.get("status").get("id").in(filter.statusIds()));
+            }
+
             //status name
             if (filter.statusName() != null) {
                 predicates.add(cb.like(root.get("status").get("name"), filter.statusName()));
@@ -92,6 +98,10 @@ public class SubmissionSpecification {
             // status id
             if (filter.getStatusId() != null) {
                 predicates.add(cb.equal(root.get("status").get("id"), filter.getStatusId()));
+            }
+            //Multi status ids
+            if (CollectionUtils.isNotEmpty(filter.getStatusIds())) {
+                predicates.add(root.get("status").get("id").in(filter.getStatusIds()));
             }
 
             // job
