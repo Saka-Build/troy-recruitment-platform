@@ -7,6 +7,7 @@ import com.troy.ats.searchfilter.dto.CandidateFilter;
 import com.troy.ats.service.CandidateService;
 import com.troy.ats.service.FileStorageService;
 import com.troy.ats.util.CommonUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -31,6 +32,7 @@ import static com.troy.ats.constants.CommonConstants.CANDIDATE_CV_TYPE_TROY;
 
 @RestController
 @RequestMapping("/api/v1/candidates")
+@Slf4j
 public class CandidateController {
 
     private final CandidateService candidateService;
@@ -139,11 +141,23 @@ public class CandidateController {
         String cvKey = cvType.toLowerCase(Locale.ROOT).contains(CANDIDATE_CV_TYPE_TROY) ? candidate.getTroyCvUrl() : candidate.getOriginalCvUrl();
 
         if (Objects.isNull(cvKey) || cvKey.isBlank()) {
+            log.warn("CV download skipped - no {} CV held for candidateId={}", cvType, candidateId);
             return ResponseEntity.notFound().build();
         }
 
         String fileName = CommonUtil.getFileName(cvKey);
-        URL url = fileStorageService.presignedUrl(cvKey, fileName);
+
+        log.info("CV download requested - candidateId={} cvType={} key={}", candidateId, cvType, cvKey);
+
+        URL url;
+        try {
+            url = fileStorageService.presignedUrl(cvKey, fileName);
+            log.info("Pre signed URL"+ url);
+        } catch (RuntimeException e) {
+            log.error("CV download failed - could not presign url. candidateId={} cvType={} key={}",
+                    candidateId, cvType, cvKey, e);
+            throw e;
+        }
 
         return ResponseEntity.ok(new FileDownloadDto(
                 url.toString(), fileName, fileStorageService.getPresignTtlMinutes()));

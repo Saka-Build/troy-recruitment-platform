@@ -13,6 +13,7 @@ import com.troy.ats.searchfilter.filter.CandidateSpecification;
 import com.troy.ats.util.CommonUtil;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
 import org.springframework.data.domain.Page;
@@ -30,6 +31,7 @@ import static com.troy.ats.util.CommonUtil.*;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class CandidateService {
 
     private final CandidateRepository candidateRepository;
@@ -134,7 +136,14 @@ public class CandidateService {
         if (originalCVFile != null && !originalCVFile.isEmpty()) {
 
             CvFormat originalCVformat = CommonUtil.determineCvFormat(originalCVFile);
-            String originalCVFileUrl = fileStorageService.store(originalCVFile, candidate.getId(), Boolean.TRUE, Boolean.FALSE);
+            String originalCVFileUrl;
+            try {
+                originalCVFileUrl = fileStorageService.store(originalCVFile, candidate.getId(), Boolean.TRUE, Boolean.FALSE);
+            } catch (RuntimeException e) {
+                CandidateService.log.error("Original CV upload failed - candidateId={} fileName={}",
+                        candidate.getId(), originalCVFile.getOriginalFilename(), e);
+                throw e;
+            }
 
             candidate.setOriginalCvUrl(originalCVFileUrl);
             candidate.setOriginalCvFormat(originalCVformat);
@@ -149,7 +158,14 @@ public class CandidateService {
         if (troyCVFile != null && !troyCVFile.isEmpty()) {
 
             CvFormat troyCVformat = CommonUtil.determineCvFormat(troyCVFile);
-            String troyCVFileUrl = fileStorageService.store(troyCVFile, candidate.getId(), Boolean.FALSE, Boolean.FALSE);
+            String troyCVFileUrl;
+            try {
+                troyCVFileUrl = fileStorageService.store(troyCVFile, candidate.getId(), Boolean.FALSE, Boolean.FALSE);
+            } catch (RuntimeException e) {
+                CandidateService.log.error("Troy CV upload failed - candidateId={} fileName={}",
+                        candidate.getId(), troyCVFile.getOriginalFilename(), e);
+                throw e;
+            }
 
             candidate.setTroyCvUrl(troyCVFileUrl);
             candidateRepository.save(candidate);
@@ -200,10 +216,22 @@ public class CandidateService {
             // Delete old CV
             if (oldCvUrl != null && !oldCvUrl.isBlank()) {
 
-                fileStorageService.delete(oldCvUrl, Boolean.TRUE, Boolean.FALSE);
+                try {
+                    fileStorageService.delete(oldCvUrl, Boolean.TRUE, Boolean.FALSE);
+                } catch (RuntimeException e) {
+                    log.error("Original CV delete failed - candidateId={} key={}", candidate.getId(), oldCvUrl, e);
+                    throw e;
+                }
             }
             // Store new file
-            String originalCVFileUrl = fileStorageService.store(originalCVFile, candidate.getId(), Boolean.TRUE, Boolean.FALSE);
+            String originalCVFileUrl;
+            try {
+                originalCVFileUrl = fileStorageService.store(originalCVFile, candidate.getId(), Boolean.TRUE, Boolean.FALSE);
+            } catch (RuntimeException e) {
+                log.error("Original CV upload failed - candidateId={} fileName={}",
+                        candidate.getId(), originalCVFile.getOriginalFilename(), e);
+                throw e;
+            }
 
             candidate.setOriginalCvUrl(originalCVFileUrl);
             candidate.setOriginalCvFormat(originalCVformat);
@@ -225,10 +253,22 @@ public class CandidateService {
             // Delete old CV
             if (oldCvUrl != null && !oldCvUrl.isBlank()) {
 
-                fileStorageService.delete(oldCvUrl, Boolean.FALSE, Boolean.FALSE);
+                try {
+                    fileStorageService.delete(oldCvUrl, Boolean.FALSE, Boolean.FALSE);
+                } catch (RuntimeException e) {
+                    log.error("Troy CV delete failed - candidateId={} key={}", candidate.getId(), oldCvUrl, e);
+                    throw e;
+                }
             }
             // Store new file
-            String troyCVFileUrl = fileStorageService.store(troyCVFile, candidate.getId(), Boolean.FALSE, Boolean.FALSE);
+            String troyCVFileUrl;
+            try {
+                troyCVFileUrl = fileStorageService.store(troyCVFile, candidate.getId(), Boolean.FALSE, Boolean.FALSE);
+            } catch (RuntimeException e) {
+                log.error("Troy CV upload failed - candidateId={} fileName={}",
+                        candidate.getId(), troyCVFile.getOriginalFilename(), e);
+                throw e;
+            }
 
             candidate.setTroyCvUrl(troyCVFileUrl);
             candidateRepository.save(candidate);
