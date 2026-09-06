@@ -88,4 +88,16 @@ public class ActivityLogServiceImpl implements ActivityLogService {
 
         return activityLogRepository.saveAll(activityLogs);
     }
+
+    /**
+     *
+     * @param entityType
+     * @param action
+     * @param entityIds
+     * @return
+     */
+    @Override
+    public List<ActivityLog> findLatestByEntityTypeAndAction(String entityType, String action, List<UUID> entityIds) {
+        return activityLogRepository.findLatestByEntityTypeAndAction(entityType, action, entityIds);
+    }
 }

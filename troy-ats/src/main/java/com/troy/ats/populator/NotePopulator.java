@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
+import java.util.Objects;
 
 import static com.troy.ats.util.CommonUtil.convertInstantToLocalDate;
 
@@ -20,6 +21,9 @@ public class NotePopulator {
 
     public void populate(Note source, NoteDto target, SessionService sessionService) {
 
+        if(Objects.isNull(source)){
+            return;
+        }
         target.setEntityType(source.getEntityType());
         target.setEntityId(source.getEntityId());
         target.setContent(source.getContent());

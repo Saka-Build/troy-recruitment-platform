@@ -4,11 +4,14 @@ import com.troy.ats.entity.Employee;
 import com.troy.ats.service.EmployeeAuthorizationService;
 import com.troy.ats.service.EmployeeService;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -17,6 +20,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.util.UUID;
 
+@Slf4j
 @Component
 public class JwtAuthFilter extends OncePerRequestFilter {
 
@@ -82,18 +86,39 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             // 7. Store authentication
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
-            System.out.println(
-                    "Authenticated: " +
-                            SecurityContextHolder
-                                    .getContext()
-                                    .getAuthentication()
-                                    .isAuthenticated());
+            log.info("Authenticated: " + SecurityContextHolder.getContext().getAuthentication().isAuthenticated());
 
-        } catch (JwtException | IllegalArgumentException  e) {
+            chain.doFilter(request, response);
+
+        } catch (ExpiredJwtException e) {
 
             SecurityContextHolder.clearContext();
+
+            unauthorized(response, "JWT token has expired");
+
+        } catch (JwtException | IllegalArgumentException e) {
+
+            SecurityContextHolder.clearContext();
+
+            unauthorized(response, "Invalid JWT token");
         }
 
-        chain.doFilter(request, response);
+
     }
+
+    private void unauthorized(HttpServletResponse response, String message) throws IOException {
+
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+
+        response.getWriter().write("""
+                {
+                    "status": 401,
+                    "error": "Unauthorized",
+                    "message": "%s"
+                }
+                """.formatted(message));
+    }
+
 }

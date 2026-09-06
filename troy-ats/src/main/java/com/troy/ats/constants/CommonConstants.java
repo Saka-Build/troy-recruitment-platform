@@ -42,6 +42,8 @@ public final class CommonConstants {
     public static final String STATUS_APPLIED = "Applied";
     public static final String SUBSTATUS_READY_FOR_SUBMISSION = "Ready For Submission";
 
+    public static final String ACTIVITY_LOG_ACTION_STATUS_UPDATE = "Updated status";
+
     private CommonConstants() {
         // Prevent instantiation
     }

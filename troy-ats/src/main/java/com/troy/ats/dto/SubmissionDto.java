@@ -2,10 +2,9 @@ package com.troy.ats.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.UUID;
 
 @Data
@@ -30,6 +29,8 @@ public class SubmissionDto {
     private String pipelineStage;
     private UUID statusId;
     private String statusName;
+    private String statusUpdatedAt;
+    private String statusUpdatedBy;
     private UUID subStatusId;
     private String subStatusName;
     BigDecimal candidateExpectedAmount;
@@ -43,6 +44,7 @@ public class SubmissionDto {
     String offerPeriod;
     private String notes;
     private long historyCounts;
+    private NoteDto latestCandidateNote;
 
 
 }
