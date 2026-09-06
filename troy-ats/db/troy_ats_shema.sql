@@ -486,6 +486,7 @@ CREATE TABLE activity_log (
 CREATE INDEX idx_activity_entity       ON activity_log (entity_type, entity_id);
 CREATE INDEX idx_activity_performed_at ON activity_log (performed_at DESC);
 CREATE INDEX idx_activity_performed_by ON activity_log (performed_by);
+CREATE INDEX idx_activity_entity_action_performed ON activity_log (entity_type, action, entity_id,performed_at DESC);
 
 
 -- ============================================================
@@ -510,6 +511,7 @@ CREATE TABLE notes (
 CREATE INDEX idx_notes_entity    ON notes (entity_type, entity_id);
 CREATE INDEX idx_notes_is_pinned ON notes (is_pinned) WHERE is_pinned = TRUE;
 CREATE INDEX idx_notes_created_by ON notes (created_by);
+CREATE INDEX idx_notes_entity_created_at ON notes (entity_type, entity_id, created_at DESC);
 
 
 -- ============================================================

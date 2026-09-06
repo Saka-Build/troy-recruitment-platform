@@ -16,6 +16,10 @@ import java.util.UUID;
                         columnList = "entity_type, entity_id"
                 ),
                 @Index(
+                        name = "idx_activity_entity_action_performed",
+                        columnList = "entity_type, action, entity_id, performed_at"
+                ),
+                @Index(
                         name = "idx_activity_performed_at",
                         columnList = "performed_at"
                 ),

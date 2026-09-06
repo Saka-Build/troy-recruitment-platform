@@ -78,6 +78,14 @@ public interface SubmissionService {
 
     /**
      *
+     * @param filter
+     * @param pageable
+     * @return
+     */
+    Page<SubmissionDto> getSubmissionsForReport(SubmissionFilter filter, Pageable pageable);
+
+    /**
+     *
      * @param pipelineStage
      * @return
      */
