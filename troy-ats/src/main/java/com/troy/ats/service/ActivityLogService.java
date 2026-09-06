@@ -4,6 +4,7 @@ package com.troy.ats.service;
 import com.troy.ats.dto.ActivityLogDto;
 import com.troy.ats.entity.ActivityLog;
 import com.troy.ats.entity.Employee;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.UUID;
@@ -53,5 +54,14 @@ public interface ActivityLogService {
      * @return
      */
     List<ActivityLog> saveAll(List<ActivityLog> activityLogs);
+
+    /**
+     *
+     * @param entityType
+     * @param action
+     * @param entityIds
+     * @return
+     */
+    List<ActivityLog> findLatestByEntityTypeAndAction(String entityType, String action, List<UUID> entityIds);
 
 }

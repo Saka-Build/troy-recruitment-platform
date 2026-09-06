@@ -16,6 +16,10 @@ import java.util.UUID;
                         columnList = "entity_type, entity_id"
                 ),
                 @Index(
+                        name = "idx_notes_entity_created_at",
+                        columnList = "entity_type, entity_id, created_at"
+                ),
+                @Index(
                         name = "idx_notes_is_pinned",
                         columnList = "is_pinned"
                 )

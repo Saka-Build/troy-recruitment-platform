@@ -66,6 +66,26 @@ public class SubmissionController {
         return ResponseEntity.ok(submissionService.getSubmissions(filter, pageable));
     }
 
+    @GetMapping("/hopeListReport")
+    @PreAuthorize("hasAuthority('SUBMISSION_READ')")
+    public ResponseEntity<Page<SubmissionDto>> getSubmissionsForReport(@RequestParam(required = false) String search,
+                                                                      @RequestParam(required = false) String pipelineStage,
+                                                                      @RequestParam(required = false) UUID statusId,
+                                                                      @RequestParam(required = false) List<UUID> statusIds,
+                                                                      @RequestParam(required = false) String statusName,
+                                                                      @RequestParam(required = false) String subStatusName,
+                                                                      @RequestParam(required = false) UUID candidateId,
+                                                                      @RequestParam(required = false) UUID jobId,
+                                                                      @RequestParam(required = false) UUID clientId,
+                                                                      @RequestParam(required = false) OffsetDateTime createdFrom,
+                                                                      @RequestParam(required = false) OffsetDateTime createdTo,
+                                                                      @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+
+        SubmissionFilter filter = new SubmissionFilter(search, pipelineStage, statusId, statusIds, statusName, subStatusName, candidateId, jobId, clientId, createdFrom, createdTo);
+
+        return ResponseEntity.ok(submissionService.getSubmissionsForReport(filter, pageable));
+    }
+
     @GetMapping("/header/submissionfilters")
     @PreAuthorize("hasAuthority('SUBMISSION_READ')")
     public ResponseEntity<SubmissionFiltersDto> getSubmissionFilters() {

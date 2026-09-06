@@ -46,6 +46,18 @@ public class NoteServiceImpl implements NoteService {
         return noteDtoList;
     }
 
+    /**
+     *
+     * @param entityType
+     * @param entityIds
+     * @return
+     */
+    @Override
+    public List<Note> findLatestNotes(String entityType, List<UUID> entityIds) {
+        return noteRepository.findLatestNotes(entityType, entityIds);
+    }
+
+
     private void populateNote(NoteRequest request, Note note) {
 
         note.setEntityType(request.getEntityType().toLowerCase(Locale.ROOT));

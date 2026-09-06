@@ -49,6 +49,7 @@ public class JobDto {
     BigDecimal experienceMax;
     UUID ownerId;
     String ownerName;
+    String createdAt;
     List<EmployeeDto> assignedRecruiters;
 
     /*BigDecimal salaryMin;

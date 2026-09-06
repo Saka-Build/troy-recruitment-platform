@@ -5,20 +5,18 @@ import com.troy.ats.entity.*;
 import com.troy.ats.enums.JobStatus;
 import com.troy.ats.enums.PipelineStage;
 import com.troy.ats.populator.CandidatePipelinePopulator;
+import com.troy.ats.populator.NotePopulator;
 import com.troy.ats.populator.ReverseSubmissionPopulator;
 import com.troy.ats.populator.SubmissionPopulator;
 import com.troy.ats.repository.SubmissionRepository;
 import com.troy.ats.searchfilter.dto.SubmissionExportFilter;
 import com.troy.ats.searchfilter.dto.SubmissionFilter;
-import com.troy.ats.searchfilter.filter.JobSpecification;
 import com.troy.ats.searchfilter.filter.SubmissionSpecification;
 import com.troy.ats.service.SubmissionService;
 import jakarta.persistence.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.collections4.MapUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.formula.functions.T;
 import org.apache.poi.ss.usermodel.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -29,20 +27,20 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.nio.channels.Pipe;
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static com.troy.ats.constants.CommonConstants.ACTIVITY_LOG_ACTION_STATUS_UPDATE;
 import static com.troy.ats.constants.CommonConstants.STATUS_APPLIED;
-import static com.troy.ats.constants.CommonConstants.SUBSTATUS_READY_FOR_SUBMISSION;
-import static com.troy.ats.util.CommonUtil.enumToStringFormat;
-import static com.troy.ats.util.CommonUtil.logActivity;
+import static com.troy.ats.util.CommonUtil.*;
 
 @Slf4j
 @Service("submissionService")
+@RequiredArgsConstructor
 public class SubmissionServiceImpl implements SubmissionService {
 
     private final SubmissionRepository submissionRepository;
@@ -54,18 +52,11 @@ public class SubmissionServiceImpl implements SubmissionService {
     private final ActivityLogServiceImpl activityLogService;
     private final ClientServiceImpl clientService;
     private final JobServiceImpl jobService;
+    private final NoteServiceImpl noteService;
+    private final NotePopulator notePopulator;
 
-    public SubmissionServiceImpl(SubmissionRepository submissionRepository, CandidatePipelinePopulator candidatePipelinePopulator, ReverseSubmissionPopulator reverseSubmissionPopulator, SubmissionStatusServiceImpl submissionStatusService, SessionServiceImpl sessionService, SubmissionPopulator submissionPopulator, ActivityLogServiceImpl activityLogService, ClientServiceImpl clientService, JobServiceImpl jobService) {
-        this.submissionRepository = submissionRepository;
-        this.candidatePipelinePopulator = candidatePipelinePopulator;
-        this.reverseSubmissionPopulator = reverseSubmissionPopulator;
-        this.submissionStatusService = submissionStatusService;
-        this.sessionService = sessionService;
-        this.submissionPopulator = submissionPopulator;
-        this.activityLogService = activityLogService;
-        this.clientService = clientService;
-        this.jobService = jobService;
-    }
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy hh:mm a", Locale.ENGLISH);
+
 
     @Override
     @Transactional(readOnly = true)
@@ -214,6 +205,62 @@ public class SubmissionServiceImpl implements SubmissionService {
                     submissionPopulator.populate(submission, dto);
                     return dto;
                 });
+    }
+
+    /**
+     *
+     * @param filter
+     * @param pageable
+     * @return
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public Page<SubmissionDto> getSubmissionsForReport(SubmissionFilter filter, Pageable pageable) {
+
+        Page<Submission> submissionPage = submissionRepository.findAll(SubmissionSpecification.filter(filter), pageable);
+
+        if (submissionPage.isEmpty()) {
+            return Page.empty(pageable);
+        }
+
+        // Candidate IDs
+        List<UUID> candidateIds = submissionPage.stream().map(submission -> submission.getCandidate().getId()).distinct().toList();
+        // Submission IDs
+        List<UUID> submissionIds = submissionPage.stream().map(Submission::getId).toList();
+
+        // Latest candidate notes
+        String candidateType = Candidate.class.getSimpleName().toLowerCase(Locale.ROOT);
+        List<Note> candidateNotes = candidateIds.isEmpty() ? Collections.emptyList() : noteService.findLatestNotes(candidateType, candidateIds);
+        Map<UUID, Note> latestCandidateNoteMap = candidateNotes.stream().collect(Collectors.toMap(Note::getEntityId, Function.identity()));
+
+        // Latest "Updated status" activity
+        String submissionType = Submission.class.getSimpleName().toLowerCase(Locale.ROOT);
+        List<ActivityLog> statusActivities = submissionIds.isEmpty() ? Collections.emptyList() : activityLogService.findLatestByEntityTypeAndAction(submissionType, ACTIVITY_LOG_ACTION_STATUS_UPDATE, submissionIds);
+        Map<UUID, ActivityLog> latestStatusActivityMap = statusActivities.stream().collect(Collectors.toMap(ActivityLog::getEntityId, Function.identity()));
+
+        return submissionPage.map(submission -> {
+                                SubmissionDto dto = new SubmissionDto();
+                                submissionPopulator.populate(submission, dto);
+                                // Latest note content only
+                                UUID candidateId = submission.getCandidate().getId();
+                                Note latestCandidateNote = latestCandidateNoteMap.get(candidateId);
+                                if(Objects.nonNull(latestCandidateNote)){
+                                    NoteDto noteDto = new NoteDto();
+                                    notePopulator.populate(latestCandidateNote, noteDto, sessionService);
+                                    dto.setLatestCandidateNote(noteDto);
+                                }
+
+                                // Latest status update
+                                UUID submissionId = submission.getId();
+                                ActivityLog latestStatusActivity = latestStatusActivityMap.get(submissionId);
+                                if(Objects.nonNull(latestStatusActivity)){
+                                    dto.setStatusUpdatedBy(latestStatusActivity.getPerformedBy().getFullName());
+                                    LocalDateTime statusUpdatedAt= convertInstantToLocalDate(latestStatusActivity.getPerformedAt(), sessionService);
+                                    dto.setStatusUpdatedAt(statusUpdatedAt.format(formatter));
+                                }
+
+                                return dto;
+                            });
     }
 
     /**
