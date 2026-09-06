@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 import static com.troy.ats.util.CommonUtil.enumToStringFormat;
@@ -27,6 +28,8 @@ public class JobPopulator {
 
     private final EmployeeServiceImpl employeeService;
     private final EmployeePopulator employeePopulator;
+
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy hh:mm a", Locale.ENGLISH);
 
     public JobPopulator(EmployeeServiceImpl employeeService, EmployeePopulator employeePopulator) {
         this.employeeService = employeeService;
@@ -109,6 +112,8 @@ public class JobPopulator {
             target.setOwnerId(source.getOwner().getId());
             target.setOwnerName(source.getOwner().getFullName());
         }
+
+        target.setCreatedAt(source.getCreatedAt().format(formatter));
 
         populateAssignedRecruiters(source, target);
 
