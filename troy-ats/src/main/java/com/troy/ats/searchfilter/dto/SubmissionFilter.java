@@ -13,6 +13,7 @@ public record SubmissionFilter(
         String subStatusName,
         UUID candidateId,
         UUID jobId,
+        String jobStatus,
         UUID clientId,
         OffsetDateTime createdFrom,
         OffsetDateTime createdTo
