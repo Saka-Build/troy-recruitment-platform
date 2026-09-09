@@ -1,6 +1,7 @@
 package com.troy.ats.searchfilter.filter;
 
 import com.troy.ats.entity.Submission;
+import com.troy.ats.enums.JobStatus;
 import com.troy.ats.enums.PipelineStage;
 import com.troy.ats.searchfilter.dto.SubmissionExportFilter;
 import com.troy.ats.searchfilter.dto.SubmissionFilter;
@@ -68,6 +69,12 @@ public class SubmissionSpecification {
             if (filter.jobId() != null) {
                 predicates.add(cb.equal(root.get("job").get("id"), filter.jobId()));
             }
+            // job Status
+            if (filter.jobStatus() != null) {
+                predicates.add(cb.equal(root.get("job").get("status"), JobStatus.fromValue(filter.jobStatus())));
+            }
+
+
             // client
             if (filter.clientId() != null) {
                 predicates.add(cb.equal(root.get("job").get("client").get("id"), filter.clientId()));
