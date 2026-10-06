@@ -22,6 +22,7 @@ public class SubmissionDto {
     private String troyJobId;
     private String jobName;
     private String jobPriority;
+    private String jobStatus;
     private String clientName;
     private String endClientName;
     @JsonProperty("BDM")

@@ -34,6 +34,7 @@ public class SubmissionPopulator {
         target.setTroyJobId(source.getJob().getJobId());
         target.setJobName(source.getJob().getTitle());
         target.setJobPriority(enumToStringFormat(source.getJob().getPriority()));
+        target.setJobStatus(enumToStringFormat(source.getJob().getStatus().name()));
         target.setClientName(source.getJob().getClient().getName());
         target.setBdm(source.getJob().getClient().getSource());
         target.setEndClientName(source.getJob().getEndClient().getName());
