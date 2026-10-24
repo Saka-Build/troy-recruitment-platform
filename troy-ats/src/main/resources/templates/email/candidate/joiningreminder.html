@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Joining Reminder</title>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #f4f6f8;
+            font-family: Arial, Helvetica, sans-serif;
+            color: #333333;
+        }
+
+        .container {
+            width: 100%;
+            padding: 30px 0;
+        }
+
+        .email-box {
+            max-width: 650px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .header {
+            background-color: #1f4e79;
+            color: #ffffff;
+            padding: 25px 30px;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .content {
+            padding: 30px;
+            line-height: 1.6;
+        }
+
+        .candidate-info {
+            margin: 20px 0;
+            background-color: #f7f9fb;
+            border-left: 4px solid #1f4e79;
+            padding: 15px 20px;
+        }
+
+        .candidate-info p {
+            margin: 7px 0;
+        }
+
+        .label {
+            font-weight: bold;
+            color: #444444;
+        }
+
+        .joining-date {
+            color: #d35400;
+            font-weight: bold;
+        }
+
+        .footer {
+            padding: 20px 30px;
+            background-color: #f4f6f8;
+            font-size: 12px;
+            color: #777777;
+            text-align: center;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 12px 22px;
+            background-color: #1f4e79;
+            color: #ffffff !important;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="email-box">
+
+        <!-- Header -->
+        <div class="header">
+            <h1>Joining Reminder</h1>
+        </div>
+
+        <!-- Content -->
+        <div class="content">
+
+            <p>
+                Dear <strong th:text="${candidateName}">Candidate Name</strong>,
+            </p>
+
+            <p>
+                This is a friendly reminder regarding your upcoming joining with
+                <strong th:text="${companyName}">Company Name</strong>.
+            </p>
+
+            <div class="candidate-info">
+
+                <p>
+                    <span class="label">Candidate Name:</span>
+                    <span th:text="${candidateName}">John Doe</span>
+                </p>
+
+                <p>
+                    <span class="label">Position:</span>
+                    <span th:text="${designation}"></span>
+                </p>
+
+                <p>
+                    <span class="label">Company:</span>
+                    <span th:text="${companyName}"></span>
+                </p>
+
+                <p>
+                    <span class="label">Joining Date:</span>
+                    <span class="joining-date"
+                          th:text="${joiningDate}">
+                        25 August 2026
+                    </span>
+                </p>
+
+                <p th:if="${joiningTime != null}">
+                    <span class="label">Joining Time:</span>
+                    <span th:text="${joiningTime}">
+                        10:00 AM
+                    </span>
+                </p>
+
+                <p th:if="${joiningLocation != null}">
+                    <span class="label">Joining Location:</span>
+                    <span th:text="${joiningLocation}">
+                        Bangalore
+                    </span>
+                </p>
+
+            </div>
+
+            <p>
+                Please ensure that you are available on the above-mentioned
+                joining date and complete any pending documentation before
+                joining.
+            </p>
+
+            <p>
+                If you have any questions or require any assistance, please
+                contact our recruitment team.
+            </p>
+
+            <p>
+                We look forward to welcoming you to the team.
+            </p>
+
+            <p>
+                Best Regards,<br>
+                <strong th:text="${recruiterName}">Recruitment Team</strong><br>
+                <span th:text="${companyName}">Company Name</span>
+            </p>
+
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>
+                This is an automated email. Please do not reply directly to
+                this email.
+            </p>
+
+            <p th:if="${companyEmail != null}"
+               th:text="${companyEmail}">
+                hr@example.com
+            </p>
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

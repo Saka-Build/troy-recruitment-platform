@@ -1,0 +1,50 @@
+package com.troy.ats.constants;
+
+import com.troy.ats.entity.Interview;
+
+public final class CommonConstants {
+
+    public static final String CANDIDATE_STATUS_ACTIVE = "Active";
+    public static final String CANDIDATE_STATUS_INACTIVE= "InActive";
+    public static final String CANDIDATE_SUBSTATUS_BLACKLISTED = "Blacklisted";
+    public static final String SUBMISSION_STATUS_INTERVIEW = "Interview";
+    public static final String SUBMISSION_SUBSTATUS_L1FEEDBACK = "L1 Feedback Awaited";
+    public static final String SUBMISSION_SUBSTATUS_L2FEEDBACK = "L2 Feedback Awaited";
+    public static final String SUBMISSION_STATUS_SELECTED = "Selected";
+    public static final String SUBMISSION_STATUS_OFFER_RELEASED = "Offer Released";
+    public static final String SUBMISSION_SUBSTATUS_CANDIDATE_CONSENT_AWAITING = "Candidate Consent Awaited";
+    public static final String SUBMISSION_STATUS_READY_TO_SUBMIT = "Ready_to_Submit";
+    public static final String SUBMISSION_SUBSTATUS_CANDIDATE_CONF_AWAITING = "Candidate Confirmation Awaited";
+    public static final String JOB_PRIORITY_URGENT = "urgent";
+    public static final String STATUS_DROPDOWN = "statuses";
+    public static final String SUB_STATUS_DROPDOWN = "substatuses";
+    public static final String JOB_DROPDOWN = "jobs";
+    public static final String CANDIDATE_CV_TYPE_TROY = "troy";
+
+    public static final String EMAIL_TYPE_CV_REQUEST = "CV_REQUEST";
+    public static final String EMAIL_TYPE_INTERVIEW_INVITATION = "INTERVIEW_INVITATION";
+    public static final String EMAIL_TYPE_FOLLOW_UP = "FOLLOW_UP";
+    public static final String EMAIL_TYPE_OFFER = "OFFER";
+    public static final String EMAIL_TYPE_JOINING_REMINDER = "JOINING_REMINDER";
+
+    public static final String EMAIL_TYPE_CV_REQUEST_SUBJECT = "Please find the candidate CV attached for your review.";
+    public static final String EMAIL_TYPE_INTERVIEW_INVITATION_SUBJECT = "We would like to invite you for an interview.";
+    public static final String EMAIL_TYPE_FOLLOW_UP_SUBJECT = "Follow up";
+    public static final String EMAIL_TYPE_OFFER_SUBJECT = "Offer Letter";
+    public static final String EMAIL_TYPE_JOINING_REMINDER_SUBJECT = "Joining Reminder Letter";
+
+    public static final String EMAIL_TEMPLATE_VARIABLE_CANDIDATE_NAME = "candidateName";
+    public static final String EMAIL_TEMPLATE_VARIABLE_DESIGNATION = "designation";
+    public static final String EMAIL_TEMPLATE_VARIABLE_EXPERIENCE = "experience";
+    public static final String EMAIL_TEMPLATE_VARIABLE_LOCATION = "joiningLocation";
+    public static final String EMAIL_TEMPLATE_PATH = "email/candidate/joiningreminder";
+
+    public static final String STATUS_APPLIED = "Applied";
+    public static final String SUBSTATUS_READY_FOR_SUBMISSION = "Ready For Submission";
+
+    public static final String ACTIVITY_LOG_ACTION_STATUS_UPDATE = "Updated status";
+
+    private CommonConstants() {
+        // Prevent instantiation
+    }
+}

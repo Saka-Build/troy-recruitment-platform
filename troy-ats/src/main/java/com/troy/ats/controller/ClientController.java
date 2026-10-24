@@ -1,0 +1,121 @@
+package com.troy.ats.controller;
+
+import com.troy.ats.dto.ClientCreateRequest;
+import com.troy.ats.dto.ClientDto;
+import com.troy.ats.dto.ClientsFiltersDto;
+import com.troy.ats.entity.Client;
+import com.troy.ats.exception.ApiResponse;
+import com.troy.ats.searchfilter.dto.ClientExportFilter;
+import com.troy.ats.searchfilter.dto.ClientFilter;
+import com.troy.ats.service.ClientService;
+import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+
+import java.io.IOException;
+import java.time.OffsetDateTime;
+import java.util.List;
+import java.util.UUID;
+
+@RestController
+@RequestMapping("/api/v1/clients")
+public class ClientController {
+
+    private final ClientService clientService;
+
+    public ClientController(ClientService clientService) {
+        this.clientService = clientService;
+    }
+
+    @GetMapping("/allClients")
+    @PreAuthorize("hasAuthority('CLIENT_READ')")
+    public List<Client> getAllClients() {
+        return clientService.getAllClients();
+    }
+
+    @GetMapping
+    @PreAuthorize("hasAuthority('CLIENT_READ')")
+    public ResponseEntity<Page<ClientDto>> getClients(@RequestParam(required = false) String search,
+                                                          @RequestParam(required = false) Boolean active,
+                                                          @RequestParam(required = false) String status,
+                                                          @RequestParam(required = false) String countryCode,
+                                                          @RequestParam(required = false) OffsetDateTime createdFrom,
+                                                          @RequestParam(required = false) OffsetDateTime createdTo,
+                                                          @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+
+        ClientFilter filter = new ClientFilter(search, active, status, countryCode, createdFrom, createdTo);
+
+        return ResponseEntity.ok(clientService.getClients(filter, pageable));
+    }
+
+    @GetMapping("/clientheader/clientfilters")
+    @PreAuthorize("hasAuthority('CLIENT_READ')")
+    public ResponseEntity<ClientsFiltersDto> getClientFilters() {
+
+        return ResponseEntity.ok(clientService.getClientFilters());
+    }
+
+    @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('CLIENT_READ')")
+    public ResponseEntity<ClientDto> getClientById(@PathVariable UUID id) {
+
+        return ResponseEntity.ok(clientService.getClientDtoById(id));
+    }
+
+    @PostMapping("/create")
+    @PreAuthorize("hasAuthority('CLIENT_WRITE')")
+    public ResponseEntity<ClientDto> createClient(
+            @Valid @RequestBody ClientCreateRequest request) {
+
+        ClientDto response = clientService.createClient(request);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @PutMapping("/update/{clientId}")
+    @PreAuthorize("hasAuthority('CLIENT_WRITE')")
+    public ResponseEntity<ClientDto> updateClient(
+            @PathVariable UUID clientId,
+            @RequestBody ClientCreateRequest request) {
+
+        ClientDto clientDto = clientService.updateClient(clientId, request);
+
+        return ResponseEntity.ok(clientDto);
+    }
+
+
+    @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('CLIENT_WRITE')")
+    public Client updateClient(@PathVariable UUID id, @RequestBody Client client) {
+       // client.setId(id);
+        return clientService.updateClient(id, client);
+    }
+
+    @DeleteMapping("delete/{id}")
+    @PreAuthorize("hasAuthority('CLIENT_DELETE')")
+    public ResponseEntity<ApiResponse> deleteClient(@PathVariable UUID id) {
+
+        clientService.deleteClient(id);
+        return ResponseEntity.ok(ApiResponse.success("Deleted successfully"));
+    }
+
+    @PostMapping("/export")
+    @PreAuthorize("hasAuthority('CLIENT_READ')")
+    public ResponseEntity<byte[]> exportClients(@RequestBody(required = false) ClientExportFilter filter) throws IOException {
+
+        byte[] excelFile = clientService.exportClients(filter);
+
+        return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=clients.xls")
+                .contentType(MediaType.parseMediaType("application/vnd.ms-excel"))
+                .body(excelFile);
+    }
+
+}

@@ -1,0 +1,22 @@
+# Overrides only. Everything else is inherited from application.yaml,
+# which Spring loads first and this file layers on top of.
+
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: validate   # never let Hibernate mutate the prod schema
+
+# Only read under this profile - S3Config and S3FileStorageServiceImpl are
+# @Profile("prod"), and local dev uses the file.upload-*-dir paths instead.
+aws:
+  region: ap-south-1
+  s3:
+    bucket-name: troy-ats-uploads-prod
+    upload-original-cv-dir: upload/originalcv
+    upload-troy-cv-dir: upload/troycv
+    upload-photo-dir: upload/employee/photo
+
+logging:
+  level:
+    software.amazon.awssdk: INFO
+    software.amazon.awssdk.request: INFO
