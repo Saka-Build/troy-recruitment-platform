@@ -142,7 +142,8 @@ public class Candidate {
     @Column(name = "original_cv_format")
     private CvFormat originalCvFormat;
 
-    @Column(name = "troy_cv_url", columnDefinition = "text")
+    @Column(name = "troy_cv_url",
+            = "text")
     private String troyCvUrl;
 
     @Column(name = "troy_cv_pdf_url", columnDefinition = "text")

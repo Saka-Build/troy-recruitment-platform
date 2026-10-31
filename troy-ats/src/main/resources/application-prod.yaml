@@ -16,7 +16,42 @@ aws:
     upload-troy-cv-dir: upload/troycv
     upload-photo-dir: upload/employee/photo
 
+jwt:
+  secret: ${JWT_SECRET}
+  access-ttl-minutes: 60
+  refresh-ttl-days: 2
+
 logging:
   level:
     software.amazon.awssdk: INFO
     software.amazon.awssdk.request: INFO
+#Actuator health endpoint
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+  endpoint:
+    health:
+      show-details: always
+      show-components: always
+      probes:
+        enabled: true
+
+      group:
+        readiness:
+          include: readinessState,db,redis
+        liveliness:
+          include: livenessState
+
+  health:
+    db:
+      enabled: true
+
+
+info:
+  app:
+    name: Troy ATS
+    description: Applicant Tracking System
+    version: 3.4

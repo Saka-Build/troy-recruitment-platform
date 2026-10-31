@@ -22,7 +22,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
 
     public RefreshTokenServiceImpl(
             StringRedisTemplate redis,
-            @Value("${app.jwt.refresh-ttl-days:7}") long refreshTtlDays
+            @Value("${jwt.refresh-ttl-days:7}") long refreshTtlDays
     ) {
         this.redis = redis;
         this.refreshTtl = Duration.ofDays(refreshTtlDays);

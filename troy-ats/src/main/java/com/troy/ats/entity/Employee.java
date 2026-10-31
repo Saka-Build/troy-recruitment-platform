@@ -88,5 +88,8 @@ public class Employee {
     }
 
 
+    public UUID getId() {
+        return this.id;
+    }
 }
 

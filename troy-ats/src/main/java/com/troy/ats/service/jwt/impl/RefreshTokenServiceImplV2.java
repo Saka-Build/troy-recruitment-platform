@@ -22,7 +22,7 @@ public class RefreshTokenServiceImplV2 implements RefreshTokenService {
 
     public RefreshTokenServiceImplV2(
             RefreshTokenRepository repository,
-            @Value("${app.jwt.refresh-ttl-days:7}") long refreshTtlDays
+            @Value("${jwt.refresh-ttl-days:7}") long refreshTtlDays
     ) {
         this.repository = repository;
         this.refreshTtl = Duration.ofDays(refreshTtlDays);

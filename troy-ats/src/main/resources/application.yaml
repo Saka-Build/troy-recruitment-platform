@@ -32,6 +32,7 @@ spring:
     # explicitly - AuthController has no RefreshTokenService bean without it.
     group:
       prod: database
+      local: database
 
 
   datasource:
@@ -67,6 +68,11 @@ file:
   upload-troy-cv-dir: ${UPLOAD_TROY_CV_DIR:C:/work/Docs-Troy-ats/upload/troycv}
   upload-photo-dir: ${UPLOAD_PHOTO_DIR:C:/work/Docs-Troy-ats/upload/employee/photo}
 
+jwt:
+    secret: ${JWT_SECRET}
+    access-ttl-minutes: 30
+    refresh-ttl-days: 2
+
 logging:
   level:
     root: INFO
@@ -77,7 +83,35 @@ logging:
 app:
   logging:
     dir: ${LOG_DIR:logs}
-  jwt:
-    secret: ${JWT_SECRET}
-    access-ttl-minutes: 30
-    refresh-ttl-days: 2
+
+
+# Actuator health endpoint
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+  endpoint:
+    health:
+      show-details: always
+      show-components: always
+      probes:
+        enabled: true
+
+      group:
+        readiness:
+          include: readinessState,db,redis
+        liveliness:
+          include: livenessState
+
+  health:
+    db:
+      enabled: true
+
+
+info:
+  app:
+    name: Troy ATS
+    description: Applicant Tracking System
+    version: 3.4

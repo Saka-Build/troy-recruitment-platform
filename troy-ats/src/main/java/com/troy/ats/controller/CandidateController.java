@@ -147,7 +147,7 @@ public class CandidateController {
 
         String fileName = CommonUtil.getFileName(cvKey);
 
-        log.info("CV download requested - candidateId={} cvType={} key={}", candidateId, cvType, cvKey);
+        log.info("CV download requested ---> candidateId={} cvType={} key={}", candidateId, cvType, cvKey);
 
         URL url;
         try {

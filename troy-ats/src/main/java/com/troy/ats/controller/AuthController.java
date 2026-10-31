@@ -33,7 +33,7 @@ import java.util.UUID;
 @RequestMapping("/api/v1/auth")
 public class AuthController {
 
-    @Value("${app.jwt.access-ttl-minutes:60}")
+    @Value("${jwt.access-ttl-minutes:60}")
     private long accessTokenTtlMinutes;
 
     private static final int MAX_FAILED_ATTEMPTS = 5;

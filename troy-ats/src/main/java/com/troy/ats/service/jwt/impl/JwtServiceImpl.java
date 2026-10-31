@@ -6,11 +6,9 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
 import javax.crypto.SecretKey;
 import java.util.Date;
 import java.util.UUID;
-
 @Service
 public class JwtServiceImpl implements JwtService {
 
@@ -18,8 +16,8 @@ public class JwtServiceImpl implements JwtService {
     private final long accessTokenTtlMillis;
 
     public JwtServiceImpl(
-            @Value("${app.jwt.secret}") String secret,
-            @Value("${app.jwt.access-ttl-minutes:60}") long accessTtlMinutes
+            @Value("${jwt.secret}") String secret,
+            @Value("${jwt.access-ttl-minutes:60}") long accessTtlMinutes
     ) {
         // secret must be >= 256 bits for HS256. Load from env/secret manager, never hardcode.
         this.signingKey = Keys.hmacShaKeyFor(secret.getBytes());
