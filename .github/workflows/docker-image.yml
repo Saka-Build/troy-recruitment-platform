@@ -25,6 +25,7 @@ jobs:
 
       # 3. Build Spring Boot JAR
       - name: Build JAR
+         working-directory: ./troy-ats
         run: |
           chmod +x ./mvnw
           ./mvnw clean package -DskipTests
@@ -38,6 +39,7 @@ jobs:
 
       # 5. Build Docker image
       - name: Build Docker Image
+          working-directory: ./troy-ats
         run: |
           docker build \
             -t troyats/troy-ats:latest \
