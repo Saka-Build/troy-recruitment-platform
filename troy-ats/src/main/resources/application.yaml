@@ -86,6 +86,8 @@ app:
 
 
 # Actuator health endpoint--for Ci/CD
+
+# Actuator health endpoint
 management:
   endpoints:
     web:
@@ -96,26 +98,19 @@ management:
     health:
       show-details: always
       show-components: always
-      mail:
-        enabled: false
-      redis:
-        enabled: false
       probes:
         enabled: true
-
       group:
         readiness:
-          include: readinessState,db,redis
-        liveliness:
+          include: readinessState,db
+        liveness:
           include: livenessState
 
+  # Disable optional health indicators
   health:
+    mail:
+      enabled: false
+    redis:
+      enabled: false
     db:
       enabled: true
-
-
-info:
-  app:
-    name: Troy ATS
-    description: Applicant Tracking System
-    version: 3.4
