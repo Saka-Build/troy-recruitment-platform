@@ -85,7 +85,7 @@ app:
     dir: ${LOG_DIR:logs}
 
 
-# Actuator health endpoint
+# Actuator health endpoint--for Ci/CD
 management:
   endpoints:
     web:
