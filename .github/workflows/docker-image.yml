@@ -1,4 +1,3 @@
-
 name: Troy ATS - Build and Push Docker Image
 
 on:
@@ -25,10 +24,10 @@ jobs:
 
       # 3. Build Spring Boot JAR
       - name: Build JAR
+        working-directory: ./troy-ats
         run: |
           chmod +x ./mvnw
           ./mvnw clean package -DskipTests
-
       # 4. Login to Docker Hub
       - name: Login to Docker Hub
         uses: docker/login-action@v3
@@ -38,113 +37,20 @@ jobs:
 
       # 5. Build Docker image
       - name: Build Docker Image
+        working-directory: ./troy-ats
         run: |
           docker build \
             -t troyats/troy-ats:latest \
             -t troyats/troy-ats:${{ github.sha }} .
-
       # 6. Push Docker images
       - name: Push Docker Image
         run: |
           docker push troyats/troy-ats:latest
           docker push troyats/troy-ats:${{ github.sha }}
-
-      # 7. Deploy to EC2 with health check and rollback
-      - name: Deploy to EC2
-        uses: appleboy/ssh-action@v1.2.0
-        env:
-          IMAGE_TAG: ${{ github.sha }}
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USER }}
-          key: ${{ secrets.EC2_SSH_KEY }}
-          envs: IMAGE_TAG
-          command_timeout: 5m
-          script: |
-            set -eu
-
-            cd /home/ec2-user/apps/troy-ats
-
-            SERVICE="troy-ats"
-            COMPOSE_FILE="docker-compose.yml"
-            HEALTH_URL="http://localhost:8080/actuator/health"
-            NEW_IMAGE="troyats/troy-ats:${IMAGE_TAG}"
-
-            echo "Validating production configuration..."
-
-            test -f "$COMPOSE_FILE"
-            test -f ./config/troy-ats.env
-            mkdir -p ./logs
-            command -v curl >/dev/null
-            command -v docker >/dev/null
-
-            docker compose -f "$COMPOSE_FILE" config -q
-
-            echo "Saving current image for rollback..."
-
-            PREVIOUS_IMAGE=$(docker inspect -f '{{.Image}}' "$SERVICE")
-
-            test -n "$PREVIOUS_IMAGE"
-            docker image inspect "$PREVIOUS_IMAGE" >/dev/null
-
-            echo "Pulling new image: $NEW_IMAGE"
-            docker pull "$NEW_IMAGE"
-
-            echo "Deploying new version..."
-
-            IMAGE_TAG="$IMAGE_TAG" docker compose \
-              -f "$COMPOSE_FILE" up -d \
-              --no-deps --force-recreate "$SERVICE"
-
-            echo "Checking application health for up to 90 seconds..."
-
-            HEALTHY=0
-
-            for i in $(seq 1 30); do
-              if curl -sS --fail "$HEALTH_URL" 2>/dev/null \
-                | grep -q '"status"[[:space:]]*:[[:space:]]*"UP"'; then
-                HEALTHY=1
-                break
-              fi
-              sleep 3
-            done
-
-            if [ "$HEALTHY" -eq 1 ]; then
-              echo "Deployment successful."
-              docker compose -f "$COMPOSE_FILE" ps "$SERVICE"
-              docker logs --tail 50 "$SERVICE"
-              exit 0
-            fi
-
-            echo "Deployment health check failed."
-            docker logs --tail 100 "$SERVICE" || true
-
-            echo "Rolling back to previous image..."
-
-            docker tag "$PREVIOUS_IMAGE" troyats/troy-ats:rollback
-
-            IMAGE_TAG="rollback" docker compose \
-              -f "$COMPOSE_FILE" up -d \
-              --no-deps --force-recreate "$SERVICE"
-
-            echo "Checking rollback health..."
-
-            ROLLBACK_HEALTHY=0
-
-            for i in $(seq 1 30); do
-              if curl -sS --fail "$HEALTH_URL" 2>/dev/null \
-                | grep -q '"status"[[:space:]]*:[[:space:]]*"UP"'; then
-                ROLLBACK_HEALTHY=1
-                break
-              fi
-              sleep 3
-            done
-
-            if [ "$ROLLBACK_HEALTHY" -eq 1 ]; then
-              echo "Rollback successful. Previous version is healthy."
-            else
-              echo "CRITICAL: Rollback failed."
-              docker logs --tail 150 "$SERVICE" || true
-            fi
-
-            exit 1
+      # 7. Deployment status
+      - name: Build Summary
+        run: |
+          echo "Docker image successfully pushed."
+          echo "Latest: troyats/troy-ats:latest"
+          echo "Version: troyats/troy-ats:${{ github.sha }}"
+          echo "EC2 deployment not performed."
