@@ -36,12 +36,16 @@ management:
     health:
       show-details: always
       show-components: always
+      mail:
+        enabled: false
+      redis:
+        enabled: false
       probes:
         enabled: true
 
       group:
         readiness:
-          include: readinessState,db,redis
+          include: readinessState,db
         liveliness:
           include: livenessState
 
